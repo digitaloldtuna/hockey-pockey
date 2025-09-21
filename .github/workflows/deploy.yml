@@ -1,0 +1,77 @@
+name: Deploy to Hosting.com cPanel
+
+on:
+  push:
+    branches: [ main ]
+  pull_request:
+    branches: [ main ]
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v4
+      
+    - name: Set up Python
+      uses: actions/setup-python@v4
+      with:
+        python-version: '3.10'
+        
+    - name: Set up Node.js
+      uses: actions/setup-node@v4
+      with:
+        node-version: '18'
+        cache: 'npm'
+        cache-dependency-path: client/package-lock.json
+        
+    - name: Install Python dependencies
+      run: |
+        cd hockey
+        pip install -r requirements.txt
+        
+    - name: Install Node.js dependencies
+      run: |
+        cd client
+        npm ci
+        
+    - name: Build React app
+      run: |
+        cd client
+        npm run build
+        
+    - name: Collect Django static files
+      run: |
+        cd hockey
+        python manage.py collectstatic --noinput
+        
+    - name: Run Django tests
+      run: |
+        cd hockey
+        python manage.py test
+        
+    - name: Create deployment package
+      run: |
+        mkdir -p deploy
+        # Copy Django backend
+        cp -r hockey deploy/
+        # Copy React build
+        cp -r client/build deploy/client_build
+        # Copy deployment scripts
+        cp deploy-scripts/* deploy/ 2>/dev/null || true
+        # Create requirements.txt for production
+        cd hockey
+        pip freeze > ../deploy/requirements.txt
+        
+    - name: Upload build artifacts
+      uses: actions/upload-artifact@v4
+      with:
+        name: deployment-package
+        path: deploy/
+        
+    - name: Deploy to cPanel (if on main branch)
+      if: github.ref == 'refs/heads/main' && github.event_name == 'push'
+      run: |
+        echo "Deployment to cPanel would happen here"
+        echo "This step requires manual setup with cPanel credentials"
