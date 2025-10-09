@@ -8,7 +8,7 @@ const App: React.FC = () => {
   const [message, setMessage] = useState<string>('');
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/hello/`)
+    fetch(`${import.meta.env.VITE_API_URL}/healthcheck/`)
       .then((res) => res.json())
       .then((data: ApiResponse) => setMessage(data.message))
       .catch((error) => console.error('Error fetching message:', error));
