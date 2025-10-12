@@ -9,7 +9,7 @@ app.use('/hockey', express.static(path.join(__dirname, '../../client/build')));
 
 // API example
 app.get('/hockey/api/test', (req: Request, res: Response) => {
-  res.json({ message: 'API is working' });
+  res.json({ message: 'API is working!!' });
 });
 
 // // Catch-all for React Router (all routes under /hockey)

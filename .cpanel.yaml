@@ -1,0 +1,8 @@
+deployment:
+  tasks:
+    - echo "Activating Node.js environment"
+    - source /home/bossyold/nodevenv/hockey-pockey/server/20/bin/activate
+    - cd client && npm install && npm run build
+    - cd ../server && npm install && npm run build
+    - echo "Restarting Node app"
+    - touch /home/bossyold/nodejsapp/hockey-pockey/tmp/restart.txt
