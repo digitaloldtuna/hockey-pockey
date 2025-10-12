@@ -4,5 +4,6 @@ deployment:
     - echo "Activating Node.js environment"
     - source /home/bossyold/nodevenv/hockey-pockey/server/20/bin/activate
     - cd ~/hockey-pockey/server && npm install && npx tsc
+    - cp -r ~/hockey-pockey/client/build/* ~/public_html/hockey
     - echo "Restarting Node.js app"
     - npm --prefix /home/bossyold/hockey-pockey/server run restart

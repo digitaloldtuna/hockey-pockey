@@ -20,6 +20,7 @@ const SignupPage = () => {
 
   return (
     <div>
+      <h1>Welcome!</h1>
       <h2>Signup</h2>
       <input
         type="email"
