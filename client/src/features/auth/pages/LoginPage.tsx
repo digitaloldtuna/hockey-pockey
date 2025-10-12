@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import api from '../../../api';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../../constants/routes';
 
 const LoginPage = () => {
   console.log('in login page')
@@ -11,10 +12,10 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await api.post('/login', { email, password });
+      const res = await api.post('/auth/login', { email, password });
       localStorage.setItem('user', JSON.stringify(res.data.user));
       console.log('SUCCESSFULLY LOGGED IN', res.data.user);
-      navigate('/');
+      navigate(ROUTES.HOME);
     } catch (err: any) {
       alert(err.response?.data?.error || 'Login failed');
     }

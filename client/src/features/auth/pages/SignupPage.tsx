@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import api from '../../../api';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../../../constants/routes';
 
 const SignupPage = () => {
   const [email, setEmail] = useState('');
@@ -9,9 +10,9 @@ const SignupPage = () => {
 
   const handleSignup = async () => {
     try {
-      await api.post('/signup', { email, password });
+      await api.post('/auth/signup', { email, password });
       alert('Signup successful!');
-      navigate('/login');
+      navigate(ROUTES.LOGIN);
     } catch (err: any) {
       alert(err.response?.data?.error || 'Signup failed');
     }

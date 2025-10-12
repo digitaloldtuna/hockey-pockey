@@ -3,28 +3,38 @@ dotenv.config();
 
 import express, { Request, Response } from "express";
 import authRoutes from './routes/auth';
+import routes from './routes/index';
 import bodyParser from 'body-parser';
 import cors from 'cors';
+import rateLimit from 'express-rate-limit';
+import { verifyToken } from './middlewares/verifyToken';
 
 const path = require('path');
 const app = express();
 const PORT = process.env.PORT || 8080; 
 
-// Serve React build from client/build
+const isProduction = process.env.NODE_ENV === 'production';
+
+const corsOptions = {
+  origin: isProduction
+    ? process.env.CORS_ORIGIN_PROD
+    : process.env.CORS_ORIGIN_DEV,
+  credentials: true, // if you're using cookies
+};
+
+app.use(cors(corsOptions));
+
+const authLimiter = rateLimit({
+  windowMs: 15 * 60 * 1000, // 15 minutes
+  max: 10, // limit each IP to 10 requests per windowMs
+  message: 'Too many login/signup attempts. Please try again later.',
+});
+
 app.use('/hockey', express.static(path.join(__dirname, '../../client/build')));
 
-app.use(cors({
-  origin: 'http://localhost:3000', // frontend origin
-  credentials: true, // if you're using cookies
-}));
-
-// // API example
-// app.get('/hockey/api/test', (req: Request, res: Response) => {
-//   res.json({ message: 'API is working!!' });
-// });
-
-app.use(bodyParser.json());
-app.use('/hockey/api', authRoutes);
+app.use(bodyParser.json()); // what does this do?
+app.use('/hockey/auth', authRoutes, authLimiter);
+app.use('/hockey/api', verifyToken, routes);
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
