@@ -5,7 +5,7 @@ const app = express();
 const PORT = process.env.PORT || 8001;
 
 // Serve static React files
-app.use(express.static(path.join(__dirname, '../client/build')))
+app.use(express.static(path.join(__dirname, '../../client/build')))
 
 // API routes
 app.get('/api/test', (req, res) => {
@@ -14,7 +14,7 @@ app.get('/api/test', (req, res) => {
 
 // Serve React app for all other routes (SPA support)
 app.get('/', (req, res) => {
-  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+  res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
 });
 
 app.listen(PORT, () => {
