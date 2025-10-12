@@ -12,7 +12,7 @@ function App() {
       .catch(err => console.error('Error:', err));
   }, []);
 
-  return <div> Message: {message ? message : 'Loading...'}</div>;
+  return <div> Message (new update): {message ? message : 'Loading...'}</div>;
 }
 
 export default App;
