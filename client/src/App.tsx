@@ -1,20 +1,18 @@
 import React, { useEffect, useState } from 'react';
+import logo from './logo.svg';
+import './App.css';
 
-type ApiResponse = {
-  message: string;
-};
-
-const App: React.FC = () => {
-  const [message, setMessage] = useState<string>('');
+function App() {
+  const [message, setMessage] = useState('');
 
   useEffect(() => {
-    fetch(`${import.meta.env.VITE_API_URL}/healthcheck/`)
-      .then((res) => res.json())
-      .then((data: ApiResponse) => setMessage(data.message))
-      .catch((error) => console.error('Error fetching message:', error));
+    fetch('/api/test')
+      .then(res => res.json())
+      .then(data => setMessage(data.message))
+      .catch(err => console.error('Error:', err));
   }, []);
 
-  return <h1>test: {message}</h1>;
-};
+  return <div>{message ? message : 'Loading...'}</div>;
+}
 
 export default App;
