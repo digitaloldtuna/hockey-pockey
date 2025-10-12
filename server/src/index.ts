@@ -30,7 +30,11 @@ const authLimiter = rateLimit({
   message: 'Too many login/signup attempts. Please try again later.',
 });
 
+console.log('out here')
 app.use('/hockey', express.static(path.join(__dirname, '../../client/build')));
+app.get('/hockey/*splat', (req, res) => {
+  res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
+});
 
 app.use(bodyParser.json()); // what does this do?
 app.use('/hockey/auth', authRoutes, authLimiter);

@@ -1,4 +1,4 @@
-export const ROUTE_PREFIX = '/hockey';
+export const ROUTE_PREFIX = '';
 
 export const ROUTES = {
   LOGIN: `${ROUTE_PREFIX}/login`,
