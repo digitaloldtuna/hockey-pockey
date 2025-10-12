@@ -1,9 +1,14 @@
-// src/supabase.ts
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY! // NOT the anon key for backend
-);
+const supabaseUrl = process.env.SUPABASE_URL;
+const supabaseAnonKey = process.env.SUPABASE_ANON_KEY;
+const supabaseAdminKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
-export default supabase;
+if (!supabaseUrl || !supabaseAnonKey || !supabaseAdminKey) {
+  throw new Error(`Missing Supabase environment variables`);
+}
+
+const supabaseClient = createClient(supabaseUrl, supabaseAnonKey);
+const supabaseAdmin = createClient(supabaseUrl, supabaseAdminKey);
+
+export default { supabaseClient, supabaseAdmin };
