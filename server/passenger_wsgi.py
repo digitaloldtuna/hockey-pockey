@@ -2,7 +2,7 @@ import sys
 import os
 
 # Set project path
-PROJECT_PATH = '/repositories/hockey-pockey/server'
+PROJECT_PATH = '/home/bossyold/repositories/hockey-pockey/server'
 
 sys.path.insert(0, PROJECT_PATH)
 
