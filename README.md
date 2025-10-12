@@ -3,7 +3,10 @@
 code for the draft site
 
 ### how to run locally
-1. client-side: ``
+1. client-side: `npm run start`
+2. server-side: `npm run dev`
+
+**notes:** running the client-side script will update on change so that it is easy to see updates. For PROD, the pre-commit hook will run and build the FE, and in cPanel, the BE will host the build files.
 
 ### check deploy will work locally
 1. client-side
@@ -15,12 +18,9 @@ code for the draft site
 make sure it compiles and loads correctly
 
 ### deploying
-1. `ssh` into the cPanel terminal
-2. in `hockey-pockey` pull the changes
-3. `cd hockey-pockey/client && npm run build`
-4. `cd ../server && npx tsc`
-5. reload the Node.js app
+1. push changes, make sure FE build also gets pushed
+2. pull changes in cPanel dash
+3. double check changes in hosted app
 
-### to do list
-[ ] update FE fetch prefix to use `/hockey/api` so we don't manually have to add `/hockey`
-[ ] update BE to host all url at `/api` except for the main app
+### resources
+- NHL API: https://github.com/Zmalski/NHL-API-Reference
