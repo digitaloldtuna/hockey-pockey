@@ -1,18 +1,22 @@
+import path from 'path';
 import express from 'express';
 
 const app = express();
-const PORT = 8001;
+const PORT = process.env.PORT || 8001;
 
-// Middleware
-app.use(express.json());
+// Serve static React files
+app.use(express.static(path.join(__dirname, '../client/build')))
 
-// Basic test route
+// API routes
 app.get('/api/test', (req, res) => {
-  console.log('GET /api/test hit');
   res.json({ message: 'Backend is working!' });
 });
 
-// Start the server
-app.listen(PORT, '0.0.0.0', () => {
+// Serve React app for all other routes (SPA support)
+app.get('/', (req, res) => {
+  res.sendFile(path.join(__dirname, '../client/build', 'index.html'));
+});
+
+app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
