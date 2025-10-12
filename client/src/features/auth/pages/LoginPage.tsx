@@ -10,7 +10,7 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await api.post('/auth/login', { email, password });
+      const res = await api.post('/authentication/login', { email, password });
       localStorage.setItem('user', JSON.stringify(res.data.user));
       console.log('SUCCESSFULLY LOGGED IN', res.data.user);
       navigate(ROUTES.HOME);

@@ -10,7 +10,7 @@ const SignupPage = () => {
 
   const handleSignup = async () => {
     try {
-      await api.post('/auth/signup', { email, password });
+      await api.post('/authentication/signup', { email, password });
       alert('Signup successful!');
       navigate(ROUTES.LOGIN);
     } catch (err: any) {

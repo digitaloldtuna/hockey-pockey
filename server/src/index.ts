@@ -37,7 +37,7 @@ app.get('/hockey/*splat', (req, res) => {
 });
 
 app.use(bodyParser.json()); // what does this do?
-app.use('/hockey/auth', authRoutes, authLimiter);
+app.use('/hockey/api/authentication', authRoutes, authLimiter);
 app.use('/hockey/api', verifyToken, routes);
 
 app.listen(PORT, () => {
