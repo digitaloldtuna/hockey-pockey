@@ -12,11 +12,6 @@ app.get('/hockey/api/test', (req: Request, res: Response) => {
   res.json({ message: 'API is working!!' });
 });
 
-// // Catch-all for React Router (all routes under /hockey)
-// app.get('/hockey/*', (req: Request, res: Response) => {
-//   res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
-// });
-
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
