@@ -4,8 +4,6 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
 
 const LoginPage = () => {
-  console.log('in login page', api.defaults.baseURL, "test")
-
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const navigate = useNavigate();
