@@ -3,5 +3,4 @@ deployment:
   tasks:
     - echo "Activating Node.js environment"
     - source /home/bossyold/nodevenv/hockey-pockey/server/20/bin/activate
-    - cd ~/hockey-pockey/client && npm install && npm run build
     - cd ~/hockey-pockey/server && npm install && npx tsc
