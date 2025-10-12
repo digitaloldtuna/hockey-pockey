@@ -8,7 +8,7 @@ const PORT = process.env.PORT || 8080;
 app.use('/hockey', express.static(path.join(__dirname, '../../client/build')));
 
 // API example
-app.get('/api/test', (req: Request, res: Response) => {
+app.get('/hockey/api/test', (req: Request, res: Response) => {
   res.json({ message: 'API is working' });
 });
 
