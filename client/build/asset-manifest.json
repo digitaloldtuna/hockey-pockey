@@ -1,15 +1,15 @@
 {
   "files": {
     "main.css": "/hockey/static/css/main.f855e6bc.css",
-    "main.js": "/hockey/static/js/main.3c00e9d2.js",
+    "main.js": "/hockey/static/js/main.92b94cc3.js",
     "static/js/453.eb570f4f.chunk.js": "/hockey/static/js/453.eb570f4f.chunk.js",
     "index.html": "/hockey/index.html",
     "main.f855e6bc.css.map": "/hockey/static/css/main.f855e6bc.css.map",
-    "main.3c00e9d2.js.map": "/hockey/static/js/main.3c00e9d2.js.map",
+    "main.92b94cc3.js.map": "/hockey/static/js/main.92b94cc3.js.map",
     "453.eb570f4f.chunk.js.map": "/hockey/static/js/453.eb570f4f.chunk.js.map"
   },
   "entrypoints": [
     "static/css/main.f855e6bc.css",
-    "static/js/main.3c00e9d2.js"
+    "static/js/main.92b94cc3.js"
   ]
 }
