@@ -30,7 +30,10 @@ const authLimiter = rateLimit({
   message: 'Too many login/signup attempts. Please try again later.',
 });
 
-console.log('out here')
+app.get('/healthcheck', (req, res) => {
+  res.send('It works!');
+});
+
 app.use('/hockey', express.static(path.join(__dirname, '../../client/build')));
 app.get('/hockey/*splat', (req, res) => {
   res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
