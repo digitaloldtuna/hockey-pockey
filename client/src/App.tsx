@@ -9,7 +9,7 @@ import HomePage from './pages/HomePage';
 
 function App() {
   return (
-    <BrowserRouter basename="/hockey">
+    <BrowserRouter>
       <Routes>
         <Route path={ROUTES.HOME} element={<HomePage />} />
         <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
