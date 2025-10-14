@@ -6,6 +6,11 @@ const supabaseClient = supabase.supabaseClient;
 
 const router = express.Router();
 
+router.use((req, _res, next) => {
+  console.log('🔍 Incoming auth route:', req.method, req.path);
+  next();
+});
+
 router.post('/signup', async (req, res) => {
   const { email, password } = req.body;
 
@@ -25,10 +30,10 @@ router.post('/signup', async (req, res) => {
       return res.status(400).json({ error: error.message });
     }
 
-    res.status(201).json({ user: data.user });
+    return res.status(201).json({ user: data.user });
   } catch (err) {
     console.error('Signup error:', err);
-    res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: 'Internal server error' });
   }
 });
 
