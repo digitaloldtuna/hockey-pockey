@@ -1,6 +1,0 @@
----
-deployment:
-  tasks:
-    - echo "Activating Node.js environment"
-    - cd ~/hockey-pockey/server && npm install && npx tsc
-    - cp -r ~/hockey-pockey/client/build/* ~/public_html/hockey

@@ -22,6 +22,8 @@ const corsOptions = {
   credentials: true, // if you're using cookies
 };
 
+console.log('STARTING UP');
+
 app.use(cors(corsOptions));
 
 const authLimiter = rateLimit({
