@@ -14,6 +14,8 @@ const SignupPage = () => {
       await api.post('/authentication/signup', { email, password });
       alert('Signup successful!');
       navigate(ROUTES.LOGIN);
+
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(err.response?.data?.error || 'Signup failed');
     }

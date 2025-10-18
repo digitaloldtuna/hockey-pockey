@@ -11,6 +11,7 @@ async function checkSession() {
     }
     return null;
   } catch (e) {
+    console.debug('cannot find session:', e);
     return null;
   }
 }

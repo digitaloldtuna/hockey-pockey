@@ -48,6 +48,8 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   }
 
   if (!user) return res.status(401).json({ error: 'Invalid session' });
+
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   (req as any).user = user;
   next();
 };

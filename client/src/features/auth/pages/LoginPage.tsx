@@ -2,7 +2,7 @@ import { useState } from 'react';
 import api from '../../../api';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../../constants/routes';
-import { AbsoluteCenter, Box, Button, Heading, Input, Link, Text, VStack } from '@chakra-ui/react';
+import { AbsoluteCenter, Box, Button, Heading, Input, Link, VStack } from '@chakra-ui/react';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -14,6 +14,7 @@ const LoginPage = () => {
       const res = await api.post('/authentication/login', { email, password });
       console.log('SUCCESSFULLY LOGGED IN', res.data);
       navigate(ROUTES.HOME);
+      // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(err.response?.data?.error || 'Login failed');
     }
