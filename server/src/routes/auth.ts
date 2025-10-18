@@ -4,25 +4,40 @@ import { supabaseAdmin, supabaseClient } from '../supabase';
 const router = express.Router();
 
 router.post('/signup', async (req, res) => {
-  const { email, password } = req.body;
+  const { email, password, name } = req.body;
 
   // Basic validation
-  if (!email || !password) {
-    return res.status(400).json({ error: 'Email and password are required.' });
+  if (!email || !password || !name) {
+    return res.status(400).json({ error: 'Email, password, and name are required.' });
   }
 
   try {
-    const { data, error } = await supabaseAdmin.auth.admin.createUser({
+    const {
+      data: { user },
+      error: userError,
+    } = await supabaseAdmin.auth.admin.createUser({
       email,
       password,
       email_confirm: true, // Send confirmation email
     });
 
-    if (error) {
-      return res.status(400).json({ error: error.message });
+    if (userError) {
+      return res.status(400).json({ error: userError.message });
     }
 
-    return res.status(201).json({ user: data.user });
+    if (!user?.id) {
+      return res.status(400).json({ error: 'Error creating user.' });
+    }
+
+    const { data: profileData, error: profileError } = await supabaseAdmin
+      .from('profiles')
+      .insert([{ user: user.id, name }]);
+
+    if (profileError) {
+      return res.status(400).json({ error: profileError.message });
+    }
+
+    return res.status(201).json({ profile: profileData });
   } catch (err) {
     console.error('Signup error:', err);
     return res.status(500).json({ error: 'Internal server error' });
@@ -40,16 +55,16 @@ router.post('/login', async (req, res) => {
 
   res.cookie('access_token', data.session.access_token, {
     httpOnly: true,
-    secure: true, // use false if testing over HTTP
+    secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 7 * 1000, // 7 days
+    maxAge: 60 * 60 * 24 * 1000, // 7 days
   });
 
   res.json({ message: 'Logged in' });
 });
 
 router.get('/session', async (req, res) => {
-  const token = req.cookies?.get['access_token'];
+  const token = req.cookies?.access_token;
   if (!token) return res.status(401).json({ authenticated: false });
 
   const {
@@ -61,7 +76,7 @@ router.get('/session', async (req, res) => {
     return res.status(401).json({ authenticated: false });
   }
 
-  res.json({ authenticated: true, user });
+  res.json({ authenticated: true });
 });
 
 router.post('/logout', (req, res) => {

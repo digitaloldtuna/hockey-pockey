@@ -11,7 +11,13 @@ const LoginPage = () => {
 
   const handleLogin = async () => {
     try {
-      const res = await api.post('/authentication/login', { email, password });
+      const res = await api.post(
+        '/authentication/login',
+        { email, password },
+        {
+          withCredentials: true, // <-- important for cookies
+        }
+      );
       console.log('SUCCESSFULLY LOGGED IN', res.data);
       navigate(ROUTES.HOME);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any

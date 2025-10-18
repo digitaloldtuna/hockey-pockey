@@ -2,6 +2,7 @@
   "name": "client",
   "version": "0.1.0",
   "private": true,
+  "proxy": "http://localhost:8080/api",
   "dependencies": {
     "@chakra-ui/react": "^3.27.1",
     "@chakra-ui/styled-system": "^2.12.0",
