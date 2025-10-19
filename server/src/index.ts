@@ -30,7 +30,7 @@ app.use('/healthcheck', (req, res) => {
   return res.json({ message: 'It works!' });
 });
 app.use('/api/authentication', authRouter);
-app.use('/api/*splat', authenticate, router);
+app.use('/api', authenticate, router);
 
 // Serve frontend
 app.use(express.static(path.join(__dirname, '../../client/build')));

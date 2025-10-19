@@ -4,8 +4,8 @@ import { Request, Response, NextFunction } from 'express';
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   console.log('within authenticate');
 
-  let accessToken = req.cookies.get['access_token'];
-  const refreshToken = req.cookies.get['refresh_token'];
+  let accessToken = req.cookies.access_token;
+  const refreshToken = req.cookies.refresh_token;
 
   if (!accessToken && !refreshToken) {
     return res.status(401).json({ error: 'Not authenticated' });
@@ -49,7 +49,6 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
 
   if (!user) return res.status(401).json({ error: 'Invalid session' });
 
-  // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  (req as any).user = user;
+  req.user = user;
   next();
 };

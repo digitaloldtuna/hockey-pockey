@@ -1,10 +1,26 @@
+import api from '../api';
+import { AbsoluteCenter, Heading } from '@chakra-ui/react';
+import { useState } from 'react';
+import { Profile } from '../constants/types';
+
 const HomePage = () => {
-  const user = JSON.parse(localStorage.getItem('user') || '{}');
+  const [profile, setProfile] = useState<Profile | null>(null);
+
+  if (!profile) {
+    api
+      .get<{ profile: Profile }>('/profile')
+      .then((res) => {
+        setProfile(res.data.profile);
+      })
+      .catch((e) => console.debug('cannot find profile:', e));
+  }
 
   return (
-    <div>
-      <h2>Welcome, {user.email || 'User'}!</h2>
-    </div>
+    <AbsoluteCenter>
+      <Heading size="2xl">
+        <>Welcome, {profile?.name}!</>
+      </Heading>
+    </AbsoluteCenter>
   );
 };
 

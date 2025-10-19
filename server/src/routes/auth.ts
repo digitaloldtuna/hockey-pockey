@@ -53,11 +53,20 @@ router.post('/login', async (req, res) => {
     return res.status(401).json({ error: 'Invalid credentials' });
   }
 
-  res.cookie('access_token', data.session.access_token, {
+  const { access_token, refresh_token, expires_in } = data.session;
+
+  res.cookie('access_token', access_token, {
     httpOnly: true,
     secure: process.env.NODE_ENV === 'production',
     sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 1000, // 7 days
+    maxAge: expires_in * 1000, // expires_in is in seconds
+  });
+
+  res.cookie('refresh_token', refresh_token, {
+    httpOnly: true,
+    secure: process.env.NODE_ENV === 'production',
+    sameSite: 'lax',
+    maxAge: 60 * 60 * 24 * 30 * 1000, // 30 days
   });
 
   res.json({ message: 'Logged in' });

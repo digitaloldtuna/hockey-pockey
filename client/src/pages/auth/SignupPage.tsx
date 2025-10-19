@@ -1,28 +1,24 @@
 import { useState } from 'react';
-import api from '../../../api';
+import api from '../../api';
 import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../../constants/routes';
+import { ROUTES } from '../../constants/routes';
 import { AbsoluteCenter, Box, Button, Heading, Input, Link, VStack } from '@chakra-ui/react';
 
-const LoginPage = () => {
+const SignupPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const [name, setName] = useState('');
   const navigate = useNavigate();
 
-  const handleLogin = async () => {
+  const handleSignup = async () => {
     try {
-      const res = await api.post(
-        '/authentication/login',
-        { email, password },
-        {
-          withCredentials: true, // <-- important for cookies
-        }
-      );
-      console.log('SUCCESSFULLY LOGGED IN', res.data);
-      navigate(ROUTES.HOME);
+      await api.post('/authentication/signup', { email, password, name });
+      alert('Signup successful!');
+      navigate(ROUTES.LOGIN);
+
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Login failed');
+      alert(err.response?.data?.error || 'Signup failed');
     }
   };
 
@@ -30,7 +26,8 @@ const LoginPage = () => {
     <AbsoluteCenter>
       <Box p="10" backgroundColor={'whiteAlpha.100'} borderRadius={'2xl'}>
         <VStack>
-          <Heading size="lg">Login</Heading>
+          <Heading size="lg">Welcome!</Heading>
+          <Heading size="lg">Signup</Heading>
           <Input
             type="email"
             placeholder="Email"
@@ -43,12 +40,18 @@ const LoginPage = () => {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
           />
-          <Button onClick={handleLogin}>Log In</Button>
-          <Link href={ROUTES.SIGNUP}>Create an account!</Link>
+          <Input
+            type="name"
+            placeholder="Name"
+            value={name}
+            onChange={(e) => setName(e.target.value)}
+          />
+          <Button onClick={handleSignup}>Sign Up</Button>
+          <Link href={ROUTES.LOGIN}>Already have an account? Log in!</Link>
         </VStack>
       </Box>
     </AbsoluteCenter>
   );
 };
 
-export default LoginPage;
+export default SignupPage;
