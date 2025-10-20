@@ -10,8 +10,7 @@ async function checkSession() {
       return true;
     }
     return false;
-  } catch (e) {
-    console.debug('cannot find session:', e);
+  } catch {
     return false;
   }
 }

@@ -12,7 +12,7 @@ run `npm i` in client, server, and root
 
 ### deploying
 
-just push!
+remember to lint with `npm run lint:fix` and ensure that the prettier precommit runs, and then just push!
 
 ### getting into shell
 
