@@ -1,5 +1,5 @@
 import api from '../api';
-import { AbsoluteCenter, Heading } from '@chakra-ui/react';
+import { Heading, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import { Profile } from '../constants/types';
 
@@ -16,11 +16,11 @@ const HomePage = () => {
   }
 
   return (
-    <AbsoluteCenter>
+    <VStack>
       <Heading size="2xl">
         <>Welcome, {profile?.name}!</>
       </Heading>
-    </AbsoluteCenter>
+    </VStack>
   );
 };
 
