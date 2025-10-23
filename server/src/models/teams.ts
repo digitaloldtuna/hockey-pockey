@@ -1,4 +1,5 @@
 import { supabaseAdmin as supabase } from '../supabase';
+import { getTeamOwnershipsFromUser } from './team_ownerships';
 
 export interface Team {
   id: string;
@@ -15,13 +16,16 @@ export interface Team {
 export interface TeamOwnership {
   id: string;
   createdAt: Date;
-  userId: string;
-  teamId: string;
+  user: string;
+  team: string;
   season: number;
 }
 
 export const getTeamsForUser = async (userId: string): Promise<Team[]> => {
-  const { data, error } = await supabase.from('teams').select('*').eq('userId', userId);
+  const teamOwnerships = await getTeamOwnershipsFromUser(userId);
+  const teamIds = teamOwnerships.map((ownership) => ownership.teamId);
+
+  const { data, error } = await supabase.from('teams').select('*').in('id', teamIds);
   if (error || !data) {
     throw Error(`Error fetching teams: ${error}`);
   }
@@ -35,3 +39,5 @@ export const getTeamFromId = async (teamId: string): Promise<Team> => {
   }
   return data;
 };
+
+// export const getScoreForTeam = async

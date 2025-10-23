@@ -12,16 +12,16 @@ router.get('/profile', async (req, res) => {
     }
 
     const profile = await getProfileFromUserId(user.id);
-    res.json({ profile });
+    return res.json({ profile });
   } catch (e) {
-    res.json(401).json({ error: `Error: ${e}` });
+    return res.json(401).json({ error: `Error: ${e}` });
   }
 });
 
 router.get('/standings', async (req, res) => {
   const data = await getStandingsNow();
   console.log('standings:', data);
-  res.json(data.standings);
+  return res.json(data.standings);
 });
 
 export default router;

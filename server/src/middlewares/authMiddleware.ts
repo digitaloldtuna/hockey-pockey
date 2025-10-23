@@ -2,8 +2,6 @@ import { supabaseAdmin } from '../supabase';
 import { Request, Response, NextFunction } from 'express';
 
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
-  console.log('within authenticate');
-
   let accessToken = req.cookies.access_token;
   const refreshToken = req.cookies.refresh_token;
 

@@ -1,12 +1,14 @@
-import { UnprotectedComponent, ProtectedComponent, Provider } from './components';
+import { UnprotectedComponent, ProtectedComponent } from './components';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
 import { ROUTES } from './constants/routes';
 import { LoginPage, SignupPage, HomePage } from './pages';
+import { ChakraProvider } from '@chakra-ui/react';
+import { system } from './theme/theme';
 
 function App() {
   return (
-    <Provider>
+    <ChakraProvider value={system}>
       <BrowserRouter>
         <Routes>
           <Route
@@ -35,7 +37,7 @@ function App() {
           />
         </Routes>
       </BrowserRouter>
-    </Provider>
+    </ChakraProvider>
   );
 }
 

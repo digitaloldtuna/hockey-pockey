@@ -2,7 +2,7 @@ import { useState } from 'react';
 import api from '../../api';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import { AbsoluteCenter, Box, Button, Heading, Input, Link, VStack } from '@chakra-ui/react';
+import { AbsoluteCenter, Box, Button, Heading, Input, Link, Text, VStack } from '@chakra-ui/react';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
@@ -27,23 +27,29 @@ const LoginPage = () => {
 
   return (
     <AbsoluteCenter>
-      <Box p="10" backgroundColor={'whiteAlpha.100'} borderRadius={'2xl'}>
+      <Box p="10" borderRadius={'2xl'} backgroundColor="whiteAlpha.500">
         <VStack>
-          <Heading size="lg">Login</Heading>
+          <Text fontSize="5xl" lineHeight="0.75" fontWeight="bold" marginBottom="3">
+            hockey
+            <br />
+            pockey
+          </Text>
           <Input
             type="email"
             placeholder="Email"
             value={email}
             onChange={(e) => setEmail(e.target.value)}
+            backgroundColor="white"
           />
           <Input
             type="password"
             placeholder="Password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
+            backgroundColor="white"
           />
           <Button onClick={handleLogin}>Log In</Button>
-          <Link href={ROUTES.SIGNUP}>Create an account!</Link>
+          <Link href={ROUTES.SIGNUP}>create an account!</Link>
         </VStack>
       </Box>
     </AbsoluteCenter>

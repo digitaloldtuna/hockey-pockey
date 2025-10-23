@@ -6,7 +6,7 @@ export interface Profile {
   id: string;
   name: string;
   createdAt: Date;
-  userId: string;
+  user: string;
 }
 
 export const createProfile = async ({
@@ -20,7 +20,7 @@ export const createProfile = async ({
 }): Promise<Profile> => {
   const { data, error } = await supabase
     .from('profiles')
-    .insert([{ user_id: userId, name, email }])
+    .insert([{ user: userId, name, email }])
     .select()
     .single();
   if (error) {
@@ -37,12 +37,8 @@ export const getProfileFromId = async (id: string): Promise<Profile> => {
   return data;
 };
 
-export const getProfileFromUserId = async (user_id: string): Promise<Profile> => {
-  const { data, error } = await supabase
-    .from('profiles')
-    .select('*')
-    .eq('user_id', user_id)
-    .single();
+export const getProfileFromUserId = async (userId: string): Promise<Profile> => {
+  const { data, error } = await supabase.from('profiles').select('*').eq('user', userId).single();
   if (error) {
     throw Error(`Error fetching profile: ${error}`);
   }
@@ -63,12 +59,14 @@ export const selectTeam = async ({
   // check if user has already selected team
   const { data } = await supabase
     .from('team_ownership')
-    .select('userId, teamId')
-    .eq('userId', userId)
-    .eq('teamId', teamId);
+    .select('user, team')
+    .eq('user', userId)
+    .eq('team', teamId);
   if (data) {
     throw Error('User has already selected this team');
   }
 
-  await supabase.from('team_ownerships').insert([{ season: CURRENT_SEASON, userId, teamId }]);
+  await supabase
+    .from('team_ownerships')
+    .insert([{ season: CURRENT_SEASON, user: userId, team: teamId }]);
 };
