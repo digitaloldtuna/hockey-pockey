@@ -1,3 +1,9 @@
+export type Session = {
+  authenticated: boolean;
+  user?: User;
+  profile?: Profile;
+};
+
 export type Profile = {
   id: string;
   name: string;
@@ -10,4 +16,8 @@ export type Draft = {
   name: string;
   season: number;
   members?: Profile[];
+};
+
+export type User = {
+  email: string;
 };

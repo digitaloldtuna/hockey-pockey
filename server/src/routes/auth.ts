@@ -1,6 +1,6 @@
 import express from 'express';
-import { createProfile } from '../models/profiles';
-import { createUser, isUserAuthenticated, loginWithCredentials } from '../models/users';
+import { createProfile, getProfileFromUserId } from '../models/profiles';
+import { createUser, getUser, loginWithCredentials } from '../models/users';
 
 const router = express.Router();
 
@@ -49,12 +49,15 @@ router.get('/session', async (req, res) => {
   const token = req.cookies?.access_token;
   if (!token) return res.status(401).json({ authenticated: false });
 
-  const authenticated = await isUserAuthenticated(token);
-  if (!authenticated) {
+  let user, profile;
+  try {
+    user = await getUser(token);
+    profile = await getProfileFromUserId(user.id);
+  } catch (err) {
     return res.status(401).json({ authenticated: false });
   }
 
-  return res.json({ authenticated: true });
+  return res.json({ authenticated: true, user, profile });
 });
 
 router.post('/logout', (req, res) => {

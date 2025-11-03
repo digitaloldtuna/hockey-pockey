@@ -1,41 +1,30 @@
-import { UnprotectedComponent, ProtectedComponent } from './components';
 import { BrowserRouter, Route, Routes } from 'react-router-dom';
 import './App.css';
-import { ROUTES } from './constants/routes';
-import { LoginPage, SignupPage, HomePage } from './pages';
 import { ChakraProvider } from '@chakra-ui/react';
 import { system } from './theme/theme';
+import { AuthProvider } from './hooks/useAuthentication';
+import { UnprotectedRoute } from './components/UnprotectedRoute';
+import { HomePage, LoginPage, SignupPage } from './pages';
+import { ProtectedRoute } from './components/ProtectedRoute';
+import { ROUTES } from './constants/routes';
+import CreateDraft from './pages/draft/CreateDraft';
 
 function App() {
   return (
     <ChakraProvider value={system}>
       <BrowserRouter>
-        <Routes>
-          <Route
-            path={ROUTES.SIGNUP}
-            element={
-              <UnprotectedComponent>
-                <SignupPage />
-              </UnprotectedComponent>
-            }
-          />
-          <Route
-            path={ROUTES.LOGIN}
-            element={
-              <UnprotectedComponent>
-                <LoginPage />
-              </UnprotectedComponent>
-            }
-          />
-          <Route
-            path={ROUTES.HOME}
-            element={
-              <ProtectedComponent>
-                <HomePage />
-              </ProtectedComponent>
-            }
-          />
-        </Routes>
+        <AuthProvider>
+          <Routes>
+            <Route element={<UnprotectedRoute />}>
+              <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+              <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+            </Route>
+            <Route element={<ProtectedRoute />}>
+              <Route path={ROUTES.HOME} element={<HomePage />} />
+              <Route path={ROUTES.DRAFT.CREATE} element={<CreateDraft />} />
+            </Route>
+          </Routes>
+        </AuthProvider>
       </BrowserRouter>
     </ChakraProvider>
   );

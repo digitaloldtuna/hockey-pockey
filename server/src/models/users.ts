@@ -61,13 +61,18 @@ export const loginWithCredentials = async ({
   return data.session;
 };
 
-export const isUserAuthenticated = async (token: string): Promise<boolean> => {
+export const getUser = async (
+  token: string
+): Promise<{
+  id: string;
+  email?: string;
+}> => {
   const {
     data: { user },
     error,
   } = await supabaseClient.auth.getUser(token);
   if (error || !user) {
-    return false;
+    throw Error(`No user.`);
   }
-  return true;
+  return user;
 };

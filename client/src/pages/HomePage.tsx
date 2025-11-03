@@ -1,28 +1,16 @@
-import api from '../api';
 import { Avatar, AvatarGroup, Box, Button, Flex, Link, Text } from '@chakra-ui/react';
-import { useState } from 'react';
-import { Profile } from '../constants/types';
 import Layout from './Layout';
 import { Plus, UserPlus } from 'lucide-react';
+import { useAuthentication } from '../hooks/useAuthentication';
 import { useNavigate } from 'react-router-dom';
+import { ROUTES } from '../constants/routes';
 
 const HomePage = () => {
+  const { profile, handleLogout } = useAuthentication();
   const navigate = useNavigate();
-  const [profile, setProfile] = useState<Profile | null>(null);
 
-  if (!profile) {
-    api
-      .get<{ profile: Profile }>('/profile')
-      .then((res) => {
-        setProfile(res.data.profile);
-      })
-      .catch((e) => console.debug('cannot find profile:', e));
-  }
-
-  const handleLogout = (e: any) => {
-    api.post('/authentication/logout').then((res) => {
-      navigate('/login');
-    });
+  const handleCreateDraft = () => {
+    navigate(ROUTES.DRAFT.CREATE);
   };
 
   return (
@@ -41,7 +29,7 @@ const HomePage = () => {
             <UserPlus />
             Join a draft
           </Button>
-          <Button rounded="2xl" colorPalette="oxford" variant="surface">
+          <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleCreateDraft}>
             <Plus />
             Create a draft
           </Button>

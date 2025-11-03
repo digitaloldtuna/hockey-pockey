@@ -1,29 +1,14 @@
 import { useState } from 'react';
-import api from '../../api';
-import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import { AbsoluteCenter, Box, Button, Heading, Input, Link, Text, VStack } from '@chakra-ui/react';
+import { AbsoluteCenter, Box, Button, Input, Link, Text, VStack } from '@chakra-ui/react';
+import { useNavigate } from 'react-router-dom';
+import { useAuthentication } from '../../hooks/useAuthentication';
 
 const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
+  const { handleLogin } = useAuthentication();
   const navigate = useNavigate();
-
-  const handleLogin = async () => {
-    try {
-      await api.post(
-        '/authentication/login',
-        { email, password },
-        {
-          withCredentials: true, // <-- important for cookies
-        }
-      );
-      navigate(ROUTES.HOME);
-      // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    } catch (err: any) {
-      alert(err.response?.data?.error || 'Login failed');
-    }
-  };
 
   return (
     <AbsoluteCenter>
@@ -48,7 +33,9 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             backgroundColor="white"
           />
-          <Button onClick={handleLogin}>Log In</Button>
+          <Button onClick={() => handleLogin(email, password).then(() => navigate(ROUTES.HOME))}>
+            Log In
+          </Button>
           <Link href={ROUTES.SIGNUP}>create an account!</Link>
         </VStack>
       </Box>
