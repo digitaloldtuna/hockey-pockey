@@ -6,5 +6,6 @@ export const ROUTES = {
   HOME: `${ROUTE_PREFIX}/`,
   DRAFT: {
     CREATE: `${ROUTE_PREFIX}/draft/create`,
+    JOIN: `${ROUTE_PREFIX}/draft/join`,
   },
 };

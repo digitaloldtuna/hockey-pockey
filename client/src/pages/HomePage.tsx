@@ -13,6 +13,10 @@ const HomePage = () => {
     navigate(ROUTES.DRAFT.CREATE);
   };
 
+  const handleJoinDraft = () => {
+    navigate(ROUTES.DRAFT.JOIN);
+  };
+
   return (
     <Layout>
       <Flex justify="space-between" align="end" marginTop="10">
@@ -25,7 +29,7 @@ const HomePage = () => {
           </Text>
         </Flex>
         <Flex gap="2" marginBottom="2">
-          <Button rounded="2xl" colorPalette="oxford" variant="surface">
+          <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleJoinDraft}>
             <UserPlus />
             Join a draft
           </Button>
