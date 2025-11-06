@@ -9,6 +9,7 @@ import { ProtectedRoute } from './components/ProtectedRoute';
 import { ROUTES } from './constants/routes';
 import CreateDraft from './pages/draft/CreateDraft';
 import JoinDraft from './pages/draft/JoinDraft';
+import Draft from './pages/draft/Draft';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
               <Route path={ROUTES.HOME} element={<HomePage />} />
               <Route path={ROUTES.DRAFT.CREATE} element={<CreateDraft />} />
               <Route path={ROUTES.DRAFT.JOIN} element={<JoinDraft />} />
+              <Route path="/draft/:draftId" element={<Draft />} />
             </Route>
           </Routes>
         </AuthProvider>

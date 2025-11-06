@@ -15,8 +15,11 @@ export type Draft = {
   id: string;
   name: string;
   season: number;
-  members?: Profile[];
+  members: { id: string; name: string }[];
+  status: DraftStatus;
 };
+
+export type DraftStatus = 'open' | 'closed' | 'in_play';
 
 export type User = {
   email: string;

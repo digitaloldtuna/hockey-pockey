@@ -3,8 +3,10 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import { AbsoluteCenter, Box, Button, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { useAuthentication } from '../../hooks/useAuthentication';
+import { useTitle } from '../../hooks/useTitle';
 
 const SignupPage = () => {
+  useTitle('Sign Up');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [name, setName] = useState('');

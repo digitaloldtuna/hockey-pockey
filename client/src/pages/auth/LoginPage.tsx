@@ -3,8 +3,10 @@ import { ROUTES } from '../../constants/routes';
 import { AbsoluteCenter, Box, Button, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { useAuthentication } from '../../hooks/useAuthentication';
+import { useTitle } from '../../hooks/useTitle';
 
 const LoginPage = () => {
+  useTitle('Log In');
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { handleLogin } = useAuthentication();

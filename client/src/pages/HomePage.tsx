@@ -4,10 +4,53 @@ import { Plus, UserPlus } from 'lucide-react';
 import { useAuthentication } from '../hooks/useAuthentication';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
+import { Draft } from '../constants/types';
+import DraftCard from '../components/DraftCard';
+import { useTitle } from '../hooks/useTitle';
+import { useState } from 'react';
+
+const MOCKED_DRAFTS: Draft[] = [
+  {
+    id: '1',
+    name: 'Open Draft',
+    season: 2026,
+    status: 'open',
+    members: [{ id: '1', name: 'Mai' }],
+  },
+  {
+    id: '2',
+    name: 'Closed Draft',
+    season: 2025,
+    status: 'closed',
+    members: [
+      { id: '1', name: 'Mai' },
+      { id: '2', name: 'Adele' },
+      { id: '3', name: 'Amy' },
+      { id: '4', name: 'Sophie' },
+    ],
+  },
+  {
+    id: '3',
+    name: 'In Play Draft',
+    season: 2026,
+    status: 'in_play',
+    members: [
+      { id: '3', name: 'Amy' },
+      { id: '1', name: 'Mai' },
+      { id: '5', name: 'Bob' },
+      { id: '6', name: 'Jim' },
+      { id: '2', name: 'Adele' },
+      { id: '4', name: 'Sophie' },
+    ],
+  },
+];
 
 const HomePage = () => {
+  const [drafts, setDrafts] = useState(MOCKED_DRAFTS);
   const { profile, handleLogout } = useAuthentication();
   const navigate = useNavigate();
+
+  useTitle('Home');
 
   const handleCreateDraft = () => {
     navigate(ROUTES.DRAFT.CREATE);
@@ -39,38 +82,10 @@ const HomePage = () => {
           </Button>
         </Flex>
       </Flex>
-      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8">
-        <Box
-          rounded="2xl"
-          backgroundColor="white"
-          width="xs"
-          padding="5"
-          _hover={{
-            shadow: 'sm',
-            cursor: 'pointer',
-          }}
-        >
-          <Text fontWeight="bold" fontSize="xl">
-            Draft Name
-          </Text>
-          <Flex justify="space-between">
-            <AvatarGroup gap="0" spaceX="-2" size="xs">
-              <Avatar.Root>
-                <Avatar.Fallback name="Mai" />
-              </Avatar.Root>
-              <Avatar.Root>
-                <Avatar.Fallback name="Adele" />
-              </Avatar.Root>
-              <Avatar.Root>
-                <Avatar.Fallback name="Amy" />
-              </Avatar.Root>
-              <Avatar.Root>
-                <Avatar.Fallback name="Sophie" />
-              </Avatar.Root>
-            </AvatarGroup>
-            <Text fontSize="lg">2026</Text>
-          </Flex>
-        </Box>
+      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" justify="space-between">
+        {drafts.map((draft) => (
+          <DraftCard draft={draft} />
+        ))}
       </Flex>
       <Flex justify="center">
         <Link color="highElfBlue" onClick={handleLogout}>
