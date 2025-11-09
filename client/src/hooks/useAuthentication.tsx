@@ -1,6 +1,7 @@
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
+import { ROUTES } from '../constants/routes';
 import { Profile, Session } from '../constants/types';
 
 interface AuthContextType {
@@ -47,6 +48,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.profile) {
         setProfile(data.profile);
       }
+      navigate(ROUTES.HOME);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(err.response?.data?.error || 'Login failed');

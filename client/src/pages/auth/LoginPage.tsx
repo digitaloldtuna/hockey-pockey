@@ -10,7 +10,6 @@ const LoginPage = () => {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const { handleLogin } = useAuthentication();
-  const navigate = useNavigate();
 
   return (
     <AbsoluteCenter>
@@ -35,9 +34,7 @@ const LoginPage = () => {
             onChange={(e) => setPassword(e.target.value)}
             backgroundColor="white"
           />
-          <Button onClick={() => handleLogin(email, password).then(() => navigate(ROUTES.HOME))}>
-            Log In
-          </Button>
+          <Button onClick={() => handleLogin(email, password)}>Log In</Button>
           <Link href={ROUTES.SIGNUP}>create an account!</Link>
         </VStack>
       </Box>

@@ -35,7 +35,6 @@ app.use('/api', authenticate, router);
 // Serve frontend
 app.use(express.static(path.join(__dirname, '../../client/build')));
 app.get('*splat', (_req, res) => {
-  console.log('hitting catch all');
   res.sendFile(path.join(__dirname, '../../client/build', 'index.html'));
 });
 

@@ -17,6 +17,8 @@ export type Draft = {
   season: number;
   members: { id: string; name: string }[];
   status: DraftStatus;
+  code?: string;
+  owner?: { id: string; name: string };
 };
 
 export type DraftStatus = 'open' | 'closed' | 'in_play';
