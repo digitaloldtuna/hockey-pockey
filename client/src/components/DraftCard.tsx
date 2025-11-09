@@ -13,6 +13,7 @@ const pickPalette = (name: string) => {
 const DraftStatusToColour = {
   open: 'yellow',
   closed: 'red',
+  team_selection: 'purple',
   in_play: 'green',
 };
 

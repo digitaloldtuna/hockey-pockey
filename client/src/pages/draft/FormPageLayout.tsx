@@ -10,7 +10,7 @@ type Props = {
   children: React.ReactNode;
 };
 
-const DraftLayout = ({ title, children }: Props) => {
+const FormPageLayout = ({ title, children }: Props) => {
   const navigate = useNavigate();
   const { handleLogout } = useAuthentication();
   return (
@@ -41,4 +41,4 @@ const DraftLayout = ({ title, children }: Props) => {
   );
 };
 
-export default DraftLayout;
+export default FormPageLayout;

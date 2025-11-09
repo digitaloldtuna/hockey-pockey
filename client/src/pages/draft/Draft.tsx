@@ -2,9 +2,10 @@ import { useState } from 'react';
 import { useParams } from 'react-router-dom';
 import { MOCKED_DRAFTS } from '../../constants/mocks';
 import ClosedDraft from './ClosedDraft';
-import DraftLayout from './DraftLayout';
+import DraftLayout from './FormPageLayout';
 import InPlayDraft from './InPlayDraft';
 import OpenDraft from './OpenDraft';
+import TeamSelection from './TeamSelection';
 
 const Draft = () => {
   const { draftId } = useParams<{ draftId: string }>();
@@ -29,8 +30,13 @@ const Draft = () => {
       );
     } else if (draft.status === 'in_play') {
       return <InPlayDraft draft={draft} />;
+    } else {
+      return (
+        <DraftLayout title={draft.name}>
+          <TeamSelection draft={draft} />
+        </DraftLayout>
+      );
     }
-    return <></>;
   };
 
   return <>{draft ? page() : `No draft found with the ID ${draftId}`}</>;

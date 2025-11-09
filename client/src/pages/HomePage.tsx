@@ -1,4 +1,4 @@
-import { Avatar, Button, Flex, Link, Text } from '@chakra-ui/react';
+import { Avatar, Button, Center, Flex, Grid, Heading, Link, Stack, Text } from '@chakra-ui/react';
 import Layout from './Layout';
 import { Plus, UserPlus } from 'lucide-react';
 import { useAuthentication } from '../hooks/useAuthentication';
@@ -28,7 +28,11 @@ const HomePage = () => {
     <Layout>
       <Flex justify="space-between" align="end" marginTop="10">
         <Flex gap="5" align="center">
-          <Avatar.Root colorPalette="red" size="xl">
+          <Avatar.Root
+            size="xl"
+            onClick={() => navigate('/profile')}
+            _hover={{ cursor: 'pointer' }}
+          >
             <Avatar.Fallback name={profile?.name[0] || ''} />
           </Avatar.Root>
           <Text fontSize="5xl" color="oxford">
@@ -46,10 +50,20 @@ const HomePage = () => {
           </Button>
         </Flex>
       </Flex>
-      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" justify="space-between">
-        {drafts.map((draft) => (
-          <DraftCard draft={draft} />
-        ))}
+      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8">
+        {drafts.length === 0 && (
+          <Center width="100%">
+            <Stack>
+              <Heading>You have no drafts 😶‍🌫️</Heading>
+              <Text>Join a draft, or create one!</Text>
+            </Stack>
+          </Center>
+        )}
+        <Grid templateColumns="repeat(3, 1fr)" gap="5">
+          {drafts.map((draft) => (
+            <DraftCard draft={draft} />
+          ))}
+        </Grid>
       </Flex>
       <Flex justify="center">
         <Link color="highElfBlue" onClick={handleLogout}>

@@ -21,8 +21,20 @@ export type Draft = {
   owner?: string; // profile id
 };
 
-export type DraftStatus = 'open' | 'closed' | 'in_play';
+export type DraftStatus = 'open' | 'closed' | 'team_selection' | 'in_play';
 
 export type User = {
   email: string;
+};
+
+export type Team = {
+  id: number;
+  apiId: number;
+  franchiseId: number;
+  fullName: string;
+  code: string;
+  leagueId: number;
+  logo: string;
+  divisionName: string;
+  conferenceName: string;
 };

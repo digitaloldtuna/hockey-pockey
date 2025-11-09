@@ -3,7 +3,7 @@ import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { ROUTES } from '../../constants/routes';
-import DraftLayout from './DraftLayout';
+import DraftLayout from './FormPageLayout';
 import { useTitle } from '../../hooks/useTitle';
 
 const JoinDraft = () => {
