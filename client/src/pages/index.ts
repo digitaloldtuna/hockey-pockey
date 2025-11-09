@@ -2,5 +2,7 @@ import Layout from './Layout';
 import HomePage from './HomePage';
 import LoginPage from './auth/LoginPage';
 import SignupPage from './auth/SignupPage';
+import Profile from './Profile';
+import { Draft, CreateDraft, JoinDraft } from './draft';
 
-export { HomePage, LoginPage, SignupPage, Layout };
+export { HomePage, LoginPage, SignupPage, Profile, Draft, CreateDraft, JoinDraft, Layout };

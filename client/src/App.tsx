@@ -3,13 +3,9 @@ import './App.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import { system } from './theme/theme';
 import { AuthProvider } from './hooks/useAuthentication';
-import { UnprotectedRoute } from './components/UnprotectedRoute';
-import { HomePage, LoginPage, SignupPage } from './pages';
-import { ProtectedRoute } from './components/ProtectedRoute';
+import { CreateDraft, Draft, HomePage, JoinDraft, LoginPage, Profile, SignupPage } from './pages';
 import { ROUTES } from './constants/routes';
-import CreateDraft from './pages/draft/CreateDraft';
-import JoinDraft from './pages/draft/JoinDraft';
-import Draft from './pages/draft/Draft';
+import { ProtectedRoute, UnprotectedRoute } from './components';
 
 function App() {
   return (
@@ -26,6 +22,7 @@ function App() {
               <Route path={ROUTES.DRAFT.CREATE} element={<CreateDraft />} />
               <Route path={ROUTES.DRAFT.JOIN} element={<JoinDraft />} />
               <Route path="/draft/:draftId" element={<Draft />} />
+              <Route path="/profile" element={<Profile />} />
             </Route>
           </Routes>
         </AuthProvider>

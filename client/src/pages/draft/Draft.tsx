@@ -1,28 +1,14 @@
 import { useState } from 'react';
 import { useParams } from 'react-router-dom';
-import { Draft as DraftType } from '../../constants/types';
+import { MOCKED_DRAFTS } from '../../constants/mocks';
+import ClosedDraft from './ClosedDraft';
 import DraftLayout from './DraftLayout';
 import InPlayDraft from './InPlayDraft';
 import OpenDraft from './OpenDraft';
 
-const MOCKED_DRAFT: DraftType = {
-  id: '1',
-  name: 'Open Draft',
-  season: 2026,
-  status: 'open',
-  members: [
-    { id: '1', name: 'Mai' },
-    { id: '2', name: 'Adele' },
-    { id: '3', name: 'Amy' },
-    { id: '4', name: 'Sophie' },
-  ],
-  code: '124356',
-  owner: { id: '1', name: 'Mai' },
-};
-
 const Draft = () => {
   const { draftId } = useParams<{ draftId: string }>();
-  const [draft, setDraft] = useState(MOCKED_DRAFT);
+  const [draft, setDraft] = useState((draftId && MOCKED_DRAFTS[draftId]) || null);
 
   const page = () => {
     if (!draft) {
@@ -30,17 +16,24 @@ const Draft = () => {
     }
 
     if (draft.status === 'open') {
-      return <OpenDraft draft={draft} />;
+      return (
+        <DraftLayout title={draft.name}>
+          <OpenDraft draft={draft} />
+        </DraftLayout>
+      );
     } else if (draft.status === 'closed') {
-      console.log('not implemented'); // TO DO
-      return <></>;
+      return (
+        <DraftLayout title={draft.name}>
+          <ClosedDraft draft={draft} />
+        </DraftLayout>
+      );
     } else if (draft.status === 'in_play') {
       return <InPlayDraft draft={draft} />;
     }
     return <></>;
   };
 
-  return <DraftLayout title={draft.name}>{page()}</DraftLayout>;
+  return <>{draft ? page() : `No draft found with the ID ${draftId}`}</>;
 };
 
 export default Draft;

@@ -18,7 +18,7 @@ export type Draft = {
   members: { id: string; name: string }[];
   status: DraftStatus;
   code?: string;
-  owner?: { id: string; name: string };
+  owner?: string; // profile id
 };
 
 export type DraftStatus = 'open' | 'closed' | 'in_play';

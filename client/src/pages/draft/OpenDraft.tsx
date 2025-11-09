@@ -28,12 +28,12 @@ const OpenDraft = ({ draft }: Props) => {
   const members: { id: string; owner: boolean; name: string; email: string }[] = draft.members.map(
     (member) => ({
       id: member.id,
-      owner: (draft.owner && draft.owner.id === member.id) || false,
+      owner: (draft.owner && draft.owner === member.id) || false,
       name: member.name,
       email: `${member.name}@gmail.com`,
     })
   );
-  const isOwner = true; // profile && draft.owner ? profile.id === draft.owner.id : false;
+  const isOwner = profile && draft.owner ? profile.id === draft.owner : false;
 
   const CloseDraftButton = () => {
     const button = (
@@ -96,14 +96,12 @@ const OpenDraft = ({ draft }: Props) => {
   return (
     <Grid templateColumns="repeat(2, 1fr)" gap="10">
       <Box rounded="2xl" backgroundColor="white" padding="5">
-        <Stack direction="column" justify="space-between" height="100%">
-          <Stack direction="column" gap="3">
-            This draft is for the {draft.season} season.
-            <CodeField />
-            <Text>
-              This draft is still <b>open</b>. Close the draft to start!
-            </Text>
-          </Stack>
+        <Stack direction="column" gap="3">
+          This draft is for the {draft.season} season.
+          <CodeField />
+          <Text marginBottom="3">
+            This draft is still <b>open</b>. Close the draft to start!
+          </Text>
           <CloseDraftButton />
         </Stack>
       </Box>

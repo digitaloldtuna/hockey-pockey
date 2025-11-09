@@ -1,52 +1,16 @@
-import { Avatar, AvatarGroup, Box, Button, Flex, Link, Text } from '@chakra-ui/react';
+import { Avatar, Button, Flex, Link, Text } from '@chakra-ui/react';
 import Layout from './Layout';
 import { Plus, UserPlus } from 'lucide-react';
 import { useAuthentication } from '../hooks/useAuthentication';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
-import { Draft } from '../constants/types';
 import DraftCard from '../components/DraftCard';
 import { useTitle } from '../hooks/useTitle';
 import { useState } from 'react';
-
-const MOCKED_DRAFTS: Draft[] = [
-  {
-    id: '1',
-    name: 'Open Draft',
-    season: 2026,
-    status: 'open',
-    members: [{ id: '1', name: 'Mai' }],
-  },
-  {
-    id: '2',
-    name: 'Closed Draft',
-    season: 2025,
-    status: 'closed',
-    members: [
-      { id: '1', name: 'Mai' },
-      { id: '2', name: 'Adele' },
-      { id: '3', name: 'Amy' },
-      { id: '4', name: 'Sophie' },
-    ],
-  },
-  {
-    id: '3',
-    name: 'In Play Draft',
-    season: 2026,
-    status: 'in_play',
-    members: [
-      { id: '3', name: 'Amy' },
-      { id: '1', name: 'Mai' },
-      { id: '5', name: 'Bob' },
-      { id: '6', name: 'Jim' },
-      { id: '2', name: 'Adele' },
-      { id: '4', name: 'Sophie' },
-    ],
-  },
-];
+import { MOCKED_DRAFTS } from '../constants/mocks';
 
 const HomePage = () => {
-  const [drafts, setDrafts] = useState(MOCKED_DRAFTS);
+  const [drafts, setDrafts] = useState(Object.values(MOCKED_DRAFTS));
   const { profile, handleLogout } = useAuthentication();
   const navigate = useNavigate();
 
