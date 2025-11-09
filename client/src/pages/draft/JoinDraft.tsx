@@ -1,9 +1,9 @@
-import { Button, Flex, Heading, Input, Link, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Heading, Input, Link, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { ROUTES } from '../../constants/routes';
-import DraftLayout from './FormPageLayout';
+import DraftLayout from './DraftLayout';
 import { useTitle } from '../../hooks/useTitle';
 
 const JoinDraft = () => {
@@ -23,16 +23,18 @@ const JoinDraft = () => {
 
   return (
     <DraftLayout title="join a draft!">
-      <Flex gap="3">
-        <Heading alignContent="center">code</Heading>
-        <Input
-          type="code"
-          value={code}
-          onChange={(e) => setCode(e.target.value)}
-          backgroundColor="white"
-        />
-      </Flex>
-      <Button onClick={handleJoinDraft}>Join!</Button>
+      <Box rounded="2xl" backgroundColor="white" padding="5">
+        <Flex gap="3">
+          <Heading alignContent="center">code</Heading>
+          <Input
+            type="code"
+            value={code}
+            onChange={(e) => setCode(e.target.value)}
+            backgroundColor="white"
+          />
+          <Button onClick={handleJoinDraft}>Join!</Button>
+        </Flex>
+      </Box>
     </DraftLayout>
   );
 };

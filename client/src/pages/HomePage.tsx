@@ -1,4 +1,15 @@
-import { Avatar, Button, Center, Flex, Grid, Heading, Link, Stack, Text } from '@chakra-ui/react';
+import {
+  Avatar,
+  Button,
+  Center,
+  Flex,
+  Grid,
+  Heading,
+  Link,
+  Spinner,
+  Stack,
+  Text,
+} from '@chakra-ui/react';
 import Layout from './Layout';
 import { Plus, UserPlus } from 'lucide-react';
 import { useAuthentication } from '../hooks/useAuthentication';
@@ -6,15 +17,33 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import DraftCard from '../components/DraftCard';
 import { useTitle } from '../hooks/useTitle';
-import { useState } from 'react';
-import { MOCKED_DRAFTS } from '../constants/mocks';
+import { useEffect, useState } from 'react';
+import api from '../api';
 
 const HomePage = () => {
-  const [drafts, setDrafts] = useState(Object.values(MOCKED_DRAFTS));
+  useTitle('Home');
+  const [drafts, setDrafts] = useState([]);
+  const [draftLoading, setDraftLoading] = useState(false);
   const { profile, handleLogout } = useAuthentication();
   const navigate = useNavigate();
 
-  useTitle('Home');
+  useEffect(() => {
+    async function fetchDrafts() {
+      setDraftLoading(true);
+      api
+        .get('/draft/all')
+        .then((res) => {
+          setDraftLoading(false);
+          console.log('RES', res);
+          setDrafts(res.data.drafts);
+        })
+        .catch((reason) => {
+          setDraftLoading(false);
+          console.log('Error fetching drafts', reason);
+        });
+    }
+    fetchDrafts();
+  }, []);
 
   const handleCreateDraft = () => {
     navigate(ROUTES.DRAFT.CREATE);
@@ -51,7 +80,12 @@ const HomePage = () => {
         </Flex>
       </Flex>
       <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8">
-        {drafts.length === 0 && (
+        {draftLoading && (
+          <Center width="stretch">
+            <Spinner size="xl" color="blue.500" />
+          </Center>
+        )}
+        {!draftLoading && drafts.length === 0 && (
           <Center width="100%">
             <Stack>
               <Heading>You have no drafts 😶‍🌫️</Heading>
@@ -60,9 +94,7 @@ const HomePage = () => {
           </Center>
         )}
         <Grid templateColumns="repeat(3, 1fr)" gap="5">
-          {drafts.map((draft) => (
-            <DraftCard draft={draft} />
-          ))}
+          {!draftLoading && drafts.map((draft) => <DraftCard draft={draft} />)}
         </Grid>
       </Flex>
       <Flex justify="center">

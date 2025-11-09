@@ -100,7 +100,7 @@ const OpenDraft = ({ draft }: Props) => {
           This draft is for the {draft.season} season.
           <CodeField />
           <Text marginBottom="3">
-            This draft is still <b>open</b>. Close the draft to start!
+            This draft is still <b>open</b>. Close the draft to start picking teams!
           </Text>
           <CloseDraftButton />
         </Stack>
@@ -129,7 +129,7 @@ const OpenDraft = ({ draft }: Props) => {
                     </Text>
                   </Stack>
                 </HStack>
-                {isOwner && (
+                {isOwner && !member.owner && (
                   <Tooltip content={`remove ${member.name} from draft`}>
                     <Icon
                       _hover={{ cursor: 'pointer' }}

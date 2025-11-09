@@ -16,7 +16,7 @@ import { Formik, Form, Field as FormField } from 'formik';
 
 import { useAuthentication } from '../hooks/useAuthentication';
 import { useTitle } from '../hooks/useTitle';
-import FormPageLayout from './draft/FormPageLayout';
+import FormPageLayout from './draft/DraftLayout';
 import { Upload } from 'lucide-react';
 
 // 🧱 Define the form’s shape

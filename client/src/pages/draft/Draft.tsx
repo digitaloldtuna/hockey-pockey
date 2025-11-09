@@ -1,19 +1,48 @@
-import { useState } from 'react';
-import { useParams } from 'react-router-dom';
-import { MOCKED_DRAFTS } from '../../constants/mocks';
+import { AbsoluteCenter, Heading, Link, Spinner, VStack } from '@chakra-ui/react';
+import { useEffect, useState } from 'react';
+import { useNavigate, useParams } from 'react-router-dom';
+import api from '../../api';
+import { Draft as DraftType } from '../../constants/types';
 import ClosedDraft from './ClosedDraft';
-import DraftLayout from './FormPageLayout';
+import DraftLayout from './DraftLayout';
 import InPlayDraft from './InPlayDraft';
 import OpenDraft from './OpenDraft';
 import TeamSelection from './TeamSelection';
 
 const Draft = () => {
+  const navigate = useNavigate();
   const { draftId } = useParams<{ draftId: string }>();
-  const [draft, setDraft] = useState((draftId && MOCKED_DRAFTS[draftId]) || null);
+  const [loading, setLoading] = useState(false);
+  const [draft, setDraft] = useState<DraftType | null>(null);
+
+  useEffect(() => {
+    async function fetchDraft() {
+      setLoading(true);
+      api
+        .get(`/draft?id=${draftId}`)
+        .then((res) => {
+          console.log('RES', res);
+          setDraft(res.data.draft);
+          setLoading(false);
+        })
+        .catch((reason) => {
+          console.log('Error fetching draft', reason);
+          setLoading(false);
+        });
+    }
+    fetchDraft();
+  }, []);
 
   const page = () => {
     if (!draft) {
-      return <></>;
+      return (
+        <AbsoluteCenter>
+          <VStack>
+            <Heading>No draft found 😶‍🌫️</Heading>
+            <Link onClick={() => navigate('/')}>go back home</Link>
+          </VStack>
+        </AbsoluteCenter>
+      );
     }
 
     if (draft.status === 'open') {
@@ -39,7 +68,17 @@ const Draft = () => {
     }
   };
 
-  return <>{draft ? page() : `No draft found with the ID ${draftId}`}</>;
+  return (
+    <>
+      {loading ? (
+        <AbsoluteCenter>
+          <Spinner size="xl" color="blue.500" />
+        </AbsoluteCenter>
+      ) : (
+        page()
+      )}
+    </>
+  );
 };
 
 export default Draft;

@@ -1,8 +1,11 @@
 import express from 'express';
 import { getProfileFromUserId } from '../models/profiles';
 import { getStandingsNow } from '../services/nhlApi';
+import draftRouter from './draft';
 
 const router = express.Router();
+
+router.use('/draft', draftRouter);
 
 router.get('/profile', async (req, res) => {
   try {
@@ -14,7 +17,7 @@ router.get('/profile', async (req, res) => {
     const profile = await getProfileFromUserId(user.id);
     return res.json({ profile });
   } catch (e) {
-    return res.json(401).json({ error: `Error: ${e}` });
+    return res.status(401).json({ error: `Error: ${e}` });
   }
 });
 
