@@ -1,5 +1,5 @@
 import express from 'express';
-import { createADraft, getAllDrafts, getDraftFromId } from '../models/drafts';
+import { createADraft, getAllDrafts, getDraftFromId, joinADraft } from '../models/drafts';
 import { getProfileFromUserId } from '../models/profiles';
 import { submitAndStartDraft } from '../services/hockey';
 
@@ -47,6 +47,23 @@ router.post('/create', async (req, res) => {
     const name = req.body.name;
     const profile = await getProfileFromUserId(user.id);
     const draft = await createADraft({ owner: profile, name });
+
+    return res.json({ draft });
+  } catch (e) {
+    return res.status(401).json({ error: `Error: ${e}` });
+  }
+});
+
+router.post('/join', async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw Error('User is not authenticated');
+    }
+
+    const code = req.body.code;
+    const profile = await getProfileFromUserId(user.id);
+    const draft = await joinADraft({ code, memberId: profile.id });
 
     return res.json({ draft });
   } catch (e) {
