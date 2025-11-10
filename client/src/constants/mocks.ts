@@ -1,5 +1,6 @@
 import { Draft, Team } from './types';
 
+/*
 export const MOCKED_DRAFTS: Record<string, Draft> = {
   '1': {
     id: '1',
@@ -51,6 +52,7 @@ export const MOCKED_DRAFTS: Record<string, Draft> = {
     ],
   },
 };
+*/
 
 export const MOCKED_TEAMS: Record<string, Team> = {
   [1]: {

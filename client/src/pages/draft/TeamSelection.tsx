@@ -1,22 +1,25 @@
 import {
   Avatar,
-  AvatarGroup,
   Box,
   Button,
+  Center,
+  Flex,
   Grid,
   Heading,
   HStack,
   Image,
-  Input,
   NativeSelect,
+  ScrollArea,
+  Spinner,
   StackSeparator,
   Tag,
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import { MOCKED_TEAMS } from '../../constants/mocks';
+import { useEffect, useMemo, useState } from 'react';
+import api from '../../api';
 import { Draft, Team } from '../../constants/types';
+import { useAuthentication } from '../../hooks/useAuthentication';
 
 const DivisionColour: Record<string, string> = {
   Metropolitan: 'red',
@@ -34,63 +37,109 @@ type Props = {
   draft: Draft;
 };
 
-const generateAssignmentBase = (teams: Team[]) => {
-  return teams.map((team) => ({
-    id: team.id,
-    fullName: team.fullName,
-    logo: team.logo,
-    division: team.divisionName,
-    conference: team.conferenceName,
-    code: team.code,
-    owner: undefined as string | undefined,
-  }));
-};
-
 const TeamSelection = ({ draft }: Props) => {
-  const [teams, setTeams] = useState(MOCKED_TEAMS);
-  const [teamAssignments, setTeamAssignments] = useState(
-    generateAssignmentBase(Object.values(teams))
-  );
+  const { profile } = useAuthentication();
+  const [loading, setLoading] = useState(false);
+  const [teams, setTeams] = useState<Record<number, Team>>({});
+
+  useEffect(() => {
+    async function fetchTeams() {
+      setLoading(true);
+      api
+        .get('/hockey/team/all')
+        .then((res: any) => {
+          console.log('TEAM RES', res);
+          const rawTeams = res.data.teams;
+          const teamObject = rawTeams.reduce((acc: Record<number, Team>, currentValue: Team) => {
+            return {
+              ...acc,
+              [currentValue.id]: { ...currentValue, owner: null },
+            };
+          }, {});
+          setTeams(teamObject);
+          setLoading(false);
+        })
+        .catch((reason: any) => {
+          console.log('Error fetching teams', reason);
+          setLoading(false);
+        });
+    }
+    fetchTeams();
+  }, []);
+
+  const isOwner = profile && draft.owner ? profile.id === draft.owner : false;
 
   const members = draft.members;
 
-  const UnassignedTeams = () => {
-    const unassignedTeams = teamAssignments.filter((ta) => !ta.owner);
+  const teamAssignments = useMemo(() => {
+    return members.map((member) => {
+      const memberTeams = Object.values(teams).filter((ta) => ta.owner === member.id);
+      return (
+        <Box width="stretch" key={member.id}>
+          <Heading size="lg">{member.name}'s Teams:</Heading>
+          {memberTeams.length === 0 ? (
+            <>No teams assigned to {member.name} yet.</>
+          ) : (
+            <Flex gap="1" wrap="wrap" maxW="500px">
+              {memberTeams.map((team) => (
+                <Avatar.Root key={team.code}>
+                  <Avatar.Fallback name={team.code} />
+                  <Avatar.Image src={team.logo} />
+                </Avatar.Root>
+              ))}
+            </Flex>
+          )}
+        </Box>
+      );
+    });
+  }, [teams, members]);
+
+  const unassignedTeams = useMemo(() => {
+    const unassignedTeams = Object.values(teams).filter((ta: Team) => !ta.owner);
     if (unassignedTeams.length > 0) {
       return (
         <Box width="stretch">
           <Heading size="lg">Unassigned Teams:</Heading>
-          <AvatarGroup gap="0" spaceX="0" size="md">
+          <Flex gap="1" wrap="wrap" maxW="500px">
             {unassignedTeams.map((team) => (
               <Avatar.Root key={team.code}>
                 <Avatar.Fallback name={team.code} />
                 <Avatar.Image src={team.logo} />
               </Avatar.Root>
             ))}
-          </AvatarGroup>
+          </Flex>
         </Box>
       );
     }
     return <></>;
-  };
+  }, [teams]);
 
   const handleSelectMember = ({ teamId, memberId }: { teamId: number; memberId: string }) => {
-    setTeamAssignments((oldAssignments) =>
-      oldAssignments.map((a) => {
-        if (a.id === teamId) {
-          return { ...a, owner: memberId };
-        }
-        return a;
-      })
-    );
+    setTeams((oldTeams) => {
+      return {
+        ...oldTeams,
+        [teamId]: {
+          ...oldTeams[teamId],
+          owner: memberId,
+        },
+      };
+    });
   };
 
-  const handleSaveDraft = () => {
-    console.log('SAVING DRAFT', teamAssignments);
-  };
+  const handleStart = async () => {
+    try {
+      const teamAssignments = Object.values(teams).map((assignment) => ({
+        teamId: assignment.id,
+        memberId: assignment.owner,
+      }));
 
-  const handleStart = () => {
-    console.log('STARTING DRAFT', teamAssignments);
+      await api.post('/draft/submit', { draftId: draft.id, teamAssignments }).then((res) => {
+        console.log('SUBMIT RES', res);
+        window.location.reload();
+      });
+    } catch (e) {
+      console.log('ERROR:', e);
+    }
   };
 
   return (
@@ -98,76 +147,80 @@ const TeamSelection = ({ draft }: Props) => {
       <Grid templateColumns="repeat(2, 1fr)" gap="10">
         <Box rounded="2xl" backgroundColor="white" padding="5">
           <Text marginBottom="5">Assign a member for each team:</Text>
-          <VStack gap="5" separator={<StackSeparator />}>
-            {teamAssignments.map((team) => (
-              <HStack width="stretch" justify="space-between">
-                <HStack>
-                  <Image src={team.logo} boxSize="60px" fit="cover" alt={team.fullName} />
-                  <VStack>
-                    <Heading size="md">{team.fullName}</Heading>
-                    <HStack>
-                      <Tag.Root size="sm" colorPalette={ConferenceColour[team.conference]}>
-                        <Tag.Label>{team.conference}</Tag.Label>
-                      </Tag.Root>
-                      <Tag.Root size="sm" colorPalette={DivisionColour[team.division]}>
-                        <Tag.Label>{team.division}</Tag.Label>
-                      </Tag.Root>
-                    </HStack>
-                  </VStack>
-                </HStack>
-                <NativeSelect.Root size="sm" width="200px">
-                  <NativeSelect.Field
-                    placeholder="Select member"
-                    onChange={(event) =>
-                      handleSelectMember({ teamId: team.id, memberId: event.currentTarget.value })
-                    }
-                  >
-                    {members.map((member) => (
-                      <option value={member.id} key={member.id}>
-                        {member.name}
-                      </option>
+          <ScrollArea.Root height="25rem" variant="hover">
+            <ScrollArea.Viewport>
+              <ScrollArea.Content paddingEnd="3" textStyle="sm">
+                <VStack gap="5" separator={<StackSeparator />}>
+                  {loading && (
+                    <Center>
+                      <Spinner size="xl" color="blue.500" />
+                    </Center>
+                  )}
+                  {!loading &&
+                    Object.values(teams).map((team) => (
+                      <HStack width="stretch" justify="space-between">
+                        <HStack>
+                          <Image src={team.logo} boxSize="60px" fit="cover" alt={team.fullName} />
+                          <Flex justify="start" direction="column" gap="1">
+                            <Heading size="md">{team.fullName}</Heading>
+                            <HStack>
+                              <Tag.Root
+                                size="sm"
+                                colorPalette={ConferenceColour[team.conferenceName]}
+                              >
+                                <Tag.Label>{team.conferenceName}</Tag.Label>
+                              </Tag.Root>
+                              <Tag.Root size="sm" colorPalette={DivisionColour[team.divisionName]}>
+                                <Tag.Label>{team.divisionName}</Tag.Label>
+                              </Tag.Root>
+                            </HStack>
+                          </Flex>
+                        </HStack>
+                        <NativeSelect.Root size="sm" width="200px" disabled={!isOwner}>
+                          <NativeSelect.Field
+                            placeholder="Select member"
+                            onChange={(event) =>
+                              handleSelectMember({
+                                teamId: team.id,
+                                memberId: event.currentTarget.value,
+                              })
+                            }
+                          >
+                            {members.map((member) => (
+                              <option value={member.id} key={member.id}>
+                                {member.name}
+                              </option>
+                            ))}
+                          </NativeSelect.Field>
+                          <NativeSelect.Indicator />
+                        </NativeSelect.Root>
+                      </HStack>
                     ))}
-                  </NativeSelect.Field>
-                  <NativeSelect.Indicator />
-                </NativeSelect.Root>
-              </HStack>
-            ))}
-          </VStack>
+                </VStack>
+              </ScrollArea.Content>
+            </ScrollArea.Viewport>
+            <ScrollArea.Scrollbar />
+          </ScrollArea.Root>
         </Box>
         <Box rounded="2xl" backgroundColor="white" padding="5">
           <VStack gap="3">
-            {members.map((member) => {
-              const memberTeams = teamAssignments.filter((ta) => ta.owner === member.id);
-              return (
-                <Box width="stretch" key={member.id}>
-                  <Heading size="lg">{member.name}'s Teams:</Heading>
-                  {memberTeams.length === 0 ? (
-                    <>No teams assigned to {member.name} yet.</>
-                  ) : (
-                    <AvatarGroup gap="0" spaceX="0" size="md">
-                      {memberTeams.map((team) => (
-                        <Avatar.Root key={team.code}>
-                          <Avatar.Fallback name={team.code} />
-                          <Avatar.Image src={team.logo} />
-                        </Avatar.Root>
-                      ))}
-                    </AvatarGroup>
-                  )}
-                </Box>
-              );
-            })}
-            <UnassignedTeams />
+            {teamAssignments}
+            {unassignedTeams}
           </VStack>
         </Box>
       </Grid>
-      <HStack gap="3" justify="flex-end" marginTop="5">
-        <Button type="button" variant="outline" onClick={handleSaveDraft}>
-          Save
-        </Button>
-        <Button type="button" onClick={handleStart}>
-          Confirm and Start
-        </Button>
-      </HStack>
+      {isOwner && (
+        <HStack justify="flex-end" marginTop="5">
+          <Button type="button" onClick={handleStart}>
+            Confirm and Start
+          </Button>
+        </HStack>
+      )}
+      {!isOwner && (
+        <Center>
+          <Text marginTop="3">to start the draft, contact the draft owner</Text>
+        </Center>
+      )}
     </Box>
   );
 };

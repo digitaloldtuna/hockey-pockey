@@ -8,6 +8,27 @@ export type DraftMemberships = {
   draft: number;
 };
 
+export const getDraftMembershipFromMemberAndDraft = async ({
+  memberId,
+  draftId,
+}: {
+  memberId: string;
+  draftId: number;
+}) => {
+  const { data, error } = await supabase
+    .from('draft_memberships')
+    .select('*')
+    .eq('profile', memberId)
+    .eq('draft', draftId)
+    .single();
+
+  if (error) {
+    throw Error(`Error finding draft membership: ${error.message}`);
+  }
+
+  return data;
+};
+
 export const createDraftMembership = async ({
   draftId,
   memberId,
@@ -21,6 +42,20 @@ export const createDraftMembership = async ({
   const profile = await getProfileFromId(memberId);
   const draft = await getDraftFromId(draftId);
 
+  const { data: membership, error: mError } = await supabase
+    .from('draft_memberships')
+    .select('*')
+    .eq('profile', profile.id)
+    .eq('draft', draft.id);
+
+  if (mError) {
+    throw Error(`Error checking if membership already exists: ${mError}`);
+  }
+
+  if (membership.length > 0) {
+    return; // membership already exists
+  }
+
   const { data, error } = await supabase
     .from('draft_memberships')
     .insert([{ profile: profile.id, draft: draft.id }])
@@ -32,6 +67,42 @@ export const createDraftMembership = async ({
   }
 
   console.log('Successfully added member');
+};
+
+export const deleteDraftMembership = async ({
+  draftId,
+  memberId,
+}: {
+  draftId: number;
+  memberId: string;
+}) => {
+  console.log(`Deleting member ${memberId} from draft ${draftId}`);
+
+  // checking that ids are valid
+  const profile = await getProfileFromId(memberId);
+  const draft = await getDraftFromId(draftId);
+
+  const { data: memberships, error: mError } = await supabase
+    .from('draft_memberships')
+    .select('*')
+    .eq('profile', profile.id)
+    .eq('draft', draft.id);
+
+  if (mError) {
+    throw Error(`Error checking if membership already exists: ${mError}`);
+  }
+
+  if (memberships.length === 0) {
+    return; // member is not in draft
+  }
+
+  const membership = memberships[0];
+  const { error } = await supabase.from('draft_memberships').delete().eq('id', membership.id);
+  if (error) {
+    throw Error(`Error removing member to draft: ${error}`);
+  }
+
+  console.log('Successfully removed member');
 };
 
 export const memberBelongsToDraft = async ({

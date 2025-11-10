@@ -9,13 +9,14 @@ export type Profile = {
   name: string;
   created_at: string;
   user: string;
+  email?: string;
 };
 
 export type Draft = {
   id: string;
   name: string;
   season: number;
-  members: { id: string; name: string }[];
+  members: Profile[];
   status: DraftStatus;
   code?: string;
   owner?: string; // profile id
@@ -37,4 +38,5 @@ export type Team = {
   logo: string;
   divisionName: string;
   conferenceName: string;
+  owner?: string;
 };

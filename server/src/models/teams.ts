@@ -40,4 +40,10 @@ export const getTeamFromId = async (teamId: string): Promise<Team> => {
   return data;
 };
 
-// export const getScoreForTeam = async
+export const getAllTeams = async (): Promise<Team[]> => {
+  const { data, error } = await supabase.from('teams').select('*');
+  if (error || !data) {
+    throw Error(`Error fetching team: ${error}`);
+  }
+  return data;
+};

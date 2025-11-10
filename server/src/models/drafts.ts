@@ -19,7 +19,6 @@ export type Draft = {
 export const getDraftFromId = async (id: number, memberId?: string) => {
   if (memberId) {
     const canAccess = await memberBelongsToDraft({ draftId: id, memberId });
-
     if (!canAccess) {
       throw Error('Member cannot access this draft');
     }
@@ -63,8 +62,25 @@ export const createADraft = async ({
   return data;
 };
 
-export const joinADraft = async (): Promise<Draft | null> => {
-  return null;
+export const joinADraft = async ({
+  code,
+  memberId,
+}: {
+  code: string;
+  memberId: string;
+}): Promise<Draft> => {
+  const { data: draft, error } = await supabase
+    .from('drafts')
+    .select('*')
+    .eq('code', code)
+    .single();
+
+  if (error) {
+    throw Error(`Error fetching draft: ${error}`);
+  }
+
+  await createDraftMembership({ draftId: draft.id, memberId });
+  return draft;
 };
 
 export const getAllDrafts = async ({ profile }: { profile: Profile }) => {
@@ -99,4 +115,36 @@ export const getAllDrafts = async ({ profile }: { profile: Profile }) => {
   );
 
   return draftsWithMembers;
+};
+
+export const closeDraft = async ({ draftId, memberId }: { draftId: number; memberId: string }) => {
+  const draft = await getDraftFromId(draftId);
+  if (draft.owner !== memberId) {
+    throw Error('Member has does not have this permission');
+  }
+
+  const { data, error } = await supabase
+    .from('drafts')
+    .update({ status: 'team_selection' })
+    .eq('id', draft.id);
+
+  if (error) {
+    throw Error(`Error updating draft: ${error.message}`);
+  }
+
+  return data;
+};
+
+export const submitDraft = async ({ draftId }: { draftId: number }) => {
+  const draft = await getDraftFromId(draftId);
+  const { data, error } = await supabase
+    .from('drafts')
+    .update({ status: 'in_play' })
+    .eq('id', draft.id);
+
+  if (error) {
+    throw Error(`Error updating draft: ${error.message}`);
+  }
+
+  return data;
 };

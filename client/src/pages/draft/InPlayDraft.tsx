@@ -1,3 +1,4 @@
+import { AbsoluteCenter } from '@chakra-ui/react';
 import { Draft } from '../../constants/types';
 
 type Props = {
@@ -5,7 +6,7 @@ type Props = {
 };
 
 const InPlayDraft = ({ draft }: Props) => {
-  return <></>;
+  return <AbsoluteCenter>🚧 This page is under constructions 🚧</AbsoluteCenter>;
 };
 
 export default InPlayDraft;

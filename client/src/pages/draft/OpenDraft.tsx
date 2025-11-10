@@ -18,6 +18,8 @@ import { useAuthentication } from '../../hooks/useAuthentication';
 import { Draft } from '../../constants/types';
 import { Tooltip } from '../../theme/tooltip';
 import { X } from 'lucide-react';
+import api from '../../api';
+import { useState } from 'react';
 
 type Props = {
   draft: Draft;
@@ -25,13 +27,13 @@ type Props = {
 
 const OpenDraft = ({ draft }: Props) => {
   const { profile } = useAuthentication();
-  const members: { id: string; owner: boolean; name: string; email: string }[] = draft.members.map(
-    (member) => ({
+  const [members, setMembers] = useState(
+    draft.members.map((member) => ({
       id: member.id,
       owner: (draft.owner && draft.owner === member.id) || false,
       name: member.name,
-      email: `${member.name}@gmail.com`,
-    })
+      email: member.email || '',
+    }))
   );
   const isOwner = profile && draft.owner ? profile.id === draft.owner : false;
 
@@ -79,17 +81,28 @@ const OpenDraft = ({ draft }: Props) => {
     );
   };
 
-  const handleCloseDraft = () => {
+  const handleCloseDraft = async () => {
     if (!isOwner) {
       return;
     }
+    try {
+      await api.post('/draft/close', { draftId: draft.id }).then((res) => {
+        window.location.reload();
+      });
+    } catch (err) {}
     console.log('CLOSING DRAFT', draft.id);
   };
 
-  const handleRemoveMember = (memberId: string) => {
+  const handleRemoveMember = async (memberId: string) => {
     if (!isOwner) {
       return;
     }
+    try {
+      await api.post('/draft/remove', { draftId: draft.id, memberId }).then((res) => {
+        console.log('REMOVED MEMBER ', memberId);
+        setMembers((oldMembers) => oldMembers.filter((member) => member.id === memberId));
+      });
+    } catch (err) {}
     console.log('REMOVING MEMBER', memberId);
   };
 

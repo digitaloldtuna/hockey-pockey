@@ -2,10 +2,12 @@ import express from 'express';
 import { getProfileFromUserId } from '../models/profiles';
 import { getStandingsNow } from '../services/nhlApi';
 import draftRouter from './draft';
+import hockeyRouter from './hockey';
 
 const router = express.Router();
 
 router.use('/draft', draftRouter);
+router.use('/hockey', hockeyRouter);
 
 router.get('/profile', async (req, res) => {
   try {

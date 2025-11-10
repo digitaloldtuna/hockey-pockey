@@ -3,6 +3,7 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api';
 import { Draft as DraftType } from '../../constants/types';
+import { useTitle } from '../../hooks/useTitle';
 import ClosedDraft from './ClosedDraft';
 import DraftLayout from './DraftLayout';
 import InPlayDraft from './InPlayDraft';
@@ -21,7 +22,7 @@ const Draft = () => {
       api
         .get(`/draft?id=${draftId}`)
         .then((res) => {
-          console.log('RES', res);
+          console.log('DRAFT RES', res);
           setDraft(res.data.draft);
           setLoading(false);
         })
