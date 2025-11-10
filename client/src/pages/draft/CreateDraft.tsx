@@ -1,10 +1,7 @@
-import { Box, Button, Flex, Heading, Input, Link, Text } from '@chakra-ui/react';
-import Layout from '../Layout';
-import { useAuthentication } from '../../hooks/useAuthentication';
+import { Box, Button, Flex, Heading, Input, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
-import { ROUTES } from '../../constants/routes';
 import DraftLayout from './DraftLayout';
 import { useTitle } from '../../hooks/useTitle';
 

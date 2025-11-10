@@ -3,7 +3,6 @@ import { useEffect, useState } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
 import api from '../../api';
 import { Draft as DraftType } from '../../constants/types';
-import { useTitle } from '../../hooks/useTitle';
 import ClosedDraft from './ClosedDraft';
 import DraftLayout from './DraftLayout';
 import InPlayDraft from './InPlayDraft';
@@ -32,7 +31,7 @@ const Draft = () => {
         });
     }
     fetchDraft();
-  }, []);
+  }, [draftId]);
 
   const page = () => {
     if (!draft) {

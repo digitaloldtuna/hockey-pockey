@@ -1,5 +1,4 @@
 import { useState } from 'react';
-import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import { AbsoluteCenter, Box, Button, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { useAuthentication } from '../../hooks/useAuthentication';
