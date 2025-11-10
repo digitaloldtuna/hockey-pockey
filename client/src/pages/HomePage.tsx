@@ -62,7 +62,7 @@ const HomePage = () => {
             onClick={() => navigate('/profile')}
             _hover={{ cursor: 'pointer' }}
           >
-            <Avatar.Fallback name={profile?.name[0] || ''} />
+            <Avatar.Fallback name={profile?.name || ''} />
           </Avatar.Root>
           <Text fontSize="5xl" color="oxford">
             Welcome, <b>{profile?.name}</b>!

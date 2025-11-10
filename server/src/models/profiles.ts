@@ -45,28 +45,25 @@ export const getProfileFromUserId = async (userId: string): Promise<Profile> => 
   return data;
 };
 
-export const selectTeam = async ({
+export const updateProfile = async ({
   userId,
-  teamId,
+  profile,
 }: {
   userId: string;
-  teamId: string;
-}): Promise<void> => {
-  // checking user and team exists
-  await getProfileFromId(userId);
-  await getTeamFromId(teamId);
+  profile: Profile;
+}): Promise<Profile> => {
+  const oldProfile = await getProfileFromUserId(userId);
 
-  // check if user has already selected team
-  const { data } = await supabase
-    .from('team_ownership')
-    .select('user, team')
-    .eq('user', userId)
-    .eq('team', teamId);
-  if (data) {
-    throw Error('User has already selected this team');
+  const { data, error } = await supabase
+    .from('profiles')
+    .update({ name: profile.name })
+    .eq('id', oldProfile.id)
+    .select()
+    .single();
+
+  if (error) {
+    throw Error(`Error updating profile ${error.message}`);
   }
 
-  await supabase
-    .from('team_ownerships')
-    .insert([{ season: CURRENT_SEASON, user: userId, team: teamId }]);
+  return data;
 };

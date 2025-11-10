@@ -18,6 +18,7 @@ import { useAuthentication } from '../hooks/useAuthentication';
 import { useTitle } from '../hooks/useTitle';
 import FormPageLayout from './draft/DraftLayout';
 import { Upload } from 'lucide-react';
+import api from '../api';
 
 // 🧱 Define the form’s shape
 interface ProfileFormValues {
@@ -31,11 +32,17 @@ const Profile = () => {
   const { profile } = useAuthentication();
   const [previewUrl, setPreviewUrl] = useState<string | null>(null);
 
-  const initialValues = {
-    name: 'John Doe',
-    email: 'johndoe@example.com',
-    profileImage: null,
-  };
+  const initialValues = profile
+    ? {
+        name: profile.name,
+        email: profile.email || '',
+        profileImage: null,
+      }
+    : {
+        name: 'John Doe',
+        email: 'johndoe@example.com',
+        profileImage: null,
+      };
 
   const handleFileChange = (
     files: File[],
@@ -54,12 +61,16 @@ const Profile = () => {
     }
   };
 
-  // 🧩 Handle form submission
   const onSubmit = (values: ProfileFormValues) => {
     console.log('Updated profile:', values);
-    setTimeout(() => {
-      alert('Profile updated!');
-    }, 800);
+    try {
+      api.post('/profile/update', { profile: values }).then((res) => {
+        console.log('UPDATE PROFILE RESPONSE', res);
+        window.location.reload();
+      });
+    } catch (error) {
+      console.log();
+    }
   };
 
   return (
