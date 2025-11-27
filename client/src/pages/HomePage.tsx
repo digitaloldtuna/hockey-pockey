@@ -34,7 +34,6 @@ const HomePage = () => {
         .get('/draft/all')
         .then((res) => {
           setDraftLoading(false);
-          console.log('HOME RES', res);
           setDrafts(res.data.drafts);
         })
         .catch((reason) => {

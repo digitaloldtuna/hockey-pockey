@@ -22,21 +22,22 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const navigate = useNavigate();
 
+  const fetchSession = async () => {
+    setLoading(true);
+    api
+      .get('/authentication/session')
+      .then((res) => {
+        setSession(res.data);
+        setProfile(res.data.profile);
+        setLoading(false);
+      })
+      .catch(() => {
+        setSession({ authenticated: false });
+        setLoading(false);
+      });
+  };
+
   useEffect(() => {
-    async function fetchSession() {
-      setLoading(true);
-      api
-        .get('/authentication/session')
-        .then((res) => {
-          setSession(res.data);
-          setProfile(res.data.profile);
-          setLoading(false);
-        })
-        .catch(() => {
-          setSession({ authenticated: false });
-          setLoading(false);
-        });
-    }
     fetchSession();
   }, []);
 
@@ -48,6 +49,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       if (data.profile) {
         setProfile(data.profile);
       }
+      fetchSession();
       navigate(ROUTES.HOME);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
@@ -58,7 +60,10 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const handleSignup = (email: string, password: string, name: string) => {
     try {
-      api.post('/authentication/signup', { email, password, name });
+      api.post('/authentication/signup', { email, password, name }).then((res) => {
+        console.log('SIGN UP SUCCESSFUL');
+        navigate(ROUTES.LOGIN);
+      });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
       alert(err.response?.data?.error || 'Signup failed');
