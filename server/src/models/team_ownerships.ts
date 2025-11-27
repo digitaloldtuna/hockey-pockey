@@ -1,24 +1,42 @@
 import { CURRENT_SEASON } from '../constants';
 import { supabaseAdmin as supabase } from '../supabase';
-import { getDraftMembershipFromMemberAndDraft } from './draft_memberships';
+import { Draft } from './drafts';
+import { DraftMembership, getDraftMembershipFromMemberAndDraft } from './draft_memberships';
 
-export type TeamOwnership = {
+export type TeamOwnership<T = number> = {
   id: number;
   createdAt: Date;
-  draftMembership: number; // gives us user and season
+  draftMembership: T;
   team: number;
 };
 
-export const getTeamOwnershipsFromUser = async (userId: string) => {
+export const getTeamOwnershipsFromUser = async (userId: string): Promise<TeamOwnership[]> => {
   const { data, error } = await supabase
     .from('team_ownerships')
     .select('*')
     .eq('draftMembership.user', userId)
     .eq('draftMembership.draft.season', CURRENT_SEASON);
   if (error || !data) {
-    throw Error(`Error fetching team ownerships: ${error}`);
+    throw Error(`Cannot fetch team ownerships: ${error.message}`);
   }
   return data;
+};
+
+export const getTeamOwnershipsFromDraft = async (
+  draft: Draft
+): Promise<TeamOwnership<DraftMembership>[]> => {
+  const { data, error } = await supabase
+    .from('team_ownerships')
+    .select(`*,draftMembership:draftMembership(*)`)
+    .eq('draftMembership.draft', draft.id);
+  if (error || !data) {
+    throw Error(`Cannot fetch team ownerships: ${error.message}`);
+  }
+
+  // the filtering above will leave draftMembership as null if draft id doesn't match
+  // but we will have to manually filter
+  const filteredOwnerships = data.filter((ownership) => !!ownership.draftMembership);
+  return filteredOwnerships;
 };
 
 export const createTeamOwnership = async ({

@@ -23,7 +23,7 @@ export interface TeamOwnership {
 
 export const getTeamsForUser = async (userId: string): Promise<Team[]> => {
   const teamOwnerships = await getTeamOwnershipsFromUser(userId);
-  const teamIds = teamOwnerships.map((ownership) => ownership.teamId);
+  const teamIds = teamOwnerships.map((ownership) => ownership.team);
 
   const { data, error } = await supabase.from('teams').select('*').in('id', teamIds);
   if (error || !data) {

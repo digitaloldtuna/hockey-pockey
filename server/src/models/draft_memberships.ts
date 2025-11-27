@@ -1,10 +1,10 @@
 import { supabaseAdmin as supabase } from '../supabase';
-import { getProfileFromId } from './profiles';
-import { getDraftFromId } from './drafts';
+import { getProfileFromId, Profile } from './profiles';
+import { Draft, getDraftFromId } from './drafts';
 
-export type DraftMemberships = {
+export type DraftMembership = {
   id: number;
-  user: string;
+  profile: Profile | string;
   draft: number;
 };
 
@@ -26,6 +26,21 @@ export const getDraftMembershipFromMemberAndDraft = async ({
     throw Error(`Error finding draft membership: ${error.message}`);
   }
 
+  return data;
+};
+
+export const getDraftMembershipsFromIds = async (ids: number[]): Promise<DraftMembership[]> => {
+  console.log('IDS', ids);
+  const { data, error } = (await supabase
+    .from('draft_memberships')
+    .select('*,profile:profiles!profile(*)')
+    .in('id', ids)) as {
+    data: DraftMembership[] | null;
+    error: any;
+  };
+  if (error || !data) {
+    throw Error(`Error finding draft membership: ${error.message}`);
+  }
   return data;
 };
 

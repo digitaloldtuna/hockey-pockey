@@ -52,7 +52,6 @@ export const MOCKED_DRAFTS: Record<string, Draft> = {
     ],
   },
 };
-*/
 
 export const MOCKED_TEAMS: Record<string, Team> = {
   [1]: {
@@ -88,4 +87,16 @@ export const MOCKED_TEAMS: Record<string, Team> = {
     divisionName: 'Pacific',
     conferenceName: 'Western',
   },
+};
+*/
+
+export const UPCOMING_GAMES = [];
+
+export const DRAFT_LEADERBOARD = (members: { id: string; name: string; email?: string }[]) => {
+  return members.map((member) => ({
+    id: member.id,
+    name: member.name,
+    email: member.email,
+    score: Math.floor(Math.random() * 10),
+  }));
 };

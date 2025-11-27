@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { ROUTES } from '../constants/routes';
 import { Profile, Session } from '../constants/types';
+import { toastError } from '../theme/toaster';
 
 interface AuthContextType {
   loading: boolean;
@@ -53,7 +54,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       navigate(ROUTES.HOME);
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Login failed');
+      console.log('ERROR', err.response?.data?.error);
+      toastError(err.response?.data?.error || 'Login failed');
     }
     setLoading(false);
   };
@@ -66,7 +68,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       });
       // eslint-disable-next-line @typescript-eslint/no-explicit-any
     } catch (err: any) {
-      alert(err.response?.data?.error || 'Signup failed');
+      console.log('ERROR', err);
+      toastError(err.response?.data?.error || 'Signup failed');
     }
   };
 

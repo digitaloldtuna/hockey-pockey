@@ -6,10 +6,12 @@ import { AuthProvider } from './hooks/useAuthentication';
 import { CreateDraft, Draft, HomePage, JoinDraft, LoginPage, Profile, SignupPage } from './pages';
 import { ROUTES } from './constants/routes';
 import { ProtectedRoute, UnprotectedRoute } from './components';
+import { Toaster } from './theme/toaster';
 
 function App() {
   return (
     <ChakraProvider value={system}>
+      <Toaster />
       <BrowserRouter>
         <AuthProvider>
           <Routes>

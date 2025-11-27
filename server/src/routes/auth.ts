@@ -19,30 +19,35 @@ router.post('/signup', async (req, res) => {
     return res.status(201).json({ profile });
   } catch (err) {
     console.error('Signup error:', err);
-    return res.status(500).json({ error: 'Internal server error' });
+    return res.status(500).json({ error: err || 'Internal server error' });
   }
 });
 
 router.post('/login', async (req, res) => {
-  const { email, password } = req.body;
-  const session = await loginWithCredentials({ email, password });
-  const { access_token, refresh_token, expires_in } = session;
+  try {
+    const { email, password } = req.body;
+    const session = await loginWithCredentials({ email, password });
+    const { access_token, refresh_token, expires_in } = session;
 
-  res.cookie('access_token', access_token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: expires_in * 1000, // expires_in is in seconds
-  });
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: expires_in * 1000, // expires_in is in seconds
+    });
 
-  res.cookie('refresh_token', refresh_token, {
-    httpOnly: true,
-    secure: process.env.NODE_ENV === 'production',
-    sameSite: 'lax',
-    maxAge: 60 * 60 * 24 * 30 * 1000, // 30 days
-  });
+    res.cookie('refresh_token', refresh_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: 60 * 60 * 24 * 30 * 1000, // 30 days
+    });
 
-  res.json({ message: 'Logged in' });
+    res.json({ message: 'Logged in' });
+  } catch (err) {
+    console.error('Signup error:', err);
+    return res.status(500).json({ error: 'Internal server error' });
+  }
 });
 
 router.get('/session', async (req, res) => {
