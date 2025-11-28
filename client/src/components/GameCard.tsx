@@ -1,4 +1,4 @@
-import { Box, Flex, Grid, Heading, HStack, Image, Tag, Text, VStack } from '@chakra-ui/react';
+import { Flex, Grid, Heading, Image, Tag, VStack } from '@chakra-ui/react';
 import { Game, Profile } from '../constants/types';
 import { getAvatarColour } from '../utils';
 

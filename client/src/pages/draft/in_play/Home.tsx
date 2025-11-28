@@ -4,17 +4,15 @@ import {
   Grid,
   Heading,
   HStack,
-  Image,
   ScrollArea,
   Switch,
-  Tag,
   Text,
   VStack,
 } from '@chakra-ui/react';
 import { useId, useState } from 'react';
 import api from '../../../api';
 import GameCard from '../../../components/GameCard';
-import { Game, Profile } from '../../../constants/types';
+import { Game } from '../../../constants/types';
 import { useDraft } from '../../../hooks/useDraft';
 import { toastError } from '../../../theme/toaster';
 import { Tooltip } from '../../../theme/tooltip';
@@ -31,9 +29,9 @@ const formatDate = (dateString: string) => {
   const formatDate = (date: Date) => date.toISOString().split('T')[0]; // "YYYY-MM-DD"
 
   let date = dateString;
-  if (date == formatDate(today)) {
+  if (date === formatDate(today)) {
     date = 'Today';
-  } else if (date == formatDate(tomorrow)) {
+  } else if (date === formatDate(tomorrow)) {
     date = 'Tomorrow';
   } else {
     date = new Date(date).toLocaleDateString('en-US', {

@@ -1,4 +1,4 @@
-import { Button, Flex, Link, Tabs, Text } from '@chakra-ui/react';
+import { Button, Flex, Tabs, Text } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
