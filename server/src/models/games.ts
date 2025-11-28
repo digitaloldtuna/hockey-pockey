@@ -22,7 +22,15 @@ export const getGames = async ({ season }: { season?: number }): Promise<Game[]>
   }
   const { data, error } = await supabase.from('games').select('*').eq('season', season);
   if (error) {
-    throw Error(`Error fetching games: ${error}`);
+    throw Error(`Cannot fetch games: ${error}`);
   }
   return data;
+};
+
+export const updateOrCreateGames = async (games: Game[]) => {
+  const { data, error } = await supabase.from('games').upsert(games, { onConflict: 'id' }).select();
+  if (error) {
+    throw Error(`Cannot update games: ${error.message}`);
+  }
+  console.log('Updated the following', data);
 };

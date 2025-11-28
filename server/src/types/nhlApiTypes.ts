@@ -1,3 +1,5 @@
+import { Game } from '../models/games';
+
 export type Standing = {
   conferenceName: string;
   divisionName: string;
@@ -34,5 +36,10 @@ export type Team = {
 
 export type TeamsResponse = {
   data: Team[];
+  total: number;
+};
+
+export type GamesResponse = {
+  data: Game[];
   total: number;
 };

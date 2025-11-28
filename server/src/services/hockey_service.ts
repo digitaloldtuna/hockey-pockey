@@ -1,9 +1,24 @@
 import { getDraftFromId } from '../models/drafts';
 import { getTeamOwnershipsFromDraft } from '../models/team_ownerships';
-import { getGames } from '../models/games';
-import { getProfileFromId, getProfileFromIds } from '../models/profiles';
+import { getProfileFromIds } from '../models/profiles';
+import { getGames as getGamesApi } from './nhlApi';
+import { Game, getGames, updateOrCreateGames } from '../models/games';
+import { getAllTeamIds } from '../models/teams';
 
-export const refreshGames = () => {};
+// WILL ONLY UPDATE FOR CURRENT SEASON (2026)
+export const refreshGames = async () => {
+  const games = await getGamesApi();
+  const teamIds = new Set<number>(await getAllTeamIds());
+
+  let gamesToUpdateOrCreate: Game[] = [];
+  games.forEach((game) => {
+    if (game.season !== 20252026) return;
+    if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) return;
+    gamesToUpdateOrCreate.push(game);
+  });
+
+  await updateOrCreateGames(gamesToUpdateOrCreate);
+};
 
 export const getLeaderboard = async (draftId: number) => {
   const draft = await getDraftFromId(draftId);
@@ -25,6 +40,7 @@ export const getLeaderboard = async (draftId: number) => {
   const owner: Record<string, string> = {};
   const scores: Record<string, number> = {};
 
+  // populating hashes for faster querying later
   teamOwnerships.forEach((ownership) => {
     const teamOwner = draftMembershipToMember[ownership.draftMembership.id];
     const team = Number(ownership.team);
@@ -39,8 +55,8 @@ export const getLeaderboard = async (draftId: number) => {
     teamsSelected.add(ownership.team);
   });
 
+  // calculating score
   const games = await getGames({});
-
   games.forEach((game) => {
     const homeTeamId = String(game.homeTeamId);
     const visitingTeamId = String(game.visitingTeamId);

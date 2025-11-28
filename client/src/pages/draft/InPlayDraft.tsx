@@ -2,11 +2,11 @@ import { Avatar, Button, Flex, Grid, Heading, HStack, Text } from '@chakra-ui/re
 import Layout from '../Layout';
 import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
-import { ArrowLeft } from 'lucide-react';
+import { ArrowLeft, RefreshCcw } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { useState } from 'react';
 import api from '../../api';
-import { toastError } from '../../theme/toaster';
+import { toastError, toastSuccess } from '../../theme/toaster';
 
 const colorPalette = ['red', 'blue', 'yellow', 'purple', 'orange'];
 
@@ -39,22 +39,40 @@ const InPlayDraft = ({ draft }: Props) => {
     fetchLeaderboard();
   }
 
+  const handleRefreshData = () => {
+    api
+      .post(`/hockey/refresh`)
+      .then((res) => {
+        toastSuccess('Successfully refreshed hockey data.');
+        fetchLeaderboard();
+      })
+      .catch((reason) => {
+        toastError('Error refreshing hockey data', reason);
+      });
+  };
+
   return (
     <Layout>
-      <Flex justify="start" align="center">
-        <Button
-          variant="plain"
-          size="2xl"
-          gap="8"
-          padding="0"
-          onClick={() => navigate(ROUTES.HOME)}
-        >
-          <ArrowLeft />
+      <Flex justify="space-between" align="center">
+        <Flex justify="start" align="center">
+          <Button
+            variant="plain"
+            size="2xl"
+            gap="8"
+            padding="0"
+            onClick={() => navigate(ROUTES.HOME)}
+          >
+            <ArrowLeft />
+          </Button>
+          <Text fontSize="3xl" color="oxford">
+            <b>{draft.name} </b>
+            {draft.season}
+          </Text>
+        </Flex>
+        <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleRefreshData}>
+          <RefreshCcw />
+          refresh
         </Button>
-        <Text fontSize="3xl" color="oxford">
-          <b>{draft.name} </b>
-          {draft.season}
-        </Text>
       </Flex>
       <Grid templateColumns="repeat(2, 1fr)" gap="10">
         {/* UPCOMING GAMES */}
@@ -77,7 +95,7 @@ const InPlayDraft = ({ draft }: Props) => {
                   padding="3"
                   paddingX="5"
                   rounded="2xl"
-                  backgroundColor="whiteAlpha.500"
+                  backgroundColor="white"
                   alignItems="center"
                 >
                   <HStack gap="3">

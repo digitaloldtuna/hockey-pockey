@@ -2,7 +2,7 @@ import { supabaseAdmin as supabase } from '../supabase';
 import { getTeamOwnershipsFromUser } from './team_ownerships';
 
 export interface Team {
-  id: string;
+  id: number;
   apiId: number;
   franchiseId: number;
   fullName: string;
@@ -46,4 +46,9 @@ export const getAllTeams = async (): Promise<Team[]> => {
     throw Error(`Error fetching team: ${error}`);
   }
   return data;
+};
+
+export const getAllTeamIds = async () => {
+  const allTeams = await getAllTeams();
+  return allTeams.map((team) => team.id);
 };
