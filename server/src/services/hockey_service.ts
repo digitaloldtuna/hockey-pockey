@@ -1,10 +1,17 @@
-import { getDraftFromId } from '../models/drafts';
-import { getTeamOwnershipsFromDraft } from '../models/team_ownerships';
+import { Draft } from '../models/drafts';
+import { getTeamOwnershipsFromDraft, TeamOwnership } from '../models/team_ownerships';
 import { getProfileFromIds, Profile } from '../models/profiles';
 import { getGames as getGamesApi } from './nhl_api';
-import { Game, getGames, getGamesInTimeFrame, updateOrCreateGames } from '../models/games';
+import {
+  Game,
+  getCompletedGamesByTeams,
+  getGames,
+  getGamesInTimeFrame,
+  updateOrCreateGames,
+} from '../models/games';
 import { getAllTeamIds, getAllTeams, Team } from '../models/teams';
 import _ from 'lodash';
+import { DraftMembership } from '../models/draft_memberships';
 
 // WILL ONLY UPDATE FOR CURRENT SEASON (2026)
 export const refreshGames = async () => {
@@ -27,6 +34,7 @@ export const refreshGames = async () => {
     game.easternStartTime = `${game.easternStartTime}+00:00`;
 
     if (game.season !== 20252026) return;
+    if (game.gameType !== 2 && game.gameType !== 3) return;
     if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) return;
     if (!(game.id in allGames)) {
       gamesToUpdateOrCreate.push(game);
@@ -109,7 +117,39 @@ export const getGamesThisWeek = async (draftId: number) => {
   const endFormatted = end.toISOString().split('T')[0];
 
   const games = await getGamesInTimeFrame({ start: nowFormatted, end: endFormatted });
+  const teamOwnerships = await getTeamOwnershipsFromDraft(draftId);
 
+  const gamesWithAnnotation = await annotateGames(games, teamOwnerships);
+  const partitionedGames = partitionGamesByDate(gamesWithAnnotation);
+
+  return partitionedGames;
+};
+
+export const getHistory = async (profile: Profile, draft: Draft) => {
+  const teamOwnerships = await getTeamOwnershipsFromDraft(draft.id);
+  const selectedTeams = teamOwnerships
+    .filter((ownership) => ownership.draftMembership.profile.id === profile.id)
+    .map((ownership) => ownership.team.apiId);
+  const validTeams = teamOwnerships.map((ownership) => ownership.team.apiId);
+
+  const rawGames = await getCompletedGamesByTeams(selectedTeams, validTeams);
+
+  // have to manually remove playing aginst yourself
+  const selectedTeamSet = new Set(selectedTeams);
+  const filteredGames = rawGames.filter(
+    (game) => !(selectedTeamSet.has(game.homeTeamId) && selectedTeamSet.has(game.visitingTeamId))
+  );
+
+  const annotatedGames = await annotateGames(filteredGames, teamOwnerships);
+  const partitionedGames = partitionGamesByDate(annotatedGames);
+
+  return partitionedGames;
+};
+
+const annotateGames = async (
+  games: Game[],
+  teamOwnerships: TeamOwnership<Team, DraftMembership<Profile>>[]
+) => {
   const teamsArray = await getAllTeams();
   const teams: Record<string, Team> = teamsArray.reduce(
     (arr, team) => ({
@@ -119,7 +159,7 @@ export const getGamesThisWeek = async (draftId: number) => {
     {}
   );
 
-  const teamOwnershipsArray = await getTeamOwnershipsFromDraft(draftId);
+  const teamOwnershipsArray = teamOwnerships;
   const teamOwnership: Record<string, Profile> = teamOwnershipsArray.reduce(
     (arr, teamOwnership) => ({
       ...arr,
@@ -140,7 +180,11 @@ export const getGamesThisWeek = async (draftId: number) => {
       };
     });
 
-  const gamesPartitioned = gamesWithAnnotation.reduce(
+  return gamesWithAnnotation;
+};
+
+const partitionGamesByDate = (games: Game[]) => {
+  const gamesPartitioned = games.reduce(
     (arr, game) => {
       if (game.gameDate in arr) {
         arr[game.gameDate].push(game);

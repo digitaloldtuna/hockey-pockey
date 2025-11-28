@@ -79,6 +79,25 @@ export const getGamesInTimeFrame = async ({
   return data;
 };
 
+export const getCompletedGamesByTeams = async (selectedTeams: number[], validTeams: number[]) => {
+  if (selectedTeams.length === 0 || validTeams.length === 0) return [];
+  const formatted = `(${selectedTeams.join(',')})`;
+
+  const { data, error } = await supabase
+    .from('games')
+    .select('*')
+    .eq('season', 20252026)
+    .or('gameStateId.in.(3,7)')
+    .in('homeTeamId', validTeams)
+    .in('visitingTeamId', validTeams)
+    .or(`homeTeamId.in.${formatted}, visitingTeamId.in.${formatted}`);
+
+  if (error) {
+    throw Error(`Cannot fetch games by teams: ${error.message}`);
+  }
+  return data;
+};
+
 const getDateRange = (start: string, end: string): string[] => {
   const result: string[] = [];
 

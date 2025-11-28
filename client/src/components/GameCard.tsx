@@ -15,7 +15,7 @@ function formatTime12(iso: string): string {
   return `${hour}:${minute} ${ampm}`;
 }
 
-const GameCard = ({ fade, game }: { fade: boolean; game: Game }) => {
+const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
   const badge = (notCounted: boolean, member?: Profile) => {
     if (member) {
       return (
