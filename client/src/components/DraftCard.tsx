@@ -2,13 +2,7 @@ import { Avatar, AvatarGroup, Box, Flex, Tag, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { DraftStatusLabel } from '../constants/mappings';
 import { Draft } from '../constants/types';
-
-const colorPalette = ['red', 'blue', 'yellow', 'purple', 'orange'];
-
-const pickPalette = (name: string) => {
-  const index = name.charCodeAt(0) % colorPalette.length;
-  return colorPalette[index];
-};
+import { getAvatarColour } from '../utils';
 
 const DraftStatusToColour = {
   open: 'yellow',
@@ -56,7 +50,7 @@ const DraftCard = ({ draft }: Props) => {
       <Flex justify="space-between">
         <AvatarGroup gap="0" spaceX="0" size="xs">
           {members.map((member) => (
-            <Avatar.Root colorPalette={pickPalette(member.id)}>
+            <Avatar.Root colorPalette={getAvatarColour(member.id)}>
               <Avatar.Fallback name={member.name} />
             </Avatar.Root>
           ))}

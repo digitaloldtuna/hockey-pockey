@@ -1,19 +1,12 @@
-import { Avatar, Button, Flex, Grid, Heading, HStack, Text } from '@chakra-ui/react';
+import { Button, Flex, Link, Tabs, Text } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
-import { ArrowLeft, RefreshCcw } from 'lucide-react';
+import { ArrowLeft, ChartBar, Home, RefreshCcw, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { useState } from 'react';
 import api from '../../api';
 import { toastError, toastSuccess } from '../../theme/toaster';
-
-const colorPalette = ['red', 'blue', 'yellow', 'purple', 'orange'];
-
-const pickPalette = (name: string) => {
-  const index = name.charCodeAt(0) % colorPalette.length;
-  return colorPalette[index];
-};
+import { InPlayHome, InPlayStandings, InPlayStats } from './in_play';
 
 type Props = {
   draft: Draft;
@@ -21,30 +14,12 @@ type Props = {
 
 const InPlayDraft = ({ draft }: Props) => {
   const navigate = useNavigate();
-  const [leaderboard, setLeaderboard] = useState<any[] | null>(null);
-
-  const fetchLeaderboard = () => {
-    api
-      .get(`/draft/leaderboard?id=${draft.id}`)
-      .then((res) => {
-        setLeaderboard(res.data.leaderboard);
-      })
-      .catch((reason) => {
-        setLeaderboard([]);
-        toastError('Error fetching leaderboard for draft', reason);
-      });
-  };
-
-  if (leaderboard === null) {
-    fetchLeaderboard();
-  }
 
   const handleRefreshData = () => {
     api
       .post(`/hockey/refresh`)
       .then((res) => {
         toastSuccess('Successfully refreshed hockey data.');
-        fetchLeaderboard();
       })
       .catch((reason) => {
         toastError('Error refreshing hockey data', reason);
@@ -53,63 +28,54 @@ const InPlayDraft = ({ draft }: Props) => {
 
   return (
     <Layout>
-      <Flex justify="space-between" align="center">
-        <Flex justify="start" align="center">
-          <Button
-            variant="plain"
-            size="2xl"
-            gap="8"
-            padding="0"
-            onClick={() => navigate(ROUTES.HOME)}
-          >
-            <ArrowLeft />
-          </Button>
-          <Text fontSize="3xl" color="oxford">
-            <b>{draft.name} </b>
-            {draft.season}
-          </Text>
-        </Flex>
-        <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleRefreshData}>
-          <RefreshCcw />
-          refresh
+      <Flex justify="start" align="center">
+        <Button
+          variant="plain"
+          size="2xl"
+          gap="8"
+          padding="0"
+          onClick={() => navigate(ROUTES.HOME)}
+        >
+          <ArrowLeft />
         </Button>
+        <Text fontSize="3xl" color="oxford">
+          <b>{draft.name} </b>
+          {draft.season}
+        </Text>
       </Flex>
-      <Grid templateColumns="repeat(2, 1fr)" gap="10">
-        {/* UPCOMING GAMES */}
-        <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column" gap="3">
-          <Text fontSize="2xl" color="oxford">
-            upcoming games
-          </Text>
+      <Tabs.Root defaultValue="home" variant="plain">
+        <Flex justify="space-between" align="center">
+          <Tabs.List bg="whiteAlpha.500" rounded="l3" p="1">
+            <Tabs.Trigger value="home" p="3">
+              <Home />
+              Home
+            </Tabs.Trigger>
+            <Tabs.Trigger value="standings">
+              <Users />
+              Standings
+            </Tabs.Trigger>
+            <Tabs.Trigger value="stats">
+              <ChartBar />
+              Stats
+            </Tabs.Trigger>
+            <Tabs.Indicator rounded="l2" />
+          </Tabs.List>
+          <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleRefreshData}>
+            <RefreshCcw />
+            refresh
+          </Button>
         </Flex>
 
-        {/* LEADERBOARD */}
-        <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column" gap="3">
-          <Text fontSize="2xl" color="oxford">
-            leaderboard
-          </Text>
-          <Flex direction="column" gap="3">
-            {leaderboard &&
-              leaderboard.map((member) => (
-                <Flex
-                  justify="space-between"
-                  padding="3"
-                  paddingX="5"
-                  rounded="2xl"
-                  backgroundColor="white"
-                  alignItems="center"
-                >
-                  <HStack gap="3">
-                    <Avatar.Root colorPalette={pickPalette(member.name)}>
-                      <Avatar.Fallback name={member.name} />
-                    </Avatar.Root>
-                    <Heading size="md">{member.name}</Heading>
-                  </HStack>
-                  <Heading size="xl">{member.score}</Heading>
-                </Flex>
-              ))}
-          </Flex>
-        </Flex>
-      </Grid>
+        <Tabs.Content value="home">
+          <InPlayHome />
+        </Tabs.Content>
+        <Tabs.Content value="standings">
+          <InPlayStandings />
+        </Tabs.Content>
+        <Tabs.Content value="stats">
+          <InPlayStats />
+        </Tabs.Content>
+      </Tabs.Root>
     </Layout>
   );
 };

@@ -20,6 +20,7 @@ import { Tooltip } from '../../theme/tooltip';
 import { X } from 'lucide-react';
 import api from '../../api';
 import { useState } from 'react';
+import { getAvatarColour } from '../../utils';
 
 type Props = {
   draft: Draft;
@@ -125,7 +126,7 @@ const OpenDraft = ({ draft }: Props) => {
             {members.map((member) => (
               <HStack key={member.name} justify="space-between">
                 <HStack gap="4">
-                  <Avatar.Root>
+                  <Avatar.Root colorPalette={getAvatarColour(member.id)}>
                     <Avatar.Fallback name={member.name} />
                   </Avatar.Root>
                   <Stack gap="0">
