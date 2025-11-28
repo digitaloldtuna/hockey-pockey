@@ -50,5 +50,5 @@ export const getAllTeams = async (): Promise<Team[]> => {
 
 export const getAllTeamIds = async () => {
   const allTeams = await getAllTeams();
-  return allTeams.map((team) => team.id);
+  return allTeams.map((team) => team.apiId);
 };

@@ -3,12 +3,13 @@ import { supabaseAdmin as supabase } from '../supabase';
 import { Draft } from './drafts';
 import { DraftMembership, getDraftMembershipFromMemberAndDraft } from './draft_memberships';
 import { Profile } from './profiles';
+import { Team } from './teams';
 
-export type TeamOwnership<T = number> = {
+export type TeamOwnership<TeamType = number, DraftType = number> = {
   id: number;
   createdAt: Date;
-  draftMembership: T;
-  team: number;
+  draftMembership: DraftType;
+  team: TeamType;
 };
 
 export const getTeamOwnershipsFromUser = async (userId: string): Promise<TeamOwnership[]> => {
@@ -25,10 +26,10 @@ export const getTeamOwnershipsFromUser = async (userId: string): Promise<TeamOwn
 
 export const getTeamOwnershipsFromDraft = async (
   draftId: number
-): Promise<TeamOwnership<DraftMembership<Profile>>[]> => {
+): Promise<TeamOwnership<Team, DraftMembership<Profile>>[]> => {
   const { data, error } = await supabase
     .from('team_ownerships')
-    .select(`*,draftMembership:draftMembership(*,profile:profile(*))`)
+    .select(`*,draftMembership:draftMembership(*,profile:profile(*)),team:team(*)`)
     .eq('draftMembership.draft', draftId);
   if (error || !data) {
     throw Error(`Cannot fetch team ownerships: ${error.message}`);

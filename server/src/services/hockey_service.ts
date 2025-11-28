@@ -9,12 +9,8 @@ import _ from 'lodash';
 // WILL ONLY UPDATE FOR CURRENT SEASON (2026)
 export const refreshGames = async () => {
   const gamesFromDB = await getGames({});
-  console.log('gamesFromDB', gamesFromDB.length);
   const allGames: Record<number, any> = gamesFromDB.reduce(
     (arr, game) => {
-      if (game.id === 2025021305) {
-        console.log('EXISTS');
-      }
       delete game.lastUpdated;
       arr[game.id] = game;
       return arr;
@@ -65,16 +61,16 @@ export const getLeaderboard = async (draftId: number) => {
   // populating hashes for faster querying later
   teamOwnerships.forEach((ownership) => {
     const teamOwner = draftMembershipToMember[ownership.draftMembership.id];
-    const team = Number(ownership.team);
+    const team = Number(ownership.team.apiId);
     owner[team] = teamOwner;
 
     if (!(teamOwner in teams)) {
-      teams[teamOwner] = new Set([ownership.team]);
+      teams[teamOwner] = new Set([ownership.team.apiId]);
       scores[teamOwner] = 0;
     } else {
-      teams[teamOwner].add(ownership.team);
+      teams[teamOwner].add(ownership.team.apiId);
     }
-    teamsSelected.add(ownership.team);
+    teamsSelected.add(ownership.team.apiId);
   });
 
   // calculating score
@@ -106,19 +102,19 @@ export const getLeaderboard = async (draftId: number) => {
 
 export const getGamesThisWeek = async (draftId: number) => {
   const now = new Date();
-  const nowFormatted = now.toISOString();
+  const nowFormatted = now.toISOString().split('T')[0];
 
-  const oneWeekLater = new Date(now);
-  oneWeekLater.setUTCDate(now.getUTCDate() + 3);
-  const oneWeekLaterFormatted = oneWeekLater.toISOString();
+  const end = new Date(now);
+  end.setUTCDate(now.getUTCDate() + 3);
+  const endFormatted = end.toISOString().split('T')[0];
 
-  const games = await getGamesInTimeFrame({ start: nowFormatted, end: oneWeekLaterFormatted });
+  const games = await getGamesInTimeFrame({ start: nowFormatted, end: endFormatted });
 
   const teamsArray = await getAllTeams();
   const teams: Record<string, Team> = teamsArray.reduce(
     (arr, team) => ({
       ...arr,
-      [team.id]: team,
+      [team.apiId]: team,
     }),
     {}
   );
@@ -127,7 +123,7 @@ export const getGamesThisWeek = async (draftId: number) => {
   const teamOwnership: Record<string, Profile> = teamOwnershipsArray.reduce(
     (arr, teamOwnership) => ({
       ...arr,
-      [teamOwnership.team]: teamOwnership.draftMembership.profile,
+      [teamOwnership.team.apiId]: teamOwnership.draftMembership.profile,
     }),
     {}
   );
@@ -153,9 +149,19 @@ export const getGamesThisWeek = async (draftId: number) => {
       arr[game.gameDate] = [game];
       return arr;
     },
-    {} as Record<string, any>
+    {} as Record<string, Game[]>
   );
 
+  // sort within each bucket
+  Object.entries(gamesPartitioned).forEach((entry) => {
+    const date = entry[0];
+    const games = entry[1];
+    gamesPartitioned[date] = games.sort((a: Game, b: Game) =>
+      a.easternStartTime.localeCompare(b.easternStartTime)
+    );
+  });
+
+  // sort based on groups
   const gamesSortedByDate = Object.entries(gamesPartitioned).sort((a, b) => {
     if (a[0] > b[0]) return 1;
     if (a[0] < b[0]) return -1;

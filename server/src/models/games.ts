@@ -66,15 +66,39 @@ export const getGamesInTimeFrame = async ({
   start: string;
   end: string;
 }): Promise<Game[]> => {
+  const dates: string[] = getDateRange(start, end);
   const { data, error } = await supabase
     .from('games')
     .select('*')
-    .gte('easternStartTime', start)
-    .lte('easternStartTime', end)
+    .in('gameDate', dates)
     .eq('season', 20252026);
 
   if (error) {
     throw Error(`Cannot fetch games: ${error}`);
   }
   return data;
+};
+
+const getDateRange = (start: string, end: string): string[] => {
+  const result: string[] = [];
+
+  // Parse safely: avoid timezone shift
+  const [sy, sm, sd] = start.split('-').map(Number);
+  const [ey, em, ed] = end.split('-').map(Number);
+
+  let current = new Date(sy, sm - 1, sd);
+  const last = new Date(ey, em - 1, ed);
+
+  while (current <= last) {
+    const year = current.getFullYear();
+    const month = String(current.getMonth() + 1).padStart(2, '0');
+    const day = String(current.getDate()).padStart(2, '0');
+
+    result.push(`${year}-${month}-${day}`);
+
+    // move 1 day forward
+    current.setDate(current.getDate() + 1);
+  }
+
+  return result;
 };

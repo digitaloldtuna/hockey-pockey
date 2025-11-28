@@ -18,7 +18,7 @@ import { toastError } from '../../../theme/toaster';
 import { Tooltip } from '../../../theme/tooltip';
 import { getAvatarColour } from '../../../utils';
 
-const formatDate = (dateString: string) => {
+const formatDate = (date: string) => {
   const today = new Date();
 
   // Get tomorrow by adding 1 day
@@ -27,18 +27,18 @@ const formatDate = (dateString: string) => {
 
   // Format function
   const formatDate = (date: Date) => date.toISOString().split('T')[0]; // "YYYY-MM-DD"
+  const prettyDate = new Date(date + 'T05:00:00Z').toLocaleDateString('en-US', {
+    year: 'numeric',
+    month: 'long', // full month name
+    day: 'numeric',
+  });
 
-  let date = dateString;
   if (date === formatDate(today)) {
-    date = 'Today';
+    date = `Today - ${prettyDate}`;
   } else if (date === formatDate(tomorrow)) {
-    date = 'Tomorrow';
+    date = `Tomorrow - ${prettyDate}`;
   } else {
-    date = new Date(date).toLocaleDateString('en-US', {
-      year: 'numeric',
-      month: 'long', // full month name
-      day: 'numeric',
-    });
+    date = prettyDate;
   }
 
   return date;
