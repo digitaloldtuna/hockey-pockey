@@ -146,6 +146,8 @@ export const getHistory = async (profile: Profile, draft: Draft) => {
   return partitionedGames;
 };
 
+export const getStandings = async () => {};
+
 const annotateGames = async (
   games: Game[],
   teamOwnerships: TeamOwnership<Team, DraftMembership<Profile>>[]

@@ -16,20 +16,16 @@ function formatTime12(iso: string): string {
 }
 
 const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
-  const badge = (notCounted: boolean, member?: Profile) => {
+  const badge = (member?: Profile) => {
     if (member) {
       return (
-        <Tag.Root
-          size="sm"
-          colorPalette={getAvatarColour(member.id)}
-          opacity={notCounted ? 0.5 : 1}
-        >
+        <Tag.Root size="sm" colorPalette={getAvatarColour(member.id)}>
           <Tag.Label>{member.name}</Tag.Label>
         </Tag.Root>
       );
     }
     return (
-      <Tag.Root size="sm" colorPalette={'yellow'} opacity={notCounted ? 0.5 : 1}>
+      <Tag.Root size="sm" colorPalette={'yellow'}>
         <Tag.Label>unclaimed</Tag.Label>
       </Tag.Root>
     );
@@ -53,23 +49,19 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
           </Text>
         </>
       );
-    } else if (!fade && game.homeMember && game.visitingMember) {
+    } else if (game.homeMember && game.visitingMember) {
       const winner = game.homeScore > game.visitingScore ? game.homeMember : game.visitingMember;
-
       return (
         <>
           <HStack align="center">
             <Text fontSize="sm" opacity={fade ? 0.5 : 1}>
               winner:
             </Text>
-            {badge(false, winner)}
+            {badge(winner)}
           </HStack>
           <Heading size="3xl" opacity={fade ? 0.5 : 1}>
             {game.homeScore} vs. {game.visitingScore}
           </Heading>
-          <Text fontSize="sm" opacity={fade ? 0.5 : 1}>
-            {formatTime12(game.easternStartTime)}
-          </Text>
         </>
       );
     }
@@ -82,42 +74,36 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
       padding="3"
       paddingX="5"
       rounded="2xl"
-      backgroundColor={fade ? 'whiteAlpha.600' : 'white'}
+      backgroundColor={'white'}
       width="100%"
       borderWidth={game.gameStateId !== 1 && !fade ? '3px' : ''}
       borderColor={game.gameStateId === 2 ? 'orange' : 'brown'}
+      opacity={fade ? 0.5 : 1}
     >
-      <VStack align="start" gap="1">
-        <Image
-          src={game.homeTeam?.logo}
-          boxSize="60px"
-          fit="cover"
-          alt={game.homeTeam?.fullName}
-          opacity={fade ? 0.5 : 1}
-        />
-        <Heading size="sm" opacity={fade ? 0.5 : 1}>
-          {game.homeTeam?.fullName}
-        </Heading>
-        {badge(fade, game.homeMember)}
-      </VStack>
+      <HStack>
+        <Image src={game.homeTeam?.logo} boxSize="60px" fit="cover" alt={game.homeTeam?.fullName} />
+        <VStack align="start" gap="1">
+          <Heading size="sm">{game.homeTeam?.fullName}</Heading>
+          {badge(game.homeMember)}
+        </VStack>
+      </HStack>
 
       <Flex align="center" justify="center" direction="column">
         {middlePiece(game)}
       </Flex>
 
-      <VStack align="end" gap="1">
+      <HStack justify="end">
+        <VStack align="end" gap="1">
+          <Heading size="sm">{game.visitingTeam?.fullName}</Heading>
+          {badge(game.visitingMember)}
+        </VStack>
         <Image
           src={game.visitingTeam?.logo}
           boxSize="60px"
           fit="cover"
           alt={game.visitingTeam?.fullName}
-          opacity={fade ? 0.5 : 1}
         />
-        <Heading size="sm" opacity={fade ? 0.5 : 1}>
-          {game.visitingTeam?.fullName}
-        </Heading>
-        {badge(fade, game.visitingMember)}
-      </VStack>
+      </HStack>
     </Grid>
   );
 };
