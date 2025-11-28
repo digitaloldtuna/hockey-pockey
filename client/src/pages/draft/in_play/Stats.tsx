@@ -1,7 +1,7 @@
-import { Grid } from '@chakra-ui/react';
+import { VStack } from '@chakra-ui/react';
 
 const Stats = () => {
-  return <Grid templateColumns="repeat(2, 1fr)" gap="10"></Grid>;
+  return <VStack>🚧 under construction 🚧</VStack>;
 };
 
 export default Stats;

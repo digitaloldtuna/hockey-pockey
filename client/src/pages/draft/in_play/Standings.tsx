@@ -7,7 +7,7 @@ const Standings = () => {
     return <></>;
   }
 
-  return <VStack></VStack>;
+  return <VStack>🚧 under construction 🚧</VStack>;
 };
 
 export default Standings;

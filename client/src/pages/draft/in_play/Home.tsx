@@ -100,12 +100,12 @@ const Home = () => {
   };
 
   return (
-    <Grid templateColumns="repeat(2, 1fr)" gap="10">
+    <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap="10">
       {/* UPCOMING GAMES */}
       <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column">
-        <Flex align="center" direction="horizontal" justify="space-between">
+        <Flex align="center" direction="horizontal" justify="space-between" marginBottom="5">
           <Text fontSize="2xl" color="oxford" fontWeight="bold">
-            upcoming games
+            Upcoming Games
           </Text>
           <Tooltip ids={{ trigger: id }} content="This is a tooltip">
             <Switch.Root
@@ -128,13 +128,8 @@ const Home = () => {
                   const date = formatDate(entry[0]);
                   const games = entry[1];
                   return (
-                    <Flex direction="column">
-                      <Heading
-                        paddingBottom="1"
-                        borderBottom="1px solid black"
-                        marginBottom="3"
-                        marginTop="7"
-                      >
+                    <Flex direction="column" paddingBottom="8">
+                      <Heading paddingBottom="1" borderBottom="1px solid black" marginBottom="3">
                         {date}
                       </Heading>
                       <VStack>
@@ -158,7 +153,7 @@ const Home = () => {
       {/* LEADERBOARD */}
       <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column" gap="3">
         <Text fontSize="2xl" color="oxford" fontWeight="bold">
-          leaderboard
+          Leaderboard
         </Text>
         <Flex direction="column" gap="3">
           {leaderboard &&
@@ -175,7 +170,10 @@ const Home = () => {
                   <Avatar.Root colorPalette={getAvatarColour(member.id)}>
                     <Avatar.Fallback name={member.name} />
                   </Avatar.Root>
-                  <Heading size="md">{member.name}</Heading>
+                  <VStack align="start" gap="0">
+                    <Heading size="md">{member.name}</Heading>
+                    <Text fontSize="xs">{member.email}</Text>
+                  </VStack>
                 </HStack>
                 <Heading size="xl">{member.score}</Heading>
               </Flex>

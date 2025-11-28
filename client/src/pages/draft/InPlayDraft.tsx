@@ -2,11 +2,11 @@ import { Button, Flex, Tabs, Text } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
-import { ArrowLeft, ChartBar, Home, RefreshCcw, Users } from 'lucide-react';
+import { ArrowLeft, ChartBar, History, Home, RefreshCcw, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import api from '../../api';
 import { toastError, toastSuccess } from '../../theme/toaster';
-import { InPlayHome, InPlayStandings, InPlayStats } from './in_play';
+import { InPlayHistory, InPlayHome, InPlayStandings, InPlayStats } from './in_play';
 
 type Props = {
   draft: Draft;
@@ -38,7 +38,7 @@ const InPlayDraft = ({ draft }: Props) => {
         >
           <ArrowLeft />
         </Button>
-        <Text fontSize="3xl" color="oxford">
+        <Text fontSize="4xl" color="oxford">
           <b>{draft.name} </b>
           {draft.season}
         </Text>
@@ -58,6 +58,10 @@ const InPlayDraft = ({ draft }: Props) => {
               <ChartBar />
               Stats
             </Tabs.Trigger>
+            <Tabs.Trigger value="history">
+              <History />
+              History
+            </Tabs.Trigger>
             <Tabs.Indicator rounded="2xl" />
           </Tabs.List>
           <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleRefreshData}>
@@ -74,6 +78,9 @@ const InPlayDraft = ({ draft }: Props) => {
         </Tabs.Content>
         <Tabs.Content value="stats">
           <InPlayStats />
+        </Tabs.Content>
+        <Tabs.Content value="history">
+          <InPlayHistory />
         </Tabs.Content>
       </Tabs.Root>
     </Layout>
