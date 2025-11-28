@@ -18,12 +18,12 @@ const Draft = () => {
 
   useEffect(() => {
     const noDraft = !draft && draftId;
-    const newDraft = draft && draftId && draftId != draft?.id;
+    const newDraft = draft && draftId && draftId !== draft?.id;
 
     if ((noDraft || newDraft) && !loading) {
       setDraftId(draftId);
     }
-  }, [draftId, draft]);
+  }, [draftId, draft, loading, setDraftId]);
 
   const page = () => {
     if (!draft) {
