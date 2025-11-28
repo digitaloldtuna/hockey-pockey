@@ -1,4 +1,3 @@
-import { useState } from 'react';
 import { ROUTES } from '../../constants/routes';
 import { AbsoluteCenter, Box, Button, Field, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { useAuthentication } from '../../hooks/useAuthentication';
@@ -31,7 +30,7 @@ const LoginPage = () => {
 
   return (
     <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-      {({}) => (
+      {() => (
         <Form>
           <AbsoluteCenter>
             <Box p="10" borderRadius={'2xl'} backgroundColor="whiteAlpha.500">

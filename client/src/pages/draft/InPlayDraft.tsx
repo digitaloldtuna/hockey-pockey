@@ -1,21 +1,9 @@
-import {
-  AbsoluteCenter,
-  Avatar,
-  Box,
-  Button,
-  Flex,
-  Grid,
-  Heading,
-  HStack,
-  Tag,
-  Text,
-} from '@chakra-ui/react';
+import { Avatar, Button, Flex, Grid, Heading, HStack, Text } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import { DRAFT_LEADERBOARD } from '../../constants/mocks';
 import { useState } from 'react';
 import api from '../../api';
 import { toastError } from '../../theme/toaster';
