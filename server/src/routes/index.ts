@@ -1,5 +1,5 @@
 import express from 'express';
-import { getStandingsNow } from '../services/nhlApi';
+import { getStandingsNow } from '../services/nhl_api';
 import draftRouter from './draft';
 import hockeyRouter from './hockey';
 import profileRouter from './profile';

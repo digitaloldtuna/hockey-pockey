@@ -14,25 +14,49 @@ export type Game = {
   season: number;
   visitingScore: number;
   visitingTeamId: number;
+  lastUpdated?: string;
 };
 
 export const getGames = async ({ season }: { season?: number }): Promise<Game[]> => {
   if (!season) {
     season = 20252026;
   }
-  const { data, error } = await supabase.from('games').select('*').eq('season', season);
-  if (error) {
-    throw Error(`Cannot fetch games: ${error}`);
+
+  // supabase queries max out at 1000 records
+  // to get all data we need to handle pagination
+  const pageSize = 1000;
+  let from = 0;
+  let results: any[] = [];
+
+  while (true) {
+    const { data, error } = await supabase
+      .from('games')
+      .select('*')
+      .eq('season', season)
+      .range(from, from + pageSize - 1);
+
+    if (error) {
+      throw Error(`Cannot fetch games: ${error}`);
+    }
+
+    results = results.concat(data);
+
+    if (data.length < pageSize) break; // last page reached
+    from += pageSize;
   }
-  return data;
+
+  return results;
 };
 
 export const updateOrCreateGames = async (games: Game[]) => {
+  if (games.length === 0) {
+    console.log('No records to update');
+  }
   const { data, error } = await supabase.from('games').upsert(games, { onConflict: 'id' }).select();
   if (error) {
     throw Error(`Cannot update games: ${error.message}`);
   }
-  console.log('Updated the following', data);
+  console.log('Updated', data.length, 'record.');
 };
 
 export const getGamesInTimeFrame = async ({

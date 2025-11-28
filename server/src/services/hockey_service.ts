@@ -1,22 +1,45 @@
 import { getDraftFromId } from '../models/drafts';
 import { getTeamOwnershipsFromDraft } from '../models/team_ownerships';
 import { getProfileFromIds, Profile } from '../models/profiles';
-import { getGames as getGamesApi } from './nhlApi';
+import { getGames as getGamesApi } from './nhl_api';
 import { Game, getGames, getGamesInTimeFrame, updateOrCreateGames } from '../models/games';
 import { getAllTeamIds, getAllTeams, Team } from '../models/teams';
+import _ from 'lodash';
 
 // WILL ONLY UPDATE FOR CURRENT SEASON (2026)
 export const refreshGames = async () => {
+  const gamesFromDB = await getGames({});
+  console.log('gamesFromDB', gamesFromDB.length);
+  const allGames: Record<number, any> = gamesFromDB.reduce(
+    (arr, game) => {
+      if (game.id === 2025021305) {
+        console.log('EXISTS');
+      }
+      delete game.lastUpdated;
+      arr[game.id] = game;
+      return arr;
+    },
+    {} as Record<number, any>
+  );
+
   const games = await getGamesApi();
   const teamIds = new Set<number>(await getAllTeamIds());
+  const gamesToUpdateOrCreate: Game[] = [];
 
-  let gamesToUpdateOrCreate: Game[] = [];
   games.forEach((game) => {
+    // reformat date since DB auto adds the 00s
+    game.easternStartTime = `${game.easternStartTime}+00:00`;
+
     if (game.season !== 20252026) return;
     if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) return;
-    gamesToUpdateOrCreate.push(game);
+    if (!(game.id in allGames)) {
+      gamesToUpdateOrCreate.push(game);
+      return;
+    }
+    if (!_.isEqual(game, allGames[game.id])) gamesToUpdateOrCreate.push(game);
   });
 
+  console.log('amount to update', gamesToUpdateOrCreate.length);
   await updateOrCreateGames(gamesToUpdateOrCreate);
 };
 
