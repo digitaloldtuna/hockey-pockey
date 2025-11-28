@@ -87,7 +87,7 @@ export const getCompletedGamesByTeams = async (selectedTeams: number[], validTea
     .from('games')
     .select('*')
     .eq('season', 20252026)
-    .or('gameStateId.in.(3,7)')
+    .eq('gameStateId', 7)
     .in('homeTeamId', validTeams)
     .in('visitingTeamId', validTeams)
     .or(`homeTeamId.in.${formatted}, visitingTeamId.in.${formatted}`);

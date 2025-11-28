@@ -1,4 +1,4 @@
-import { Flex, Heading, HStack, ScrollArea, Text, VStack } from '@chakra-ui/react';
+import { Box, Flex, Grid, Heading, HStack, ScrollArea, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import api from '../../../api';
 import { HistoryCard } from '../../../components';
@@ -79,41 +79,46 @@ const History = () => {
 
   return (
     <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column">
-      <ScrollArea.Root height="32rem" variant="hover">
-        <ScrollArea.Viewport>
-          <ScrollArea.Content>
-            <Flex direction="column" gap="3">
-              {history &&
-                history.map((entry) => {
-                  const date = formatDate(entry[0]);
-                  const games = entry[1];
-                  return (
-                    <Flex direction="column" paddingBottom="8">
-                      <HStack
-                        paddingBottom="1"
-                        borderBottom="1px solid black"
-                        marginBottom="3"
-                        justify="space-between"
-                      >
-                        <Heading>{date}</Heading>
-                        <Text fontSize="lg">{winsIndicator(games)}</Text>
-                      </HStack>
-                      <VStack>
-                        {games.map((game) => (
-                          <HistoryCard game={game} />
-                        ))}
-                      </VStack>
-                    </Flex>
-                  );
-                })}
-            </Flex>
-          </ScrollArea.Content>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar>
-          <ScrollArea.Thumb />
-        </ScrollArea.Scrollbar>
-        <ScrollArea.Corner />
-      </ScrollArea.Root>
+      <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap="10">
+        <ScrollArea.Root height="32rem" variant="hover">
+          <ScrollArea.Viewport>
+            <ScrollArea.Content>
+              <Flex direction="column" gap="3">
+                {history &&
+                  history.map((entry) => {
+                    const date = formatDate(entry[0]);
+                    const games = entry[1];
+                    return (
+                      <Flex direction="column" paddingBottom="8">
+                        <HStack
+                          paddingBottom="1"
+                          borderBottom="1px solid black"
+                          marginBottom="3"
+                          justify="space-between"
+                        >
+                          <Heading>{date}</Heading>
+                          <Text fontSize="lg">{winsIndicator(games)}</Text>
+                        </HStack>
+                        <VStack>
+                          {games.map((game) => (
+                            <HistoryCard game={game} />
+                          ))}
+                        </VStack>
+                      </Flex>
+                    );
+                  })}
+              </Flex>
+            </ScrollArea.Content>
+          </ScrollArea.Viewport>
+          <ScrollArea.Scrollbar>
+            <ScrollArea.Thumb />
+          </ScrollArea.Scrollbar>
+          <ScrollArea.Corner />
+        </ScrollArea.Root>
+        <Box rounded="2xl" backgroundColor="white" width="sm" padding="5">
+          Filters coming soon 😶‍🌫️
+        </Box>
+      </Grid>
     </Flex>
   );
 };

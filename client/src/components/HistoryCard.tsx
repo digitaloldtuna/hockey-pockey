@@ -55,7 +55,9 @@ const HistoryCard = ({ game }: { game: Game }) => {
       padding="3"
       paddingX="5"
       rounded="2xl"
-      backgroundColor={won ? '#d0f2d1' : '#f2d0d0'}
+      borderWidth="3px"
+      borderColor={won ? '#4ccf51' : '#cf4c4c'}
+      backgroundColor={won ? '#f2fcf2' : '#fcf2f2'}
       width="100%"
     >
       <HStack>

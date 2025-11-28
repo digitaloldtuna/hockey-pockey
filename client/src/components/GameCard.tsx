@@ -38,18 +38,7 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
           {formatTime12(game.easternStartTime)}
         </Heading>
       );
-    } else if (game.gameStateId === 2) {
-      return (
-        <>
-          <Heading size="3xl" opacity={fade ? 0.5 : 1}>
-            {game.homeScore} vs. {game.visitingScore}
-          </Heading>
-          <Text fontSize="sm" opacity={fade ? 0.5 : 1}>
-            {formatTime12(game.easternStartTime)}
-          </Text>
-        </>
-      );
-    } else if (game.homeMember && game.visitingMember) {
+    } else if (game.gameStateId === 7) {
       const winner = game.homeScore > game.visitingScore ? game.homeMember : game.visitingMember;
       return (
         <>
@@ -62,6 +51,17 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
           <Heading size="3xl" opacity={fade ? 0.5 : 1}>
             {game.homeScore} vs. {game.visitingScore}
           </Heading>
+        </>
+      );
+    } else {
+      return (
+        <>
+          <Heading size="3xl" opacity={fade ? 0.5 : 1}>
+            {game.homeScore} vs. {game.visitingScore}
+          </Heading>
+          <Text fontSize="sm" opacity={fade ? 0.5 : 1}>
+            {formatTime12(game.easternStartTime)}
+          </Text>
         </>
       );
     }
@@ -77,7 +77,7 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
       backgroundColor={'white'}
       width="100%"
       borderWidth={game.gameStateId !== 1 && !fade ? '3px' : ''}
-      borderColor={game.gameStateId === 2 ? 'orange' : 'brown'}
+      borderColor={game.gameStateId !== 7 ? 'orange' : 'brown'}
       opacity={fade ? 0.5 : 1}
     >
       <HStack>
