@@ -2,7 +2,12 @@ import express from 'express';
 import { getDraftFromId } from '../models/drafts';
 import { getProfileFromUserId } from '../models/profiles';
 import { getAllTeams } from '../models/teams';
-import { getGamesThisWeek, getHistory, refreshGames } from '../services/hockey_service';
+import {
+  getGamesThisWeek,
+  getHistory,
+  getStandings,
+  refreshGames,
+} from '../services/hockey_service';
 
 const router = express.Router();
 
@@ -59,6 +64,20 @@ router.get('/member/history', async (req, res) => {
 
     const history = await getHistory(profile, draft);
     return res.json({ history });
+  } catch (e) {
+    return res.status(401).json({ error: `Error: ${e}` });
+  }
+});
+
+router.get('/standings', async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw Error('User is not authenticated');
+    }
+    const draftId = Number(req.query.id);
+    const standings = await getStandings(draftId);
+    return res.json({ standings });
   } catch (e) {
     return res.status(401).json({ error: `Error: ${e}` });
   }

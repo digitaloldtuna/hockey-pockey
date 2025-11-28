@@ -20,18 +20,7 @@ import { useEffect, useMemo, useState } from 'react';
 import api from '../../api';
 import { Draft, Team } from '../../constants/types';
 import { useAuthentication } from '../../hooks/useAuthentication';
-
-const DivisionColour: Record<string, string> = {
-  Metropolitan: 'red',
-  Atlantic: 'green',
-  Pacific: 'blue',
-  Central: 'yellow',
-};
-
-const ConferenceColour: Record<string, string> = {
-  Eastern: 'yellow',
-  Western: 'red',
-};
+import { getConferenceColour, getDivisionColour } from '../../utils';
 
 type Props = {
   draft: Draft;
@@ -166,11 +155,14 @@ const TeamSelection = ({ draft }: Props) => {
                             <HStack>
                               <Tag.Root
                                 size="sm"
-                                colorPalette={ConferenceColour[team.conferenceName]}
+                                colorPalette={getConferenceColour(team.conferenceName)}
                               >
                                 <Tag.Label>{team.conferenceName}</Tag.Label>
                               </Tag.Root>
-                              <Tag.Root size="sm" colorPalette={DivisionColour[team.divisionName]}>
+                              <Tag.Root
+                                size="sm"
+                                colorPalette={getDivisionColour(team.divisionName)}
+                              >
                                 <Tag.Label>{team.divisionName}</Tag.Label>
                               </Tag.Root>
                             </HStack>

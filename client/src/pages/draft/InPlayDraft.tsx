@@ -43,7 +43,7 @@ const InPlayDraft = ({ draft }: Props) => {
           {draft.season}
         </Text>
       </Flex>
-      <Tabs.Root defaultValue="home" variant="plain">
+      <Tabs.Root defaultValue="standings" variant="plain">
         <Flex justify="space-between" align="center">
           <Tabs.List bg="whiteAlpha.500" rounded="2xl" p="1">
             <Tabs.Trigger value="home" p="3">

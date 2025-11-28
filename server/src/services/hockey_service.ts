@@ -4,7 +4,8 @@ import { getProfileFromIds, Profile } from '../models/profiles';
 import { getGames as getGamesApi } from './nhl_api';
 import {
   Game,
-  getCompletedGamesByTeams,
+  getCompletedGamesForSomeTeams,
+  getCompletedGamesForTeams,
   getGames,
   getGamesInTimeFrame,
   updateOrCreateGames,
@@ -87,6 +88,9 @@ export const getLeaderboard = async (draftId: number) => {
     const homeTeamId = String(game.homeTeamId);
     const visitingTeamId = String(game.visitingTeamId);
 
+    // if game is not done, continue
+    if (game.gameStateId !== 7) return;
+
     // if one of the team is unassigned, continue
     if (!teamsSelected.has(game.homeTeamId) || !teamsSelected.has(game.visitingTeamId)) return;
 
@@ -132,7 +136,7 @@ export const getHistory = async (profile: Profile, draft: Draft) => {
     .map((ownership) => ownership.team.apiId);
   const validTeams = teamOwnerships.map((ownership) => ownership.team.apiId);
 
-  const rawGames = await getCompletedGamesByTeams(selectedTeams, validTeams);
+  const rawGames = await getCompletedGamesForSomeTeams(selectedTeams, validTeams);
 
   // have to manually remove playing aginst yourself
   const selectedTeamSet = new Set(selectedTeams);
@@ -146,7 +150,86 @@ export const getHistory = async (profile: Profile, draft: Draft) => {
   return partitionedGames;
 };
 
-export const getStandings = async () => {};
+export const getStandings = async (draftId: number) => {
+  const teamOwnerships = await getTeamOwnershipsFromDraft(draftId);
+  const validTeams = teamOwnerships.map((ownership) => ownership.team.apiId);
+  const rawGames = await getCompletedGamesForTeams(validTeams);
+  const annotatedAndFilteredGames = (await annotateGames(rawGames, teamOwnerships)).filter(
+    (game) => !(game.homeMember.id === game.visitingMember.id)
+  );
+  const games = annotatedAndFilteredGames.sort((a, b) =>
+    a.easternStartTime.localeCompare(b.easternStartTime)
+  );
+
+  const teams = teamOwnerships.reduce(
+    (arr, ownership) => {
+      arr[ownership.team.id] = {
+        ...ownership.team,
+        member: ownership.draftMembership.profile,
+        wins: 0,
+        loses: 0,
+        lt: [],
+        streak: { type: 'w', value: 0 },
+      };
+      return arr;
+    },
+    {} as Record<string, any>
+  );
+
+  console.log('teams', teams);
+
+  games.forEach((game) => {
+    const winningTeam = game.homeScore > game.visitingScore ? game.homeTeam : game.visitingTeam;
+    const losingTeam = game.homeScore > game.visitingScore ? game.visitingTeam : game.homeTeam;
+
+    const winnerId = String(winningTeam.id);
+    const loserId = String(losingTeam.id);
+
+    // logic for winner
+    teams[winnerId].wins++;
+    if (teams[winnerId].lt.length < 10) {
+      teams[winnerId].lt.push(true);
+    } else {
+      teams[winnerId].lt.pop();
+      teams[winnerId].lt.push(true);
+    }
+
+    if (teams[winnerId].streak.type === 'w') {
+      teams[winnerId].streak.value++;
+    } else {
+      teams[winnerId].streak.type = 'w';
+      teams[winnerId].streak.value = 1;
+    }
+
+    // logic for loser
+    teams[loserId].loses++;
+    if (teams[loserId].lt.length < 10) {
+      teams[loserId].lt.push(false);
+    } else {
+      teams[loserId].lt.pop();
+      teams[loserId].lt.push(false);
+    }
+
+    if (teams[loserId].streak.type === 'l') {
+      teams[loserId].streak.value++;
+    } else {
+      teams[loserId].streak.type = 'l';
+      teams[loserId].streak.value = 1;
+    }
+  });
+
+  const standings = Object.values(teams);
+  const sortedStandings = standings.sort((a, b) => {
+    if (b.wins !== a.wins) {
+      return b.wins - a.wins;
+    } else {
+      const bltw = b.lt.filter(Boolean).length;
+      const altw = a.lt.filter(Boolean).length;
+      return bltw - altw;
+    }
+  });
+  return sortedStandings;
+};
 
 const annotateGames = async (
   games: Game[],

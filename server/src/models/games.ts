@@ -79,7 +79,10 @@ export const getGamesInTimeFrame = async ({
   return data;
 };
 
-export const getCompletedGamesByTeams = async (selectedTeams: number[], validTeams: number[]) => {
+export const getCompletedGamesForSomeTeams = async (
+  selectedTeams: number[],
+  validTeams: number[]
+) => {
   if (selectedTeams.length === 0 || validTeams.length === 0) return [];
   const formatted = `(${selectedTeams.join(',')})`;
 
@@ -91,6 +94,23 @@ export const getCompletedGamesByTeams = async (selectedTeams: number[], validTea
     .in('homeTeamId', validTeams)
     .in('visitingTeamId', validTeams)
     .or(`homeTeamId.in.${formatted}, visitingTeamId.in.${formatted}`);
+
+  if (error) {
+    throw Error(`Cannot fetch games by teams: ${error.message}`);
+  }
+  return data;
+};
+
+export const getCompletedGamesForTeams = async (validTeams: number[]) => {
+  if (validTeams.length === 0) return [];
+
+  const { data, error } = await supabase
+    .from('games')
+    .select('*')
+    .eq('season', 20252026)
+    .eq('gameStateId', 7)
+    .in('homeTeamId', validTeams)
+    .in('visitingTeamId', validTeams);
 
   if (error) {
     throw Error(`Cannot fetch games by teams: ${error.message}`);
