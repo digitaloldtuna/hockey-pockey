@@ -104,7 +104,7 @@ export const getGamesThisWeek = async (draftId: number) => {
   const teamOwnership: Record<string, Profile> = teamOwnershipsArray.reduce(
     (arr, teamOwnership) => ({
       ...arr,
-      [teamOwnership.id]: teamOwnership.draftMembership.profile,
+      [teamOwnership.team]: teamOwnership.draftMembership.profile,
     }),
     {}
   );
