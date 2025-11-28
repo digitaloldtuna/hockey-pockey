@@ -40,3 +40,21 @@ export type Team = {
   conferenceName: string;
   owner?: string;
 };
+
+export type Game = {
+  id: number;
+  easternStartTime: string; // ISO date string
+  gameDate: string; // ISO date string (YYYY-MM-DD)
+  gameNumber: number;
+  gameScheduleStateId: number;
+  gameStateId: number;
+  gameType: number;
+  homeScore: number;
+  homeTeam?: Team;
+  homeMember?: Profile;
+  period: number;
+  season: number;
+  visitingScore: number;
+  visitingTeam?: Team;
+  visitingMember?: Profile;
+};

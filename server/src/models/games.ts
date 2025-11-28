@@ -34,3 +34,23 @@ export const updateOrCreateGames = async (games: Game[]) => {
   }
   console.log('Updated the following', data);
 };
+
+export const getGamesInTimeFrame = async ({
+  start,
+  end,
+}: {
+  start: string;
+  end: string;
+}): Promise<Game[]> => {
+  const { data, error } = await supabase
+    .from('games')
+    .select('*')
+    .gte('easternStartTime', start)
+    .lte('easternStartTime', end)
+    .eq('season', 20252026);
+
+  if (error) {
+    throw Error(`Cannot fetch games: ${error}`);
+  }
+  return data;
+};

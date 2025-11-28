@@ -1,9 +1,9 @@
 import { getDraftFromId } from '../models/drafts';
 import { getTeamOwnershipsFromDraft } from '../models/team_ownerships';
-import { getProfileFromIds } from '../models/profiles';
+import { getProfileFromIds, Profile } from '../models/profiles';
 import { getGames as getGamesApi } from './nhlApi';
-import { Game, getGames, updateOrCreateGames } from '../models/games';
-import { getAllTeamIds } from '../models/teams';
+import { Game, getGames, getGamesInTimeFrame, updateOrCreateGames } from '../models/games';
+import { getAllTeamIds, getAllTeams, Team } from '../models/teams';
 
 // WILL ONLY UPDATE FOR CURRENT SEASON (2026)
 export const refreshGames = async () => {
@@ -21,15 +21,14 @@ export const refreshGames = async () => {
 };
 
 export const getLeaderboard = async (draftId: number) => {
-  const draft = await getDraftFromId(draftId);
-  const teamOwnerships = await getTeamOwnershipsFromDraft(draft);
+  const teamOwnerships = await getTeamOwnershipsFromDraft(draftId);
   const draftMemberships = teamOwnerships.map((ownership) => ownership.draftMembership);
 
   const draftMembershipToMember: Record<number, string> = draftMemberships.reduce(
     (arr, membership) => {
       return {
         ...arr,
-        [membership.id]: membership.profile,
+        [membership.id]: membership.profile.id,
       };
     },
     {}
@@ -80,4 +79,65 @@ export const getLeaderboard = async (draftId: number) => {
     .sort((a, b) => b.score - a.score);
 
   return leaderboard;
+};
+
+export const getGamesThisWeek = async (draftId: number) => {
+  const now = new Date();
+  const nowFormatted = now.toISOString();
+
+  const oneWeekLater = new Date(now);
+  oneWeekLater.setUTCDate(now.getUTCDate() + 3);
+  const oneWeekLaterFormatted = oneWeekLater.toISOString();
+
+  const games = await getGamesInTimeFrame({ start: nowFormatted, end: oneWeekLaterFormatted });
+
+  const teamsArray = await getAllTeams();
+  const teams: Record<string, Team> = teamsArray.reduce(
+    (arr, team) => ({
+      ...arr,
+      [team.id]: team,
+    }),
+    {}
+  );
+
+  const teamOwnershipsArray = await getTeamOwnershipsFromDraft(draftId);
+  const teamOwnership: Record<string, Profile> = teamOwnershipsArray.reduce(
+    (arr, teamOwnership) => ({
+      ...arr,
+      [teamOwnership.id]: teamOwnership.draftMembership.profile,
+    }),
+    {}
+  );
+
+  const gamesWithAnnotation = await games
+    .filter((game) => !!teams[String(game.homeTeamId)] && !!teams[String(game.visitingTeamId)])
+    .map((game) => {
+      return {
+        ...game,
+        homeTeam: teams[String(game.homeTeamId)],
+        visitingTeam: teams[String(game.visitingTeamId)],
+        homeMember: teamOwnership[String(game.homeTeamId)],
+        visitingMember: teamOwnership[String(game.visitingTeamId)],
+      };
+    });
+
+  const gamesPartitioned = gamesWithAnnotation.reduce(
+    (arr, game) => {
+      if (game.gameDate in arr) {
+        arr[game.gameDate].push(game);
+        return arr;
+      }
+      arr[game.gameDate] = [game];
+      return arr;
+    },
+    {} as Record<string, any>
+  );
+
+  const gamesSortedByDate = Object.entries(gamesPartitioned).sort((a, b) => {
+    if (a[0] > b[0]) return 1;
+    if (a[0] < b[0]) return -1;
+    return 0;
+  });
+
+  return gamesSortedByDate;
 };

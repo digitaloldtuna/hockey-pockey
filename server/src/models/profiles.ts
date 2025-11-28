@@ -32,7 +32,7 @@ export const createProfile = async ({
 export const getProfileFromId = async (id: string): Promise<Profile> => {
   const { data, error } = await supabase.from('profiles').select('*').eq('id', id).single();
   if (error) {
-    throw Error(`Cannot fetch profiles: ${error}`);
+    throw Error(`Cannot fetch profile: ${error.message}`);
   }
   return data;
 };
@@ -40,7 +40,7 @@ export const getProfileFromId = async (id: string): Promise<Profile> => {
 export const getProfileFromIds = async (ids: string[]): Promise<Profile[]> => {
   const { data, error } = await supabase.from('profiles').select('*').in('id', ids);
   if (error) {
-    throw Error(`Cannot fetch profiles: ${error}`);
+    throw Error(`Cannot fetch profiles: ${error.message}`);
   }
   return data;
 };
@@ -48,7 +48,7 @@ export const getProfileFromIds = async (ids: string[]): Promise<Profile[]> => {
 export const getProfileFromUserId = async (userId: string): Promise<Profile> => {
   const { data, error } = await supabase.from('profiles').select('*').eq('user', userId).single();
   if (error) {
-    throw Error(`Cannot fetch profiles: ${error}`);
+    throw Error(`Cannot fetch profile with user id: ${error.message}`);
   }
   return data;
 };

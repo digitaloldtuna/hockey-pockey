@@ -45,7 +45,7 @@ const InPlayDraft = ({ draft }: Props) => {
       </Flex>
       <Tabs.Root defaultValue="home" variant="plain">
         <Flex justify="space-between" align="center">
-          <Tabs.List bg="whiteAlpha.500" rounded="l3" p="1">
+          <Tabs.List bg="whiteAlpha.500" rounded="2xl" p="1">
             <Tabs.Trigger value="home" p="3">
               <Home />
               Home
@@ -58,7 +58,7 @@ const InPlayDraft = ({ draft }: Props) => {
               <ChartBar />
               Stats
             </Tabs.Trigger>
-            <Tabs.Indicator rounded="l2" />
+            <Tabs.Indicator rounded="2xl" />
           </Tabs.List>
           <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleRefreshData}>
             <RefreshCcw />

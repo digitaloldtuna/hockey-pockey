@@ -2,9 +2,9 @@ import { supabaseAdmin as supabase } from '../supabase';
 import { getProfileFromId, Profile } from './profiles';
 import { Draft, getDraftFromId } from './drafts';
 
-export type DraftMembership = {
+export type DraftMembership<T = string> = {
   id: number;
-  profile: Profile | string;
+  profile: T;
   draft: number;
 };
 

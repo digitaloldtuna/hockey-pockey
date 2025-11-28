@@ -2,6 +2,7 @@ import { CURRENT_SEASON } from '../constants';
 import { supabaseAdmin as supabase } from '../supabase';
 import { Draft } from './drafts';
 import { DraftMembership, getDraftMembershipFromMemberAndDraft } from './draft_memberships';
+import { Profile } from './profiles';
 
 export type TeamOwnership<T = number> = {
   id: number;
@@ -23,12 +24,12 @@ export const getTeamOwnershipsFromUser = async (userId: string): Promise<TeamOwn
 };
 
 export const getTeamOwnershipsFromDraft = async (
-  draft: Draft
-): Promise<TeamOwnership<DraftMembership>[]> => {
+  draftId: number
+): Promise<TeamOwnership<DraftMembership<Profile>>[]> => {
   const { data, error } = await supabase
     .from('team_ownerships')
-    .select(`*,draftMembership:draftMembership(*)`)
-    .eq('draftMembership.draft', draft.id);
+    .select(`*,draftMembership:draftMembership(*,profile:profile(*))`)
+    .eq('draftMembership.draft', draftId);
   if (error || !data) {
     throw Error(`Cannot fetch team ownerships: ${error.message}`);
   }
