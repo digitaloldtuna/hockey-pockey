@@ -1,8 +1,8 @@
 import { AbsoluteCenter, Heading, Link, Spinner, VStack } from '@chakra-ui/react';
-import { useEffect, useState } from 'react';
+import { useEffect } from 'react';
 import { useNavigate, useParams } from 'react-router-dom';
-import api from '../../api';
-import { Draft as DraftType } from '../../constants/types';
+import { useDraft } from '../../hooks/useDraft';
+import { useTitle } from '../../hooks/useTitle';
 import ClosedDraft from './ClosedDraft';
 import DraftLayout from './DraftLayout';
 import InPlayDraft from './InPlayDraft';
@@ -12,26 +12,18 @@ import TeamSelection from './TeamSelection';
 const Draft = () => {
   const navigate = useNavigate();
   const { draftId } = useParams<{ draftId: string }>();
-  const [loading, setLoading] = useState(false);
-  const [draft, setDraft] = useState<DraftType | null>(null);
+  const { loading, draft, setDraftId } = useDraft();
+
+  useTitle(draft?.name || 'Loading');
 
   useEffect(() => {
-    async function fetchDraft() {
-      setLoading(true);
-      api
-        .get(`/draft?id=${draftId}`)
-        .then((res) => {
-          console.log('DRAFT RES', res);
-          setDraft(res.data.draft);
-          setLoading(false);
-        })
-        .catch((reason) => {
-          console.log('Error fetching draft', reason);
-          setLoading(false);
-        });
+    const noDraft = !draft && draftId;
+    const newDraft = draft && draftId && draftId != draft?.id;
+
+    if ((noDraft || newDraft) && !loading) {
+      setDraftId(draftId);
     }
-    fetchDraft();
-  }, [draftId]);
+  }, [draftId, draft]);
 
   const page = () => {
     if (!draft) {

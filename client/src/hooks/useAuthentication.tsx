@@ -1,3 +1,4 @@
+import { useQueryClient } from '@tanstack/react-query';
 import { createContext, useContext, useState, ReactNode, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
@@ -22,6 +23,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [profile, setProfile] = useState<Profile | null>(null);
 
   const navigate = useNavigate();
+  const queryClient = useQueryClient();
 
   const fetchSession = async () => {
     setLoading(true);
@@ -81,8 +83,12 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         setProfile(null);
         navigate('/login');
         setLoading(false);
+        queryClient.clear();
       })
-      .catch(() => setLoading(false));
+      .catch(() => {
+        setLoading(false);
+        queryClient.clear();
+      });
   };
 
   return (

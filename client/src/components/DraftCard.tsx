@@ -49,11 +49,9 @@ const DraftCard = ({ draft }: Props) => {
         <Text fontWeight="bold" fontSize="xl" marginBottom="1">
           {draft.name}
         </Text>
-        <Text>
-          <Tag.Root size="sm" colorPalette={DraftStatusToColour[draft.status]}>
-            <Tag.Label>{DraftStatusLabel[draft.status]}</Tag.Label>
-          </Tag.Root>
-        </Text>
+        <Tag.Root size="sm" colorPalette={DraftStatusToColour[draft.status]}>
+          <Tag.Label>{DraftStatusLabel[draft.status]}</Tag.Label>
+        </Tag.Root>
       </Flex>
       <Flex justify="space-between">
         <AvatarGroup gap="0" spaceX="0" size="xs">
