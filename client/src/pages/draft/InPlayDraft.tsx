@@ -1,6 +1,5 @@
 import { Button, Flex, Tabs, Text } from '@chakra-ui/react';
 import Layout from '../Layout';
-import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
 import { ArrowLeft, ChartBar, History, Home, RefreshCcw, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
