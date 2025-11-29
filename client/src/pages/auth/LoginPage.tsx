@@ -1,21 +1,9 @@
 import { ROUTES } from '../../constants/routes';
-import {
-  Box,
-  Button,
-  Field,
-  Flex,
-  Grid,
-  HStack,
-  Input,
-  Link,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Button, Field, Input, Link, Text, VStack } from '@chakra-ui/react';
 import { useAuthentication } from '../../hooks/useAuthentication';
 import { useTitle } from '../../hooks/useTitle';
 import * as Yup from 'yup';
 import { ErrorMessage, Form, Formik, Field as FormField } from 'formik';
-import BlobbyGrainBackground from '../../components/BlobbyBackground';
 import AuthLayout from './AuthLayout';
 
 interface LoginFormValues {
