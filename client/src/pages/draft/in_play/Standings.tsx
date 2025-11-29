@@ -1,22 +1,10 @@
-import {
-  Avatar,
-  Flex,
-  Heading,
-  HStack,
-  Image,
-  Link,
-  Table,
-  Tag,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
+import { Flex, HStack, Image, Link, Table, Tag, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import api from '../../../api';
 import { useDraft } from '../../../hooks/useDraft';
 import { toastError } from '../../../theme/toaster';
 import { Team, Profile } from '../../../constants/types';
 import { getAvatarColour, getConferenceColour, getDivisionColour } from '../../../utils';
-import { profile } from 'console';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 
 type Standing = Team & {
