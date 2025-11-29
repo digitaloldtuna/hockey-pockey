@@ -10,13 +10,10 @@ import {
   Text,
   VStack,
 } from '@chakra-ui/react';
-import { useState } from 'react';
-import api from '../../../api';
 import { HistoryCard } from '../../../components';
 import { Game, Profile } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { useDraft } from '../../../hooks/useDraft';
-import { toastError } from '../../../theme/toaster';
 
 const formatDate = (date: string) => {
   const today = new Date();
@@ -88,7 +85,7 @@ const HistoryList = ({
                 const date = formatDate(entry[0]);
                 const games = entry[1];
                 return (
-                  <Flex direction="column" paddingBottom="8">
+                  <Flex direction="column" paddingBottom="8" key={date}>
                     <HStack
                       paddingBottom="1"
                       borderBottom="1px solid black"
@@ -100,7 +97,7 @@ const HistoryList = ({
                     </HStack>
                     <VStack>
                       {games.map((game) => (
-                        <HistoryCard game={game} />
+                        <HistoryCard game={game} key={game.id} />
                       ))}
                     </VStack>
                   </Flex>
@@ -118,28 +115,10 @@ const HistoryList = ({
 };
 
 const History = () => {
-  const [history, setHistory] = useState<[string, Game[]][] | null>(null);
   const { profile } = useAuthentication();
-  const { draft } = useDraft();
+  const { draft, history } = useDraft();
   if (!draft) {
     return <></>;
-  }
-
-  const fetchHistory = () => {
-    api
-      .get(`/hockey/member/history?id=${draft.id}`)
-      .then((res) => {
-        const sortedHistory = res.data.history.reverse();
-        setHistory(sortedHistory);
-      })
-      .catch((reason) => {
-        setHistory(null);
-        toastError('Cannot fetching games for week', reason);
-      });
-  };
-
-  if (history === null) {
-    fetchHistory();
   }
 
   return (

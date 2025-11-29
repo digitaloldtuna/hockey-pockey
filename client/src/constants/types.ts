@@ -59,3 +59,14 @@ export type Game = {
   visitingTeam?: Team;
   visitingMember?: Profile;
 };
+
+export type Standing = Team & {
+  member: Profile;
+  wins: number;
+  loses: number;
+  lt: boolean[];
+  streak: {
+    type: 'w' | 'l';
+    value: number;
+  };
+};

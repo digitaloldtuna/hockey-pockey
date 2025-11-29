@@ -1,12 +1,11 @@
-import { Button, Flex, Tabs, Text } from '@chakra-ui/react';
+import { Box, Button, Flex, Tabs, Text, defineKeyframes } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
 import { ArrowLeft, ChartBar, History, Home, RefreshCcw, Users } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
-import api from '../../api';
-import { toastError, toastSuccess } from '../../theme/toaster';
 import { InPlayHistory, InPlayHome, InPlayStandings, InPlayStats } from './in_play';
+import { useDraft } from '../../hooks/useDraft';
 
 type Props = {
   draft: Draft;
@@ -14,17 +13,7 @@ type Props = {
 
 const InPlayDraft = ({ draft }: Props) => {
   const navigate = useNavigate();
-
-  const handleRefreshData = () => {
-    api
-      .post(`/hockey/refresh`)
-      .then((res) => {
-        toastSuccess('Successfully refreshed hockey data.');
-      })
-      .catch((reason) => {
-        toastError('Error refreshing hockey data', reason);
-      });
-  };
+  const { refresh, isRefreshing } = useDraft();
 
   return (
     <Layout>
@@ -43,7 +32,7 @@ const InPlayDraft = ({ draft }: Props) => {
           {draft.season}
         </Text>
       </Flex>
-      <Tabs.Root defaultValue="history" variant="plain">
+      <Tabs.Root defaultValue="home" variant="plain">
         <Flex justify="space-between" align="center">
           <Tabs.List bg="whiteAlpha.500" rounded="2xl" p="1">
             <Tabs.Trigger value="home" p="3">
@@ -64,9 +53,15 @@ const InPlayDraft = ({ draft }: Props) => {
             </Tabs.Trigger>
             <Tabs.Indicator rounded="2xl" />
           </Tabs.List>
-          <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleRefreshData}>
-            <RefreshCcw />
-            refresh
+          <Button
+            rounded="2xl"
+            colorPalette="oxford"
+            variant="surface"
+            onClick={refresh}
+            disabled={isRefreshing}
+          >
+            <RefreshCcw size={20} className={isRefreshing ? 'rotate' : ''} />
+            {isRefreshing ? 'refreshing' : 'refresh'}
           </Button>
         </Flex>
 

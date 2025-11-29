@@ -12,11 +12,9 @@ import {
   VStack,
 } from '@chakra-ui/react';
 import { useId, useState } from 'react';
-import api from '../../../api';
 import GameCard from '../../../components/GameCard';
 import { Game } from '../../../constants/types';
 import { useDraft } from '../../../hooks/useDraft';
-import { toastError } from '../../../theme/toaster';
 import { Tooltip } from '../../../theme/tooltip';
 import { getAvatarColour } from '../../../utils';
 
@@ -78,7 +76,7 @@ const UpcomingGames = ({ upcomingGames }: { upcomingGames: [string, Game[]][] | 
                   </Heading>
                   <VStack>
                     {games.map((game) => (
-                      <GameCard fade={notCounted(game)} game={game} />
+                      <GameCard key={game.id} fade={notCounted(game)} game={game} />
                     ))}
                   </VStack>
                 </Flex>
@@ -120,6 +118,7 @@ const Leaderboard = ({
           rounded="2xl"
           backgroundColor="white"
           alignItems="center"
+          key={member.id}
         >
           <HStack gap="3">
             <Avatar.Root colorPalette={getAvatarColour(member.id)}>
@@ -142,44 +141,10 @@ const Leaderboard = ({
 
 const Home = () => {
   const id = useId();
-  const [upcomingGames, setUpcomingGames] = useState<[string, Game[]][] | null>(null);
-  const [leaderboard, setLeaderboard] = useState<any[] | null>(null);
   const [filtered, setFiltered] = useState<boolean>(false);
-  const { draft } = useDraft();
+  const { draft, upcomingGames, leaderboard } = useDraft();
   if (!draft) {
     return <></>;
-  }
-
-  const fetchGamesForThisWeek = () => {
-    api
-      .get(`/hockey/games/thisweek?id=${draft.id}`)
-      .then((res) => {
-        setUpcomingGames(res.data.games);
-      })
-      .catch((reason) => {
-        setUpcomingGames(null);
-        toastError('Cannot fetching games for week', reason);
-      });
-  };
-
-  const fetchLeaderboard = () => {
-    api
-      .get(`/draft/leaderboard?id=${draft.id}`)
-      .then((res) => {
-        setLeaderboard(res.data.leaderboard);
-      })
-      .catch((reason) => {
-        setLeaderboard([]);
-        toastError('Cannot fetch leaderboard for draft', reason);
-      });
-  };
-
-  if (leaderboard === null) {
-    fetchLeaderboard();
-  }
-
-  if (upcomingGames === null) {
-    fetchGamesForThisWeek();
   }
 
   const notCounted = (game: Game) => {
