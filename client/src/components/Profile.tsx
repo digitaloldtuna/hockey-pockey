@@ -83,7 +83,7 @@ const Profile = () => {
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       {({ setFieldValue, values }) => (
         <Form>
-          <VStack rounded="2xl" backgroundColor="white" padding="8" gap="5">
+          <VStack rounded="2xl" backgroundColor="white" p={{ base: 4, md: 8 }} gap="5">
             {/* Profile Image */}
             <Fieldset.Root>
               <Field.Root align="center">

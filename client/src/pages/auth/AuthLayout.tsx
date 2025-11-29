@@ -32,7 +32,12 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
           </Flex>
 
           {/* Right side: form */}
-          <Flex p={{ base: 6, md: 10 }} w="full" align="center" justify="center">
+          <Flex
+            p={{ base: 6, md: 10 }}
+            w="full"
+            align={{ base: 'start', md: 'center' }}
+            justify="center"
+          >
             {children}
           </Flex>
         </Grid>

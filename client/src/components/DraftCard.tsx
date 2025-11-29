@@ -33,7 +33,7 @@ const DraftCard = ({ draft }: Props) => {
       rounded="2xl"
       backgroundColor="white"
       w="100%"
-      width={{ base: '100%', md: 'sm' }}
+      width={{ base: '100%', md: 'xs' }}
       p={{ base: 3, md: 5 }}
       h="fit-content"
       _hover={{
@@ -44,7 +44,7 @@ const DraftCard = ({ draft }: Props) => {
     >
       {/* Title + status */}
       <Flex justify="space-between" align="center" mb="2">
-        <Text fontWeight="bold" fontSize={{ base: 'md', md: 'xl' }}>
+        <Text fontWeight="bold" fontSize={{ base: 'lg', md: 'xl' }}>
           {draft.name}
         </Text>
 
@@ -55,7 +55,7 @@ const DraftCard = ({ draft }: Props) => {
 
       {/* Avatars + season */}
       <Flex justify="space-between" align="center">
-        <AvatarGroup gap="0" spaceX="0" size={{ base: '2xs', md: 'xs' }}>
+        <AvatarGroup spaceX={{ base: '-2', md: '0' }} size="sm">
           {members.map((member) => (
             <Avatar.Root key={member.id} colorPalette={getAvatarColour(member.id)}>
               <Avatar.Fallback name={member.name} />

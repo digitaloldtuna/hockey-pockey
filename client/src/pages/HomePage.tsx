@@ -41,15 +41,15 @@ const HomePage = () => {
   return (
     <Layout>
       {/* Prevent horizontal scrolling */}
-      <Box overflowX="hidden" w="100%">
+      <Box w="100%">
         <Grid
           templateColumns={{ base: '1fr', md: '3fr 1fr' }}
-          gap={{ base: 6, md: 10 }}
+          gap={{ base: 0, md: 10 }}
           w="100%"
           maxW="100%"
         >
           {/* Right Section */}
-          <Box w="100%" maxW="100%" overflowX="hidden">
+          <Box w="100%" maxW="100%">
             {/* Top Section: Welcome + Buttons */}
             <Flex
               direction={{ base: 'column', md: 'row' }}
@@ -71,16 +71,14 @@ const HomePage = () => {
               </Text>
 
               {/* Buttons */}
-              <Flex
+              <Grid
+                templateColumns="repeat(2, 1fr)"
                 gap={3}
-                direction={{ base: 'column', sm: 'row' }}
                 flexWrap="wrap"
-                w="100%"
-                maxW="100%"
-                justify="end"
+                w={{ base: 'full', md: 'fit-content' }}
               >
                 <Button
-                  w={{ base: '100%', sm: 'auto' }}
+                  w={{ base: 'full', md: 'fit-content' }}
                   rounded="2xl"
                   colorPalette="oxford"
                   variant="surface"
@@ -91,7 +89,7 @@ const HomePage = () => {
                 </Button>
 
                 <Button
-                  w={{ base: '100%', sm: 'auto' }}
+                  w={{ base: 'full', md: 'fit-content' }}
                   rounded="2xl"
                   colorPalette="oxford"
                   variant="surface"
@@ -100,7 +98,7 @@ const HomePage = () => {
                   <Plus />
                   Create a draft
                 </Button>
-              </Flex>
+              </Grid>
             </Flex>
 
             {/* Draft Cards Container */}
