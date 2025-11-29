@@ -50,7 +50,7 @@ const Draft = () => {
         </DraftLayout>
       );
     } else if (draft.status === 'in_play') {
-      return <InPlayDraft draft={draft} />;
+      return <InPlayDraft />;
     } else {
       return (
         <DraftLayout title={draft.name}>

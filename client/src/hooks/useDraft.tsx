@@ -133,10 +133,6 @@ export function DraftProvider({ children }: { children: ReactNode }) {
     toastError('Error refreshing hockey data:', refreshError.message);
   }
 
-  const handleRefreshData = () => {
-    refresh();
-  };
-
   return (
     <DraftContext.Provider
       value={{

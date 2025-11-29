@@ -1,4 +1,4 @@
-import { Box, Button, Flex, Tabs, Text, defineKeyframes } from '@chakra-ui/react';
+import { Button, Flex, Tabs, Text } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { Draft } from '../../constants/types';
 import { ROUTES } from '../../constants/routes';
@@ -7,13 +7,12 @@ import { useNavigate } from 'react-router-dom';
 import { InPlayHistory, InPlayHome, InPlayStandings, InPlayStats } from './in_play';
 import { useDraft } from '../../hooks/useDraft';
 
-type Props = {
-  draft: Draft;
-};
-
-const InPlayDraft = ({ draft }: Props) => {
+const InPlayDraft = () => {
   const navigate = useNavigate();
-  const { refresh, isRefreshing } = useDraft();
+  const { draft, refresh, isRefreshing } = useDraft();
+  if (!draft) {
+    return <></>;
+  }
 
   return (
     <Layout>
