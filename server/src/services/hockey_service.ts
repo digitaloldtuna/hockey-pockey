@@ -31,13 +31,11 @@ export const refreshGames = async () => {
   const gamesToUpdateOrCreate: Game[] = [];
 
   games.forEach((game) => {
-    if (game.homeTeamId === 59 || game.visitingTeamId === 59) console.log('it exists', game);
     // reformat date since DB auto adds the 00s
     game.easternStartTime = `${game.easternStartTime}+00:00`;
 
     if (game.season !== 20252026) return;
     if (game.gameType !== 2 && game.gameType !== 3 && game.gameType !== 7) return;
-    if (game.homeTeamId === 59 || game.visitingTeamId === 59) console.log('it exists');
     if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) return;
     if (!(game.id in allGames)) {
       gamesToUpdateOrCreate.push(game);
