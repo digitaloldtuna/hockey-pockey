@@ -20,7 +20,7 @@ const DraftCard = ({ draft }: Props) => {
 
   const membersLength = draft.members.length;
 
-  let members: { id: string; name: string }[] = draft.members;
+  let members: { id: string; name: string; profileImage?: string }[] = draft.members;
   let lastMember = undefined;
   if (membersLength > 5) {
     members = draft.members.slice(0, 4);
@@ -52,6 +52,7 @@ const DraftCard = ({ draft }: Props) => {
           {members.map((member) => (
             <Avatar.Root colorPalette={getAvatarColour(member.id)}>
               <Avatar.Fallback name={member.name} />
+              <Avatar.Image src={member.profileImage || undefined} />
             </Avatar.Root>
           ))}
           {lastMember && (

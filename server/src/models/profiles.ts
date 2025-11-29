@@ -5,8 +5,9 @@ import { getTeamFromId } from './teams';
 export interface Profile {
   id: string;
   name: string;
-  createdAt: Date;
+  createdAt?: Date;
   user: string;
+  profileImage?: string;
 }
 
 export const createProfile = async ({
@@ -64,7 +65,7 @@ export const updateProfile = async ({
 
   const { data, error } = await supabase
     .from('profiles')
-    .update({ name: profile.name })
+    .update({ name: profile.name, profileImage: profile.profileImage })
     .eq('id', oldProfile.id)
     .select()
     .single();

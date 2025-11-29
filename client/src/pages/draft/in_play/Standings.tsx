@@ -1,4 +1,4 @@
-import { Flex, HStack, Image, Link, Table, Tag, Text, VStack } from '@chakra-ui/react';
+import { Avatar, Flex, HStack, Image, Link, Table, Tag, Text, VStack } from '@chakra-ui/react';
 import { useState } from 'react';
 import api from '../../../api';
 import { useDraft } from '../../../hooks/useDraft';
@@ -85,7 +85,12 @@ const Standings = () => {
                   key={standing.id}
                   backgroundColor={profile && standing.member.id === profile.id ? '#f7fcfc' : ''}
                 >
-                  <Table.Cell>{i + 1}</Table.Cell>
+                  <Table.Cell>
+                    <HStack>
+                      {i + 1}
+                      {profile && standing.member.id === profile.id && <Text>⭐</Text>}
+                    </HStack>
+                  </Table.Cell>
                   <Table.Cell>
                     <HStack margin="2" gap="3">
                       <Image
@@ -132,14 +137,14 @@ const Standings = () => {
                   </Table.Cell>
                   <Table.Cell>
                     <HStack>
+                      <Avatar.Root colorPalette={getAvatarColour(standing.member.id)}>
+                        <Avatar.Fallback name={standing.member.name} />
+                        <Avatar.Image src={standing.member.profileImage || undefined} />
+                      </Avatar.Root>
                       <Tag.Root size="lg" colorPalette={getAvatarColour(standing.member.id)}>
                         <Tag.Label>{standing.member.name}</Tag.Label>
                       </Tag.Root>
-                      {profile && standing.member.id === profile.id ? '⭐' : ''}
                     </HStack>
-                    {/* <Avatar.Root colorPalette={getAvatarColour(standing.member.id)}>
-                        <Avatar.Fallback name={standing.member.name} />
-                      </Avatar.Root> */}
                   </Table.Cell>
                 </Table.Row>
               ))}

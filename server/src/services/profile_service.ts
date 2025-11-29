@@ -1,0 +1,35 @@
+import { updateProfile } from '../models/profiles';
+import { supabaseAdmin as supabase } from '../supabase';
+
+export const updateProfileService = async (
+  userId: string,
+  context: { file?: Express.Multer.File; name: string; email: string }
+) => {
+  let profileImageUrl: string | null = null;
+
+  if (context.file) {
+    // Upload the file to Supabase Storage
+    const fileExt = context.file.originalname.split('.').pop();
+    const fileName = `${userId}-${Date.now()}.${fileExt}`;
+    const { error: uploadError } = await supabase.storage
+      .from('profile')
+      .upload(fileName, context.file.buffer, {
+        contentType: context.file.mimetype,
+        cacheControl: '3600',
+        upsert: true,
+      });
+
+    if (uploadError) throw uploadError;
+
+    // Get the public URL
+    const { data: publicUrlData } = supabase.storage.from('profile').getPublicUrl(fileName);
+    profileImageUrl = publicUrlData.publicUrl;
+  }
+
+  // Build the data object for database update
+  const dataToUpdate: any = { name: context.name };
+  if (profileImageUrl) dataToUpdate.profileImage = profileImageUrl;
+
+  const updatedProfile = await updateProfile({ userId, profile: dataToUpdate });
+  return updatedProfile;
+};

@@ -10,6 +10,7 @@ export type Profile = {
   created_at: string;
   user: string;
   email?: string;
+  profileImage?: string;
 };
 
 export type Draft = {

@@ -1,5 +1,6 @@
 import {
   Avatar,
+  Box,
   Button,
   Center,
   Flex,
@@ -19,10 +20,12 @@ import DraftCard from '../components/DraftCard';
 import { useTitle } from '../hooks/useTitle';
 import { useEffect, useState } from 'react';
 import api from '../api';
+import Profile from '../components/Profile';
+import { Draft } from '../constants/types';
 
 const HomePage = () => {
   useTitle('Home');
-  const [drafts, setDrafts] = useState([]);
+  const [drafts, setDrafts] = useState<Draft[]>([]);
   const [draftLoading, setDraftLoading] = useState(false);
   const { profile, handleLogout } = useAuthentication();
   const navigate = useNavigate();
@@ -54,53 +57,58 @@ const HomePage = () => {
 
   return (
     <Layout>
-      <Flex justify="space-between" align="end" marginTop="10">
-        <Flex gap="5" align="center">
-          <Avatar.Root
-            size="xl"
-            onClick={() => navigate('/profile')}
-            _hover={{ cursor: 'pointer' }}
-          >
-            <Avatar.Fallback name={profile?.name || ''} />
-          </Avatar.Root>
-          <Text fontSize="5xl" color="oxford">
-            Welcome, <b>{profile?.name}</b>!
-          </Text>
-        </Flex>
-        <Flex gap="2" marginBottom="2">
-          <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleJoinDraft}>
-            <UserPlus />
-            Join a draft
-          </Button>
-          <Button rounded="2xl" colorPalette="oxford" variant="surface" onClick={handleCreateDraft}>
-            <Plus />
-            Create a draft
-          </Button>
-        </Flex>
-      </Flex>
-      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8">
-        {draftLoading && (
-          <Center width="stretch">
-            <Spinner size="xl" color="blue.500" />
-          </Center>
-        )}
-        {!draftLoading && drafts.length === 0 && (
-          <Center width="100%">
-            <Stack>
-              <Heading>You have no drafts 😶‍🌫️</Heading>
-              <Text>Join a draft, or create one!</Text>
-            </Stack>
-          </Center>
-        )}
-        <Grid templateColumns="repeat(3, 1fr)" gap="5">
-          {!draftLoading && drafts.map((draft) => <DraftCard draft={draft} />)}
-        </Grid>
-      </Flex>
-      <Flex justify="center">
-        <Link color="highElfBlue" onClick={handleLogout}>
-          logout
-        </Link>
-      </Flex>
+      <Grid templateColumns={{ base: '1fr', md: '1fr 3fr' }} gap="10">
+        <Box marginTop="10">
+          <Profile />
+        </Box>
+        <Box>
+          <Flex justify="space-between" align="end" marginTop="10" marginBottom="5">
+            <Flex gap="5" align="center">
+              <Text fontSize="5xl" color="oxford">
+                Welcome, <b>{profile?.name}</b>!
+              </Text>
+            </Flex>
+            <Flex gap="2" marginBottom="2">
+              <Button
+                rounded="2xl"
+                colorPalette="oxford"
+                variant="surface"
+                onClick={handleJoinDraft}
+              >
+                <UserPlus />
+                Join a draft
+              </Button>
+              <Button
+                rounded="2xl"
+                colorPalette="oxford"
+                variant="surface"
+                onClick={handleCreateDraft}
+              >
+                <Plus />
+                Create a draft
+              </Button>
+            </Flex>
+          </Flex>
+          <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8">
+            {draftLoading && (
+              <Center width="stretch">
+                <Spinner size="xl" color="blue.500" />
+              </Center>
+            )}
+            {!draftLoading && drafts.length === 0 && (
+              <Center width="100%">
+                <Stack>
+                  <Heading>You have no drafts 😶‍🌫️</Heading>
+                  <Text>Join a draft, or create one!</Text>
+                </Stack>
+              </Center>
+            )}
+            <Grid templateColumns="repeat(3, 1fr)" gap="5">
+              {!draftLoading && drafts.map((draft) => <DraftCard draft={draft} />)}
+            </Grid>
+          </Flex>
+        </Box>
+      </Grid>
     </Layout>
   );
 };

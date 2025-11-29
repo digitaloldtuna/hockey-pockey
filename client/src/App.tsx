@@ -30,7 +30,6 @@ function App() {
                   <Route path={ROUTES.DRAFT.CREATE} element={<CreateDraft />} />
                   <Route path={ROUTES.DRAFT.JOIN} element={<JoinDraft />} />
                   <Route path="/draft/:draftId" element={<Draft />} />
-                  <Route path="/profile" element={<Profile />} />
                 </Route>
               </Routes>
             </DraftProvider>

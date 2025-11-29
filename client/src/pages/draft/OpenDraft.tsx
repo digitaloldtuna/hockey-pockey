@@ -34,6 +34,7 @@ const OpenDraft = ({ draft }: Props) => {
       owner: (draft.owner && draft.owner === member.id) || false,
       name: member.name,
       email: member.email || '',
+      profileImage: member.profileImage,
     }))
   );
   const isOwner = profile && draft.owner ? profile.id === draft.owner : false;
@@ -128,6 +129,7 @@ const OpenDraft = ({ draft }: Props) => {
                 <HStack gap="4">
                   <Avatar.Root colorPalette={getAvatarColour(member.id)}>
                     <Avatar.Fallback name={member.name} />
+                    <Avatar.Image src={member.profileImage || undefined} />
                   </Avatar.Root>
                   <Stack gap="0">
                     <HStack>

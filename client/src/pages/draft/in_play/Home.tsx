@@ -169,6 +169,7 @@ const Home = () => {
                 <HStack gap="3">
                   <Avatar.Root colorPalette={getAvatarColour(member.id)}>
                     <Avatar.Fallback name={member.name} />
+                    <Avatar.Image src={member.profileImage || undefined} />
                   </Avatar.Root>
                   <VStack align="start" gap="0">
                     <Heading size="md">{member.name}</Heading>
