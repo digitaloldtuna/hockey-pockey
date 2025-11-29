@@ -3,11 +3,8 @@ import {
   Button,
   Input,
   VStack,
-  HStack,
   Fieldset,
   Field,
-  Box,
-  Grid,
   FileUpload,
   Avatar,
   Tag,
@@ -16,7 +13,6 @@ import {
 import { Formik, Form, Field as FormField } from 'formik';
 
 import { useAuthentication } from '../hooks/useAuthentication';
-import { useTitle } from '../hooks/useTitle';
 import { Upload } from 'lucide-react';
 import api from '../api';
 
@@ -102,9 +98,11 @@ const Profile = () => {
                     <Avatar.Image src={previewUrl || undefined} />
                   </Avatar.Root>
                   <Flex justify="center" direction="column" align="center" gap={2}>
-                    <Tag.Root size="sm" colorPalette={'red'}>
-                      <Tag.Label>your image is publically accessible</Tag.Label>
-                    </Tag.Root>
+                    {previewUrl && (
+                      <Tag.Root size="sm" colorPalette={'red'}>
+                        <Tag.Label>your image is publically accessible</Tag.Label>
+                      </Tag.Root>
+                    )}
                     <FileUpload.Root
                       maxFiles={1}
                       accept={{ 'image/*': [] }}

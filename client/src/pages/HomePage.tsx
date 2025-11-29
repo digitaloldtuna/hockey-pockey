@@ -1,16 +1,4 @@
-import {
-  Avatar,
-  Box,
-  Button,
-  Center,
-  Flex,
-  Grid,
-  Heading,
-  Link,
-  Spinner,
-  Stack,
-  Text,
-} from '@chakra-ui/react';
+import { Box, Button, Center, Flex, Grid, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
 import Layout from './Layout';
 import { Plus, UserPlus } from 'lucide-react';
 import { useAuthentication } from '../hooks/useAuthentication';
@@ -27,7 +15,7 @@ const HomePage = () => {
   useTitle('Home');
   const [drafts, setDrafts] = useState<Draft[]>([]);
   const [draftLoading, setDraftLoading] = useState(false);
-  const { profile, handleLogout } = useAuthentication();
+  const { profile } = useAuthentication();
   const navigate = useNavigate();
 
   useEffect(() => {
