@@ -31,11 +31,13 @@ export const refreshGames = async () => {
   const gamesToUpdateOrCreate: Game[] = [];
 
   games.forEach((game) => {
+    if (game.homeTeamId === 59 || game.visitingTeamId === 59) console.log('it exists', game);
     // reformat date since DB auto adds the 00s
     game.easternStartTime = `${game.easternStartTime}+00:00`;
 
     if (game.season !== 20252026) return;
-    if (game.gameType !== 2 && game.gameType !== 3) return;
+    if (game.gameType !== 2 && game.gameType !== 3 && game.gameType !== 7) return;
+    if (game.homeTeamId === 59 || game.visitingTeamId === 59) console.log('it exists');
     if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) return;
     if (!(game.id in allGames)) {
       gamesToUpdateOrCreate.push(game);
@@ -114,10 +116,12 @@ export const getLeaderboard = async (draftId: number) => {
 
 export const getGamesThisWeek = async (draftId: number) => {
   const now = new Date();
-  const nowFormatted = now.toISOString().split('T')[0];
+  const nowFormatted = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+  }).format(now);
 
-  const end = new Date(now);
-  end.setUTCDate(now.getUTCDate() + 3);
+  const end = new Date();
+  end.setUTCDate(now.getUTCDate() + 4);
   const endFormatted = end.toISOString().split('T')[0];
 
   const games = await getGamesInTimeFrame({ start: nowFormatted, end: endFormatted });
@@ -175,8 +179,6 @@ export const getStandings = async (draftId: number) => {
     },
     {} as Record<string, any>
   );
-
-  console.log('teams', teams);
 
   games.forEach((game) => {
     const winningTeam = game.homeScore > game.visitingScore ? game.homeTeam : game.visitingTeam;

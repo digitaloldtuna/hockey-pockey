@@ -16,6 +16,8 @@ import { useDraft } from '../../../hooks/useDraft';
 import { toastError } from '../../../theme/toaster';
 import { Team, Profile } from '../../../constants/types';
 import { getAvatarColour, getConferenceColour, getDivisionColour } from '../../../utils';
+import { profile } from 'console';
+import { useAuthentication } from '../../../hooks/useAuthentication';
 
 type Standing = Team & {
   member: Profile;
@@ -38,6 +40,7 @@ const formatLastTen = (record: boolean[]) => {
 
 const Standings = () => {
   const [standings, setStandings] = useState<Standing[] | null>(null);
+  const { profile } = useAuthentication();
   const { draft } = useDraft();
   if (!draft) {
     return <></>;
@@ -90,7 +93,10 @@ const Standings = () => {
           <Table.Body>
             {standings &&
               standings.map((standing, i) => (
-                <Table.Row key={standing.id}>
+                <Table.Row
+                  key={standing.id}
+                  backgroundColor={profile && standing.member.id === profile.id ? '#f7fcfc' : ''}
+                >
                   <Table.Cell>{i + 1}</Table.Cell>
                   <Table.Cell>
                     <HStack margin="2" gap="3">
@@ -137,12 +143,15 @@ const Standings = () => {
                     </Text>
                   </Table.Cell>
                   <Table.Cell>
+                    <HStack>
+                      <Tag.Root size="lg" colorPalette={getAvatarColour(standing.member.id)}>
+                        <Tag.Label>{standing.member.name}</Tag.Label>
+                      </Tag.Root>
+                      {profile && standing.member.id === profile.id ? '⭐' : ''}
+                    </HStack>
                     {/* <Avatar.Root colorPalette={getAvatarColour(standing.member.id)}>
                         <Avatar.Fallback name={standing.member.name} />
                       </Avatar.Root> */}
-                    <Tag.Root size="lg" colorPalette={getAvatarColour(standing.member.id)}>
-                      <Tag.Label>{standing.member.name}</Tag.Label>
-                    </Tag.Root>
                   </Table.Cell>
                 </Table.Row>
               ))}

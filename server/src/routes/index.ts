@@ -10,10 +10,4 @@ router.use('/draft', draftRouter);
 router.use('/hockey', hockeyRouter);
 router.use('/profile', profileRouter);
 
-router.get('/standings', async (req, res) => {
-  const data = await getStandingsNow();
-  console.log('standings:', data);
-  return res.json(data.standings);
-});
-
 export default router;

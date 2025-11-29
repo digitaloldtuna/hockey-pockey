@@ -30,7 +30,6 @@ export const getDraftMembershipFromMemberAndDraft = async ({
 };
 
 export const getDraftMembershipsFromIds = async (ids: number[]): Promise<DraftMembership[]> => {
-  console.log('IDS', ids);
   const { data, error } = (await supabase
     .from('draft_memberships')
     .select('*,profile:profiles!profile(*)')
