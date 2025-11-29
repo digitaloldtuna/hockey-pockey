@@ -1,9 +1,22 @@
 import { ROUTES } from '../../constants/routes';
-import { AbsoluteCenter, Box, Button, Field, Input, Link, Text, VStack } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Field,
+  Flex,
+  Grid,
+  HStack,
+  Input,
+  Link,
+  Text,
+  VStack,
+} from '@chakra-ui/react';
 import { useAuthentication } from '../../hooks/useAuthentication';
 import { useTitle } from '../../hooks/useTitle';
 import * as Yup from 'yup';
 import { ErrorMessage, Form, Formik, Field as FormField } from 'formik';
+import BlobbyGrainBackground from '../../components/BlobbyBackground';
+import AuthLayout from './AuthLayout';
 
 interface LoginFormValues {
   email: string;
@@ -20,8 +33,8 @@ const LoginPage = () => {
   const { handleLogin } = useAuthentication();
 
   const validationSchema = Yup.object({
-    email: Yup.string().email('Invalid email').required('Email is required'),
-    password: Yup.string().required('Password is required'),
+    email: Yup.string().email('invalid email').required('email is required'),
+    password: Yup.string().required('password is required'),
   });
 
   const onSubmit = (values: LoginFormValues) => {
@@ -29,43 +42,89 @@ const LoginPage = () => {
   };
 
   return (
-    <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
-      {() => (
-        <Form>
-          <AbsoluteCenter>
-            <Box p="10" borderRadius={'2xl'} backgroundColor="whiteAlpha.500">
-              <VStack>
-                <Text fontSize="5xl" lineHeight="0.75" fontWeight="bold" marginBottom="3">
-                  hockey
-                  <br />
-                  pockey
-                </Text>
-                <FormField name="email">
-                  {({ field }: { field: any }) => (
-                    <Field.Root>
-                      <Field.Label>Email</Field.Label>
-                      <Input {...field} backgroundColor="white" />
-                      <ErrorMessage name="email" component="div" />
-                    </Field.Root>
-                  )}
-                </FormField>
-                <FormField name="password">
-                  {({ field }: { field: any }) => (
-                    <Field.Root>
-                      <Field.Label>Password</Field.Label>
-                      <Input {...field} type="password" backgroundColor="white" />
-                      <ErrorMessage name="password" component="div" />
-                    </Field.Root>
-                  )}
-                </FormField>
-                <Button type="submit">Log In</Button>
-                <Link href={ROUTES.SIGNUP}>create an account!</Link>
-              </VStack>
-            </Box>
-          </AbsoluteCenter>
-        </Form>
-      )}
-    </Formik>
+    <AuthLayout>
+      <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
+        {() => (
+          <Form style={{ width: '100%' }}>
+            <VStack gap={4} w={{ base: 'full', md: '500px' }}>
+              <FormField name="email">
+                {({ field }: { field: any }) => (
+                  <Field.Root width="full">
+                    <Field.Label color="white">
+                      <b>email</b>
+                    </Field.Label>
+                    <Input
+                      {...field}
+                      placeholder="enter email"
+                      border="transparent"
+                      borderBottom="2px solid white"
+                      borderRadius="0"
+                      color="whiteAlpha.900"
+                      _focus={{
+                        boxShadow: 'none',
+                        outline: 'none',
+                        borderBottom: '2px solid white',
+                      }}
+                      _placeholder={{
+                        color: 'whiteAlpha.400',
+                      }}
+                    />
+                    <ErrorMessage name="email">
+                      {(msg) => (
+                        <Text color="#820707" fontSize="xs">
+                          {msg}
+                        </Text>
+                      )}
+                    </ErrorMessage>
+                  </Field.Root>
+                )}
+              </FormField>
+
+              <FormField name="password">
+                {({ field }: { field: any }) => (
+                  <Field.Root width="full">
+                    <Field.Label color="white">
+                      <b>password</b>
+                    </Field.Label>
+                    <Input
+                      {...field}
+                      type="password"
+                      placeholder="enter password"
+                      border="transparent"
+                      borderBottom="2px solid white"
+                      borderRadius="0"
+                      color="whiteAlpha.900"
+                      _focus={{
+                        boxShadow: 'none',
+                        outline: 'none',
+                        borderBottom: '2px solid white',
+                      }}
+                      _placeholder={{
+                        color: 'whiteAlpha.400',
+                      }}
+                    />
+                    <ErrorMessage name="password">
+                      {(msg) => (
+                        <Text color="#820707" fontSize="xs">
+                          {msg}
+                        </Text>
+                      )}
+                    </ErrorMessage>
+                  </Field.Root>
+                )}
+              </FormField>
+
+              <Button type="submit" rounded="2xl" w={{ base: 'full', md: 'auto' }} mt={5}>
+                log in
+              </Button>
+              <Link href={ROUTES.SIGNUP} fontSize="sm">
+                create an account!
+              </Link>
+            </VStack>
+          </Form>
+        )}
+      </Formik>
+    </AuthLayout>
   );
 };
 
