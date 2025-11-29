@@ -43,7 +43,7 @@ const DraftCard = ({ draft }: Props) => {
       onClick={() => navigate(`/draft/${draft.id}`)}
     >
       {/* Title + status */}
-      <Flex justify="space-between" align="center" mb={{ base: 2, md: 3 }}>
+      <Flex justify="space-between" align="center" mb="2">
         <Text fontWeight="bold" fontSize={{ base: 'md', md: 'xl' }}>
           {draft.name}
         </Text>

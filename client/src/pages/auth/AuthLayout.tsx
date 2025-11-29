@@ -19,10 +19,11 @@ const AuthLayout: React.FC<AuthLayoutProps> = ({ children }) => {
             textAlign={{ base: 'center', md: 'left' }}
           >
             <Text
-              fontSize={{ base: '80px', md: '150px' }}
+              fontSize={{ base: '70px', md: '150px' }}
               lineHeight="0.75"
               fontWeight="bold"
               color="white"
+              fontFamily="heading"
             >
               hockey
               <br />

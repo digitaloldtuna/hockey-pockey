@@ -104,9 +104,9 @@ const Home = () => {
       {/* UPCOMING GAMES */}
       <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column">
         <Flex align="center" direction="horizontal" justify="space-between" marginBottom="5">
-          <Text fontSize="2xl" color="oxford" fontWeight="bold">
+          <Heading size="2xl" color="oxford" fontWeight="bold">
             Upcoming Games
-          </Text>
+          </Heading>
           <Tooltip ids={{ trigger: id }} content="This is a tooltip">
             <Switch.Root
               ids={{ root: id }}
@@ -152,9 +152,9 @@ const Home = () => {
 
       {/* LEADERBOARD */}
       <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column" gap="3">
-        <Text fontSize="2xl" color="oxford" fontWeight="bold">
+        <Heading size="2xl" color="oxford" fontWeight="bold">
           Leaderboard
-        </Text>
+        </Heading>
         <Flex direction="column" gap="3">
           {leaderboard &&
             leaderboard.map((member) => (
@@ -172,7 +172,9 @@ const Home = () => {
                     <Avatar.Image src={member.profileImage || undefined} />
                   </Avatar.Root>
                   <VStack align="start" gap="0">
-                    <Heading size="md">{member.name}</Heading>
+                    <Text fontSize="sm" fontWeight="bold">
+                      {member.name}
+                    </Text>
                     <Text fontSize="xs">{member.email}</Text>
                   </VStack>
                 </HStack>

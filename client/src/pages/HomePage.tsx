@@ -61,7 +61,12 @@ const HomePage = () => {
               w="100%"
               maxW="100%"
             >
-              <Text fontSize={{ base: '3xl', md: '5xl' }} color="oxford" w="100%">
+              <Text
+                fontSize={{ base: '3xl', md: '5xl' }}
+                color="oxford"
+                w="100%"
+                fontFamily="heading"
+              >
                 Welcome, <b>{profile?.name}</b>!
               </Text>
 

@@ -38,7 +38,7 @@ const InPlayDraft = ({ draft }: Props) => {
         >
           <ArrowLeft />
         </Button>
-        <Text fontSize="4xl" color="oxford">
+        <Text fontSize="4xl" color="oxford" fontFamily="heading">
           <b>{draft.name} </b>
           {draft.season}
         </Text>
