@@ -1,10 +1,12 @@
 import {
   Avatar,
+  Center,
   Flex,
   Grid,
   Heading,
   HStack,
   ScrollArea,
+  Spinner,
   Switch,
   Text,
   VStack,
@@ -44,9 +46,103 @@ const formatDate = (date: string) => {
   return date;
 };
 
+const notCounted = (game: Game) => {
+  return !game.homeMember || !game.visitingMember || game.homeMember.id === game.visitingMember.id;
+};
+
+const UpcomingGames = ({ upcomingGames }: { upcomingGames: [string, Game[]][] | null }) => {
+  if (upcomingGames === null) {
+    return (
+      <Center w="full" h="full">
+        <Spinner size="xl" color="blue.500" />
+      </Center>
+    );
+  }
+
+  if (upcomingGames.length === 0) {
+    return <Text>There are no upcoming games</Text>;
+  }
+
+  return (
+    <ScrollArea.Root height="30rem" variant="hover">
+      <ScrollArea.Viewport>
+        <ScrollArea.Content>
+          <Flex direction="column" gap="3">
+            {upcomingGames.map((entry) => {
+              const date = formatDate(entry[0]);
+              const games = entry[1];
+              return (
+                <Flex direction="column" paddingBottom="8">
+                  <Heading paddingBottom="1" borderBottom="1px solid black" marginBottom="3">
+                    {date}
+                  </Heading>
+                  <VStack>
+                    {games.map((game) => (
+                      <GameCard fade={notCounted(game)} game={game} />
+                    ))}
+                  </VStack>
+                </Flex>
+              );
+            })}
+          </Flex>
+        </ScrollArea.Content>
+      </ScrollArea.Viewport>
+      <ScrollArea.Scrollbar>
+        <ScrollArea.Thumb />
+      </ScrollArea.Scrollbar>
+      <ScrollArea.Corner />
+    </ScrollArea.Root>
+  );
+};
+
+const Leaderboard = ({
+  leaderboard,
+}: {
+  leaderboard:
+    | { id: string; name: string; email: string; profileImage: string; score: number }[]
+    | null;
+}) => {
+  if (leaderboard === null) {
+    return (
+      <Center w="full" h="full">
+        <Spinner size="xl" color="blue.500" />
+      </Center>
+    );
+  }
+
+  return (
+    <>
+      {leaderboard.map((member) => (
+        <Flex
+          justify="space-between"
+          padding="3"
+          paddingX="5"
+          rounded="2xl"
+          backgroundColor="white"
+          alignItems="center"
+        >
+          <HStack gap="3">
+            <Avatar.Root colorPalette={getAvatarColour(member.id)}>
+              <Avatar.Fallback name={member.name} />
+              <Avatar.Image src={member.profileImage || undefined} />
+            </Avatar.Root>
+            <VStack align="start" gap="0">
+              <Text fontSize="sm" fontWeight="bold">
+                {member.name}
+              </Text>
+              <Text fontSize="xs">{member.email}</Text>
+            </VStack>
+          </HStack>
+          <Heading size="xl">{member.score}</Heading>
+        </Flex>
+      ))}
+    </>
+  );
+};
+
 const Home = () => {
   const id = useId();
-  const [gamesThisWeek, setGamesThisWeek] = useState<[string, Game[]][] | null>(null);
+  const [upcomingGames, setUpcomingGames] = useState<[string, Game[]][] | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[] | null>(null);
   const [filtered, setFiltered] = useState<boolean>(false);
   const { draft } = useDraft();
@@ -58,10 +154,10 @@ const Home = () => {
     api
       .get(`/hockey/games/thisweek?id=${draft.id}`)
       .then((res) => {
-        setGamesThisWeek(res.data.games);
+        setUpcomingGames(res.data.games);
       })
       .catch((reason) => {
-        setGamesThisWeek(null);
+        setUpcomingGames(null);
         toastError('Cannot fetching games for week', reason);
       });
   };
@@ -82,7 +178,7 @@ const Home = () => {
     fetchLeaderboard();
   }
 
-  if (gamesThisWeek === null) {
+  if (upcomingGames === null) {
     fetchGamesForThisWeek();
   }
 
@@ -93,8 +189,8 @@ const Home = () => {
   };
 
   const filteredGamesThisWeek = (): [string, Game[]][] => {
-    if (!gamesThisWeek) return [];
-    return gamesThisWeek?.map(([date, games]) => {
+    if (!upcomingGames) return [];
+    return upcomingGames?.map(([date, games]) => {
       return [date, games.filter((game) => !notCounted(game))];
     });
   };
@@ -119,35 +215,7 @@ const Home = () => {
             </Switch.Root>
           </Tooltip>
         </Flex>
-
-        <ScrollArea.Root height="30rem" variant="hover">
-          <ScrollArea.Viewport>
-            <ScrollArea.Content>
-              <Flex direction="column" gap="3">
-                {(filtered ? filteredGamesThisWeek() : gamesThisWeek || []).map((entry) => {
-                  const date = formatDate(entry[0]);
-                  const games = entry[1];
-                  return (
-                    <Flex direction="column" paddingBottom="8">
-                      <Heading paddingBottom="1" borderBottom="1px solid black" marginBottom="3">
-                        {date}
-                      </Heading>
-                      <VStack>
-                        {games.map((game) => (
-                          <GameCard fade={notCounted(game)} game={game} />
-                        ))}
-                      </VStack>
-                    </Flex>
-                  );
-                })}
-              </Flex>
-            </ScrollArea.Content>
-          </ScrollArea.Viewport>
-          <ScrollArea.Scrollbar>
-            <ScrollArea.Thumb />
-          </ScrollArea.Scrollbar>
-          <ScrollArea.Corner />
-        </ScrollArea.Root>
+        <UpcomingGames upcomingGames={filtered ? filteredGamesThisWeek() : upcomingGames} />
       </Flex>
 
       {/* LEADERBOARD */}
@@ -156,31 +224,7 @@ const Home = () => {
           Leaderboard
         </Heading>
         <Flex direction="column" gap="3">
-          {leaderboard &&
-            leaderboard.map((member) => (
-              <Flex
-                justify="space-between"
-                padding="3"
-                paddingX="5"
-                rounded="2xl"
-                backgroundColor="white"
-                alignItems="center"
-              >
-                <HStack gap="3">
-                  <Avatar.Root colorPalette={getAvatarColour(member.id)}>
-                    <Avatar.Fallback name={member.name} />
-                    <Avatar.Image src={member.profileImage || undefined} />
-                  </Avatar.Root>
-                  <VStack align="start" gap="0">
-                    <Text fontSize="sm" fontWeight="bold">
-                      {member.name}
-                    </Text>
-                    <Text fontSize="xs">{member.email}</Text>
-                  </VStack>
-                </HStack>
-                <Heading size="xl">{member.score}</Heading>
-              </Flex>
-            ))}
+          <Leaderboard leaderboard={leaderboard} />
         </Flex>
       </Flex>
     </Grid>
