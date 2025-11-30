@@ -40,40 +40,30 @@ const HistoryList = ({
   }
 
   return (
-    <ScrollArea.Root height="30rem" variant="hover">
-      <ScrollArea.Viewport>
-        <ScrollArea.Content>
-          <Flex direction="column" gap="3">
-            {history.map((entry) => {
-              const date = formatDate(entry[0], true);
-              const games = entry[1];
-              return (
-                <Flex direction="column" paddingBottom="8" key={date}>
-                  <HStack
-                    paddingBottom="1"
-                    borderBottom="1px solid black"
-                    marginBottom="3"
-                    justify="space-between"
-                  >
-                    <Heading size={{ base: 'md', md: 'xl' }}>{date}</Heading>
-                    <Text fontSize={{ base: 'sm', md: 'lg' }}>{winsIndicator(games, profile)}</Text>
-                  </HStack>
-                  <VStack>
-                    {games.map((game) => (
-                      <HistoryCard game={game} key={game.id} />
-                    ))}
-                  </VStack>
-                </Flex>
-              );
-            })}
+    <Flex direction="column" gap="3">
+      {history.map((entry) => {
+        const date = formatDate(entry[0], true);
+        const games = entry[1];
+        return (
+          <Flex direction="column" paddingBottom="8" key={date}>
+            <HStack
+              paddingBottom="1"
+              borderBottom="1px solid black"
+              marginBottom="3"
+              justify="space-between"
+            >
+              <Heading size={{ base: 'md', md: 'xl' }}>{date}</Heading>
+              <Text fontSize={{ base: 'sm', md: 'lg' }}>{winsIndicator(games, profile)}</Text>
+            </HStack>
+            <VStack>
+              {games.map((game) => (
+                <HistoryCard game={game} key={game.id} />
+              ))}
+            </VStack>
           </Flex>
-        </ScrollArea.Content>
-      </ScrollArea.Viewport>
-      <ScrollArea.Scrollbar>
-        <ScrollArea.Thumb />
-      </ScrollArea.Scrollbar>
-      <ScrollArea.Corner />
-    </ScrollArea.Root>
+        );
+      })}
+    </Flex>
   );
 };
 

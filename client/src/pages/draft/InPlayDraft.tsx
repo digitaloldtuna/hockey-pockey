@@ -43,12 +43,17 @@ const InPlayDraft = () => {
         variant="plain"
         orientation={orientation}
         size={{ base: 'sm', md: 'lg' }}
+        overflowY="visible"
       >
         <Flex
           justify={{ base: 'space-between', md: 'start' }}
           align="center"
           direction={{ base: 'row', md: 'column' }}
           gap="3"
+          position={{ base: 'auto', md: 'sticky' }}
+          height="fit-content"
+          top="5" // <-- IMPORTANT
+          zIndex="100" // <-- keeps tabs above content while scrolling
         >
           <Tabs.List bg="whiteAlpha.500" rounded="2xl" p="1">
             <Tabs.Trigger value="home" p="3">

@@ -10,9 +10,10 @@ const Layout = ({ marginX, children }: Props) => {
     <Flex
       marginX={marginX}
       paddingX={{ base: 4, sm: 6, md: 12, lg: 20 }} // reduced on small screens
-      paddingTop={{ base: 4, sm: 6, md: 8, lg: 10 }} // reduced on small screens
+      paddingY={{ base: 4, sm: 6, md: 8, lg: 10 }} // reduced on small screens
       gap={{ base: 3, md: 5 }} // smaller gap on mobile
       direction="column"
+      overflow="visible"
     >
       {children}
     </Flex>
