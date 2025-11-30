@@ -58,7 +58,6 @@ router.get('/session', async (req, res) => {
 
   try {
     const user = await getUser(access);
-    console.log('Parsed user', user);
     const profile = await getProfileFromUserId(user.id);
     return res.json({ authenticated: true, user, profile });
   } catch (err) {

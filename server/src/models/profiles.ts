@@ -45,11 +45,16 @@ export const getProfileFromIds = async (ids: string[]): Promise<Profile[]> => {
 };
 
 export const getProfileFromUserId = async (userId: string): Promise<Profile> => {
-  const { data, error } = await supabase.from('profiles').select('*').eq('user', userId).single();
+  console.log('Getting user with id', userId);
+  const { data, error } = await supabase.from('profiles').select('*').eq('user', userId);
   if (error) {
     throw Error(`Cannot fetch profile with user id: ${error.message}`);
   }
-  return data;
+  if (data.length !== 1) {
+    throw Error(`Invalid return object: ${data}`);
+  }
+  const profile = data[0];
+  return profile;
 };
 
 export const updateProfile = async ({
