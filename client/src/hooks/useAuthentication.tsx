@@ -23,30 +23,30 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
 
-  /**
-   * Fetch session exactly once on page load.
-   * Axios interceptor will retry /session if a refresh occurs.
-   */
-  const fetchSession = async () => {
-    if (initialized) return;
-    setInitialized(true);
-
-    try {
-      const res = await api.get('/authentication/session');
-      setSession(res.data);
-      setProfile(res.data.profile);
-    } catch {
-      setSession({ authenticated: false });
-      setProfile(null);
-    } finally {
-      setLoading(false);
-    }
-  };
-
   // Run once at mount
   useEffect(() => {
+    /**
+     * Fetch session exactly once on page load.
+     * Axios interceptor will retry /session if a refresh occurs.
+     */
+    const fetchSession = async () => {
+      if (initialized) return;
+      setInitialized(true);
+
+      try {
+        const res = await api.get('/authentication/session');
+        setSession(res.data);
+        setProfile(res.data.profile);
+      } catch {
+        setSession({ authenticated: false });
+        setProfile(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+
     fetchSession();
-  }, [fetchSession]);
+  }, []);
 
   /**
    * Signup
