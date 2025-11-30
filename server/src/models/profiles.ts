@@ -1,6 +1,4 @@
-import { CURRENT_SEASON } from '../constants';
 import { supabaseAdmin as supabase } from '../supabase';
-import { getTeamFromId } from './teams';
 
 export interface Profile {
   id: string;

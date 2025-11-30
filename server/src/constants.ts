@@ -1,2 +1,0 @@
-export const API_CURRENT_SEASON = 20252026;
-export const CURRENT_SEASON = 2026;

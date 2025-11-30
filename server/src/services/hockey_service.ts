@@ -13,10 +13,14 @@ import {
 import { getAllTeamIds, getAllTeams, Team } from '../models/teams';
 import _ from 'lodash';
 import { DraftMembership } from '../models/draft_memberships';
-import e from 'express';
+import { updateEnvVariable } from '../models/env';
+import { getApiSeason } from '../utils/mappings';
+import { getCurrentSeason } from './env_service';
 
-// WILL ONLY UPDATE FOR CURRENT SEASON (2026)
+// WILL ONLY UPDATE FOR CURRENT SEASON
 export const refreshGames = async () => {
+  const apiSeason = getApiSeason(await getCurrentSeason());
+
   const gamesFromDB = await getGames({});
   const allGames: Record<number, any> = gamesFromDB.reduce(
     (arr, game) => {
@@ -35,7 +39,7 @@ export const refreshGames = async () => {
     // reformat date since DB auto adds the 00s
     game.easternStartTime = `${game.easternStartTime}+00:00`;
 
-    if (game.season !== 20252026) return;
+    if (game.season !== apiSeason) return;
     if (game.gameType !== 2 && game.gameType !== 3 && game.gameType !== 7) return;
     if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) return;
     if (!(game.id in allGames)) {
@@ -47,6 +51,7 @@ export const refreshGames = async () => {
 
   console.log('amount to update', gamesToUpdateOrCreate.length);
   await updateOrCreateGames(gamesToUpdateOrCreate);
+  await updateLastRefreshed();
 };
 
 export const getLeaderboard = async (draftId: number) => {
@@ -308,4 +313,11 @@ const partitionGamesByDate = (games: Game[]) => {
   });
 
   return gamesSortedByDate;
+};
+
+const updateLastRefreshed = async () => {
+  const now = new Date();
+  const estString = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
+  const updatedTime = new Date(estString);
+  await updateEnvVariable('lastRefreshed', updatedTime);
 };

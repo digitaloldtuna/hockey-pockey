@@ -1,4 +1,6 @@
+import { getCurrentSeason } from '../services/env_service';
 import { supabaseAdmin as supabase } from '../supabase';
+import { getApiSeason } from '../utils/mappings';
 
 export type Game = {
   id: number;
@@ -19,7 +21,7 @@ export type Game = {
 
 export const getGames = async ({ season }: { season?: number }): Promise<Game[]> => {
   if (!season) {
-    season = 20252026;
+    season = getApiSeason(await getCurrentSeason());
   }
 
   // supabase queries max out at 1000 records
@@ -66,12 +68,15 @@ export const getGamesInTimeFrame = async ({
   start: string;
   end: string;
 }): Promise<Game[]> => {
+  const season = await getCurrentSeason();
+  const apiSeason = getApiSeason(season);
+
   const dates: string[] = getDateRange(start, end);
   const { data, error } = await supabase
     .from('games')
     .select('*')
     .in('gameDate', dates)
-    .eq('season', 20252026);
+    .eq('season', apiSeason);
 
   if (error) {
     throw Error(`Cannot fetch games: ${error}`);
@@ -86,10 +91,13 @@ export const getCompletedGamesForSomeTeams = async (
   if (selectedTeams.length === 0 || validTeams.length === 0) return [];
   const formatted = `(${selectedTeams.join(',')})`;
 
+  const season = await getCurrentSeason();
+  const apiSeason = getApiSeason(season);
+
   const { data, error } = await supabase
     .from('games')
     .select('*')
-    .eq('season', 20252026)
+    .eq('season', apiSeason)
     .eq('gameStateId', 7)
     .in('homeTeamId', validTeams)
     .in('visitingTeamId', validTeams)
@@ -104,10 +112,13 @@ export const getCompletedGamesForSomeTeams = async (
 export const getCompletedGamesForTeams = async (validTeams: number[]) => {
   if (validTeams.length === 0) return [];
 
+  const season = await getCurrentSeason();
+  const apiSeason = getApiSeason(season);
+
   const { data, error } = await supabase
     .from('games')
     .select('*')
-    .eq('season', 20252026)
+    .eq('season', apiSeason)
     .eq('gameStateId', 7)
     .in('homeTeamId', validTeams)
     .in('visitingTeamId', validTeams);

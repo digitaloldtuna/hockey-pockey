@@ -1,4 +1,5 @@
 import { nanoid } from 'nanoid';
+import { getCurrentSeason } from '../services/env_service';
 import { supabaseAdmin as supabase } from '../supabase';
 import {
   createDraftMembership,
@@ -44,12 +45,13 @@ export const createADraft = async ({
   owner: Profile;
   name: string;
 }): Promise<Draft> => {
-  const code = nanoid();
+  const code = nanoid(); // generate random join code for the draft
+  const season = await getCurrentSeason();
 
   console.log(`Creating draft ${name} with owner ${owner.name} (${owner.id}) and code ${code}`);
   const { data, error } = await supabase
     .from('drafts')
-    .insert([{ name, season: 2026, code, owner: owner.id, status: 'open' }])
+    .insert([{ name, season, code, owner: owner.id, status: 'open' }])
     .select()
     .single();
 

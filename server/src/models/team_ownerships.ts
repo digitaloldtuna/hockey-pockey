@@ -1,6 +1,5 @@
-import { CURRENT_SEASON } from '../constants';
+import { getCurrentSeason } from '../services/env_service';
 import { supabaseAdmin as supabase } from '../supabase';
-import { Draft } from './drafts';
 import { DraftMembership, getDraftMembershipFromMemberAndDraft } from './draft_memberships';
 import { Profile } from './profiles';
 import { Team } from './teams';
@@ -13,11 +12,13 @@ export type TeamOwnership<TeamType = number, DraftType = number> = {
 };
 
 export const getTeamOwnershipsFromUser = async (userId: string): Promise<TeamOwnership[]> => {
+  const season = await getCurrentSeason();
+
   const { data, error } = await supabase
     .from('team_ownerships')
     .select('*')
     .eq('draftMembership.user', userId)
-    .eq('draftMembership.draft.season', CURRENT_SEASON);
+    .eq('draftMembership.draft.season', season);
   if (error || !data) {
     throw Error(`Cannot fetch team ownerships: ${error.message}`);
   }
