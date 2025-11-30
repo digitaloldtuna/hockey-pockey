@@ -71,7 +71,12 @@ const UpcomingGames = ({ upcomingGames }: { upcomingGames: [string, Game[]][] | 
               const games = entry[1];
               return (
                 <Flex direction="column" paddingBottom="8">
-                  <Heading paddingBottom="1" borderBottom="1px solid black" marginBottom="3">
+                  <Heading
+                    paddingBottom="1"
+                    borderBottom="1px solid black"
+                    marginBottom="3"
+                    size={{ base: 'md', md: 'xl' }}
+                  >
                     {date}
                   </Heading>
                   <VStack>
@@ -161,11 +166,23 @@ const Home = () => {
   };
 
   return (
-    <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap="10">
+    <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap="5">
       {/* UPCOMING GAMES */}
-      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column">
-        <Flex align="center" direction="horizontal" justify="space-between" marginBottom="5">
-          <Heading size="2xl" color="oxford" fontWeight="bold">
+      <Flex
+        rounded={{ base: 'md', md: '2xl' }}
+        backgroundColor="whiteAlpha.500"
+        padding={{ base: '2', md: '8' }}
+        direction="column"
+        w="full"
+        order={{ base: 2, md: 1 }}
+      >
+        <Flex
+          align="center"
+          direction="horizontal"
+          justify="space-between"
+          marginBottom={{ base: '2', md: '5' }}
+        >
+          <Heading size={{ base: 'lg', md: '2xl' }} color="oxford" fontWeight="bold">
             Upcoming Games
           </Heading>
           <Tooltip ids={{ trigger: id }} content="This is a tooltip">
@@ -173,10 +190,11 @@ const Home = () => {
               ids={{ root: id }}
               checked={filtered}
               onCheckedChange={(e: { checked: boolean }) => setFiltered(e.checked)}
+              size={{ base: 'xs', md: 'md' }}
             >
               <Switch.HiddenInput />
               <Switch.Control />
-              <Switch.Label>valid games</Switch.Label>
+              <Switch.Label size="xs">valid games</Switch.Label>
             </Switch.Root>
           </Tooltip>
         </Flex>
@@ -184,11 +202,18 @@ const Home = () => {
       </Flex>
 
       {/* LEADERBOARD */}
-      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column" gap="3">
-        <Heading size="2xl" color="oxford" fontWeight="bold">
+      <Flex
+        rounded={{ base: 'md', md: '2xl' }}
+        backgroundColor="whiteAlpha.500"
+        padding={{ base: '2', md: '8' }}
+        direction="column"
+        gap={{ base: '1', md: '3' }}
+        order={{ base: 1, md: 2 }}
+      >
+        <Heading size={{ base: 'lg', md: '2xl' }} color="oxford" fontWeight="bold">
           Leaderboard
         </Heading>
-        <Flex direction="column" gap="3">
+        <Flex direction="column" gap={{ base: '1', md: '3' }}>
           <Leaderboard leaderboard={leaderboard} />
         </Flex>
       </Flex>

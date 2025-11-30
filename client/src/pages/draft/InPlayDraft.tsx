@@ -1,4 +1,4 @@
-import { Button, Flex, Tabs, Text } from '@chakra-ui/react';
+import { Button, Flex, Tabs, Text, useBreakpointValue } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { ROUTES } from '../../constants/routes';
 import { ArrowLeft, ChartBar, History, Home, RefreshCcw, Users } from 'lucide-react';
@@ -8,6 +8,10 @@ import { useDraft } from '../../hooks/useDraft';
 
 const InPlayDraft = () => {
   const navigate = useNavigate();
+  const orientation = useBreakpointValue<'horizontal' | 'vertical'>({
+    base: 'horizontal',
+    md: 'vertical',
+  });
   const { draft, refresh, isRefreshing } = useDraft();
   if (!draft) {
     return <></>;
@@ -15,39 +19,53 @@ const InPlayDraft = () => {
 
   return (
     <Layout>
-      <Flex justify="start" align="center">
+      <Flex justify="start" align="center" w="full" h="full">
         <Button
           variant="plain"
-          size="2xl"
-          gap="8"
+          size={{ base: 'lg', md: '2xl' }}
           padding="0"
           onClick={() => navigate(ROUTES.HOME)}
         >
           <ArrowLeft />
         </Button>
-        <Text fontSize="4xl" color="oxford" fontFamily="heading">
-          <b>{draft.name} </b>
+        <Text
+          fontSize={{ base: '2xl', md: '4xl' }}
+          color="oxford"
+          fontFamily="heading"
+          lineHeight="1"
+        >
+          <b>{draft.name}</b>
           {draft.season}
         </Text>
       </Flex>
-      <Tabs.Root defaultValue="home" variant="plain">
-        <Flex justify="space-between" align="center">
+      <Tabs.Root
+        defaultValue="home"
+        variant="plain"
+        orientation={orientation}
+        size={{ base: 'sm', md: 'lg' }}
+      >
+        <Flex
+          justify={{ base: 'space-between', md: 'start' }}
+          align="center"
+          direction={{ base: 'row', md: 'column' }}
+          gap="3"
+        >
           <Tabs.List bg="whiteAlpha.500" rounded="2xl" p="1">
             <Tabs.Trigger value="home" p="3">
               <Home />
-              Home
+              {orientation === 'vertical' && 'Home'}
             </Tabs.Trigger>
             <Tabs.Trigger value="standings">
               <Users />
-              Standings
+              {orientation === 'vertical' && 'Standings'}
             </Tabs.Trigger>
             <Tabs.Trigger value="stats">
               <ChartBar />
-              Stats
+              {orientation === 'vertical' && 'Stats'}
             </Tabs.Trigger>
             <Tabs.Trigger value="history">
               <History />
-              History
+              {orientation === 'vertical' && 'History'}
             </Tabs.Trigger>
             <Tabs.Indicator rounded="2xl" />
           </Tabs.List>
@@ -57,6 +75,7 @@ const InPlayDraft = () => {
             variant="surface"
             onClick={refresh}
             disabled={isRefreshing}
+            w={{ base: 'auto', md: '100%' }}
           >
             <RefreshCcw size={20} className={isRefreshing ? 'rotate' : ''} />
             {isRefreshing ? 'refreshing' : 'refresh'}
