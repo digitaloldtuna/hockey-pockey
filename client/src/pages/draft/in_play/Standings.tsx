@@ -34,6 +34,7 @@ const StandingsTable = ({ standings, profile }: { standings: Standing[]; profile
           <Table.ColumnHeader>Wins</Table.ColumnHeader>
           <Table.ColumnHeader>Loses</Table.ColumnHeader>
           <Table.ColumnHeader>L10</Table.ColumnHeader>
+          <Table.ColumnHeader>Win Rate</Table.ColumnHeader>
           <Table.ColumnHeader>Owner</Table.ColumnHeader>
         </Table.Row>
       </Table.Header>
@@ -81,6 +82,11 @@ const StandingsTable = ({ standings, profile }: { standings: Standing[]; profile
             <Table.Cell>
               <Text fontSize="md" fontWeight="bold">
                 {formatLastTen(standing.lt)}
+              </Text>
+            </Table.Cell>
+            <Table.Cell>
+              <Text fontSize="md" fontWeight="bold">
+                {standing.win_rate}%
               </Text>
             </Table.Cell>
             <Table.Cell>

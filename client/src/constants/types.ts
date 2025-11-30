@@ -69,4 +69,5 @@ export type Standing = Team & {
     type: 'w' | 'l';
     value: number;
   };
+  win_rate: number;
 };

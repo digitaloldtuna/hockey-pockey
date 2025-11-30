@@ -13,6 +13,7 @@ import {
 import { getAllTeamIds, getAllTeams, Team } from '../models/teams';
 import _ from 'lodash';
 import { DraftMembership } from '../models/draft_memberships';
+import e from 'express';
 
 // WILL ONLY UPDATE FOR CURRENT SEASON (2026)
 export const refreshGames = async () => {
@@ -172,6 +173,7 @@ export const getStandings = async (draftId: number) => {
         loses: 0,
         lt: [],
         streak: { type: 'w', value: 0 },
+        win_rate: 0.0,
       };
       return arr;
     },
@@ -218,10 +220,18 @@ export const getStandings = async (draftId: number) => {
     }
   });
 
-  const standings = Object.values(teams);
+  const standings = Object.values(teams).map((team) => {
+    return {
+      ...team,
+      win_rate: Math.trunc((10000 * team.wins) / (team.wins + team.loses)) / 100,
+    };
+  });
+
   const sortedStandings = standings.sort((a, b) => {
     if (b.wins !== a.wins) {
       return b.wins - a.wins;
+    } else if (b.win_rate !== a.win_rate) {
+      return b.win_rate - a.win_rate;
     } else {
       const bltw = b.lt.filter(Boolean).length;
       const altw = a.lt.filter(Boolean).length;
