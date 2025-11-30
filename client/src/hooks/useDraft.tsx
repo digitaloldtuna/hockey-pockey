@@ -3,6 +3,7 @@ import { useQuery } from '@tanstack/react-query';
 import api from '../api';
 import { Draft, Game, Standing } from '../constants/types';
 import { toastError, toastSuccess } from '../theme/toaster';
+import { useAuthentication } from './useAuthentication';
 
 interface DraftContextType {
   draftId: string | null;
@@ -24,6 +25,7 @@ interface DraftContextType {
 const DraftContext = createContext<DraftContextType | undefined>(undefined);
 
 export function DraftProvider({ children }: { children: ReactNode }) {
+  const { session } = useAuthentication();
   const [draftId, setDraftId] = useState<string | null>(null);
 
   const [upcomingGames, setUpcomingGames] = useState<[string, Game[]][] | null>(null);
@@ -32,7 +34,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
   const [history, setHistory] = useState<[string, Game[]][] | null>(null);
 
   const fetchGamesForThisWeek = () => {
-    if (!draftId) return;
+    if (!session?.authenticated || !draftId) return;
     api
       .get(`/hockey/games/thisweek?id=${draftId}`)
       .then((res) => {
@@ -45,7 +47,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchLeaderboard = () => {
-    if (!draftId) return;
+    if (!session?.authenticated || !draftId) return;
     api
       .get(`/draft/leaderboard?id=${draftId}`)
       .then((res) => {
@@ -58,7 +60,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchStandings = () => {
-    if (!draftId) return;
+    if (!session?.authenticated || !draftId) return;
     api
       .get(`/hockey/standings?id=${draftId}`)
       .then((res) => {
@@ -71,7 +73,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
   };
 
   const fetchHistory = () => {
-    if (!draftId) return;
+    if (!session?.authenticated || !draftId) return;
     api
       .get(`/hockey/member/history?id=${draftId}`)
       .then((res) => {
@@ -98,7 +100,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
       fetchHistory();
       return res.data.draft as Draft;
     },
-    enabled: !!draftId, // only fetch when there's a draftId
+    enabled: !!draftId && session?.authenticated, // only fetch when there's a draftId
     retry: false,
   });
 
@@ -125,7 +127,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
       }
       return false;
     },
-    enabled: false, // only fetch when there's a draftId
+    enabled: false,
     retry: false,
   });
 
