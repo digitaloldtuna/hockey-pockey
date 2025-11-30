@@ -16,39 +16,7 @@ import GameCard from '../../../components/GameCard';
 import { Game } from '../../../constants/types';
 import { useDraft } from '../../../hooks/useDraft';
 import { Tooltip } from '../../../theme/tooltip';
-import { getAvatarColour } from '../../../utils';
-
-const formatDate = (date: string) => {
-  const now = new Date();
-
-  const today = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/New_York',
-  }).format(now);
-
-  now.setDate(now.getDate() + 1);
-  const tomorrow = new Intl.DateTimeFormat('en-CA', {
-    timeZone: 'America/New_York',
-  }).format(now);
-
-  console.log('dates', today, tomorrow);
-
-  // Format function
-  const prettyDate = new Date(date + 'T05:00:00Z').toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long', // full month name
-    day: 'numeric',
-  });
-
-  if (date === today) {
-    date = `Today - ${prettyDate}`;
-  } else if (date === tomorrow) {
-    date = `Tomorrow - ${prettyDate}`;
-  } else {
-    date = prettyDate;
-  }
-
-  return date;
-};
+import { formatDate, getAvatarColour } from '../../../utils';
 
 const notCounted = (game: Game) => {
   return !game.homeMember || !game.visitingMember || game.homeMember.id === game.visitingMember.id;
@@ -73,7 +41,7 @@ const UpcomingGames = ({ upcomingGames }: { upcomingGames: [string, Game[]][] | 
         <ScrollArea.Content>
           <Flex direction="column" gap="3">
             {upcomingGames.map((entry) => {
-              const date = formatDate(entry[0]);
+              const date = formatDate(entry[0], true);
               const games = entry[1];
               return (
                 <Flex direction="column" paddingBottom="8" key={date}>

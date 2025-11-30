@@ -3,32 +3,7 @@ import { HistoryCard } from '../../../components';
 import { Game, Profile } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { useDraft } from '../../../hooks/useDraft';
-
-const formatDate = (date: string) => {
-  const today = new Date();
-
-  // Get tomorrow by adding 1 day
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
-
-  // Format function
-  const formatDate = (date: Date) => date.toISOString().split('T')[0]; // "YYYY-MM-DD"
-  const prettyDate = new Date(date + 'T05:00:00Z').toLocaleDateString('en-US', {
-    year: 'numeric',
-    month: 'long', // full month name
-    day: 'numeric',
-  });
-
-  if (date === formatDate(today)) {
-    date = `Today - ${prettyDate}`;
-  } else if (date === formatDate(tomorrow)) {
-    date = `Tomorrow - ${prettyDate}`;
-  } else {
-    date = prettyDate;
-  }
-
-  return date;
-};
+import { formatDate } from '../../../utils';
 
 const winsIndicator = (games: Game[], profile: Profile) => {
   if (!profile) return <></>;
@@ -70,7 +45,7 @@ const HistoryList = ({
         <ScrollArea.Content>
           <Flex direction="column" gap="3">
             {history.map((entry) => {
-              const date = formatDate(entry[0]);
+              const date = formatDate(entry[0], true);
               const games = entry[1];
               return (
                 <Flex direction="column" paddingBottom="8" key={date}>
