@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     };
 
     fetchSession();
-  }, []);
+  }, [initialized]);
 
   /**
    * Signup
