@@ -317,7 +317,5 @@ const partitionGamesByDate = (games: Game[]) => {
 
 const updateLastRefreshed = async () => {
   const now = new Date();
-  const estString = now.toLocaleString('en-US', { timeZone: 'America/New_York' });
-  const updatedTime = new Date(estString);
-  await updateEnvVariable('lastRefreshed', updatedTime);
+  await updateEnvVariable('lastRefreshed', now);
 };
