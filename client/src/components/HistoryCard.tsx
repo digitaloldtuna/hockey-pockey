@@ -1,4 +1,14 @@
-import { Flex, Grid, Heading, HStack, Image, Tag, Text, VStack } from '@chakra-ui/react';
+import {
+  Flex,
+  Grid,
+  Heading,
+  HStack,
+  Image,
+  Tag,
+  Text,
+  useBreakpointValue,
+  VStack,
+} from '@chakra-ui/react';
 import { Game, Profile } from '../constants/types';
 import { useAuthentication } from '../hooks/useAuthentication';
 import { getAvatarColour } from '../utils';
@@ -17,22 +27,17 @@ function formatTime12(iso: string): string {
 }
 
 const HistoryCard = ({ game }: { game: Game }) => {
+  const isBase = useBreakpointValue({ base: true, md: false });
+
   const { profile } = useAuthentication();
   const won =
     (profile?.id === game.homeMember?.id && game.homeScore > game.visitingScore) ||
     (profile?.id === game.visitingMember?.id && game.homeScore < game.visitingScore);
 
   const badge = (member?: Profile) => {
-    if (member) {
-      return (
-        <Tag.Root size="sm" colorPalette={getAvatarColour(member.id)}>
-          <Tag.Label>{member.name}</Tag.Label>
-        </Tag.Root>
-      );
-    }
     return (
-      <Tag.Root size="sm" colorPalette={'yellow'}>
-        <Tag.Label>unclaimed</Tag.Label>
+      <Tag.Root size="sm" colorPalette={member ? getAvatarColour(member.id) : 'yellow'}>
+        <Tag.Label>{member ? member.name : 'unclaimed'}</Tag.Label>
       </Tag.Root>
     );
   };
@@ -40,10 +45,10 @@ const HistoryCard = ({ game }: { game: Game }) => {
   const middlePiece = (game: Game) => {
     return (
       <>
-        <Heading size="3xl">
+        <Heading size={{ base: '2xl', md: '3xl' }}>
           {game.homeScore} vs. {game.visitingScore}
         </Heading>
-        <Text fontSize="sm">{formatTime12(game.easternStartTime)}</Text>
+        <Text fontSize={{ base: 'xs', md: 'sm' }}>{formatTime12(game.easternStartTime)}</Text>
       </>
     );
   };
@@ -51,9 +56,8 @@ const HistoryCard = ({ game }: { game: Game }) => {
   return (
     <Grid
       templateColumns="repeat(3, 1fr)"
-      gap={4}
       padding="3"
-      paddingX="5"
+      paddingX={{ base: '3', md: '5' }}
       rounded="2xl"
       borderWidth="3px"
       borderColor={won ? '#4ccf51' : '#cf4c4c'}
@@ -61,9 +65,14 @@ const HistoryCard = ({ game }: { game: Game }) => {
       width="100%"
     >
       <HStack>
-        <Image src={game.homeTeam?.logo} boxSize="60px" fit="cover" alt={game.homeTeam?.fullName} />
+        <Image
+          src={game.homeTeam?.logo}
+          boxSize={{ base: '35px', md: '60px' }}
+          fit="cover"
+          alt={game.homeTeam?.fullName}
+        />
         <VStack align="start" gap="1">
-          <Heading size="sm">{game.homeTeam?.fullName}</Heading>
+          <Heading size="sm">{isBase ? game.homeTeam?.code : game.homeTeam?.fullName}</Heading>
           {badge(game.homeMember)}
         </VStack>
       </HStack>
@@ -74,12 +83,14 @@ const HistoryCard = ({ game }: { game: Game }) => {
 
       <HStack justify="end">
         <VStack align="end" gap="1">
-          <Heading size="sm">{game.visitingTeam?.fullName}</Heading>
+          <Heading size="sm" textAlign="right">
+            {isBase ? game.visitingTeam?.code : game.visitingTeam?.fullName}
+          </Heading>
           {badge(game.visitingMember)}
         </VStack>
         <Image
           src={game.visitingTeam?.logo}
-          boxSize="60px"
+          boxSize={{ base: '35px', md: '60px' }}
           fit="cover"
           alt={game.visitingTeam?.fullName}
         />

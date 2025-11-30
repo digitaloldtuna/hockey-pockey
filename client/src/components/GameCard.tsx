@@ -40,21 +40,17 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
   const middlePiece = (game: Game) => {
     if (game.gameStateId === 1) {
       return (
-        <Heading size={{ base: '2xl', md: '3xl' }} opacity={fade ? 0.5 : 1}>
-          {formatTime12(game.easternStartTime)}
-        </Heading>
+        <Heading size={{ base: '2xl', md: '3xl' }}>{formatTime12(game.easternStartTime)}</Heading>
       );
     } else if (game.gameStateId === 7) {
       const winner = game.homeScore > game.visitingScore ? game.homeMember : game.visitingMember;
       return (
         <>
           <Stack align="center" direction={isBase ? 'column' : 'row'} gap={{ base: '0', md: '1' }}>
-            <Text fontSize={{ base: 'xs', md: 'sm' }} opacity={fade ? 0.5 : 1}>
-              winner:
-            </Text>
+            <Text fontSize={{ base: 'xs', md: 'sm' }}>winner:</Text>
             {badge(winner)}
           </Stack>
-          <Heading size={{ base: '2xl', md: '3xl' }} opacity={fade ? 0.5 : 1}>
+          <Heading size={{ base: '2xl', md: '3xl' }}>
             {game.homeScore} vs. {game.visitingScore}
           </Heading>
         </>
@@ -62,12 +58,10 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
     } else {
       return (
         <>
-          <Heading size={{ base: '2xl', md: '3xl' }} opacity={fade ? 0.5 : 1}>
+          <Heading size={{ base: '2xl', md: '3xl' }}>
             {game.homeScore} vs. {game.visitingScore}
           </Heading>
-          <Text fontSize={{ base: 'xs', md: 'sm' }} opacity={fade ? 0.5 : 1}>
-            {formatTime12(game.easternStartTime)}
-          </Text>
+          <Text fontSize={{ base: 'xs', md: 'sm' }}>{formatTime12(game.easternStartTime)}</Text>
         </>
       );
     }
@@ -82,9 +76,9 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
       rounded="2xl"
       backgroundColor={'white'}
       width="100%"
+      opacity={fade ? 0.6 : 1}
       borderWidth={game.gameStateId !== 1 && !fade ? '3px' : ''}
       borderColor={game.gameStateId !== 7 ? 'orange' : 'brown'}
-      opacity={fade ? 0.5 : 1}
     >
       <HStack>
         <Image

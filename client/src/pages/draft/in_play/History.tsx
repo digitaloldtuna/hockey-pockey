@@ -76,33 +76,32 @@ const HistoryList = ({
   }
 
   return (
-    <ScrollArea.Root height="32rem" variant="hover">
+    <ScrollArea.Root height="30rem" variant="hover">
       <ScrollArea.Viewport>
         <ScrollArea.Content>
           <Flex direction="column" gap="3">
-            {history &&
-              history.map((entry) => {
-                const date = formatDate(entry[0]);
-                const games = entry[1];
-                return (
-                  <Flex direction="column" paddingBottom="8" key={date}>
-                    <HStack
-                      paddingBottom="1"
-                      borderBottom="1px solid black"
-                      marginBottom="3"
-                      justify="space-between"
-                    >
-                      <Heading>{date}</Heading>
-                      <Text fontSize="lg">{winsIndicator(games, profile)}</Text>
-                    </HStack>
-                    <VStack>
-                      {games.map((game) => (
-                        <HistoryCard game={game} key={game.id} />
-                      ))}
-                    </VStack>
-                  </Flex>
-                );
-              })}
+            {history.map((entry) => {
+              const date = formatDate(entry[0]);
+              const games = entry[1];
+              return (
+                <Flex direction="column" paddingBottom="8" key={date}>
+                  <HStack
+                    paddingBottom="1"
+                    borderBottom="1px solid black"
+                    marginBottom="3"
+                    justify="space-between"
+                  >
+                    <Heading size={{ base: 'md', md: 'xl' }}>{date}</Heading>
+                    <Text fontSize={{ base: 'sm', md: 'lg' }}>{winsIndicator(games, profile)}</Text>
+                  </HStack>
+                  <VStack>
+                    {games.map((game) => (
+                      <HistoryCard game={game} key={game.id} />
+                    ))}
+                  </VStack>
+                </Flex>
+              );
+            })}
           </Flex>
         </ScrollArea.Content>
       </ScrollArea.Viewport>
@@ -122,13 +121,13 @@ const History = () => {
   }
 
   return (
-    <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column">
-      <Grid templateColumns={{ base: '1fr', md: '2fr 1fr' }} gap="10">
-        <HistoryList history={history} profile={profile} />
-        <Box rounded="2xl" backgroundColor="white" width="sm" padding="5">
-          Filters coming soon 😶‍🌫️
-        </Box>
-      </Grid>
+    <Flex
+      rounded="2xl"
+      backgroundColor="whiteAlpha.500"
+      padding={{ base: '3', md: '8' }}
+      direction="column"
+    >
+      <HistoryList history={history} profile={profile} />
     </Flex>
   );
 };

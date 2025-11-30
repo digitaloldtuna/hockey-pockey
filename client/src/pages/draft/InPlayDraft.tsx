@@ -82,16 +82,16 @@ const InPlayDraft = () => {
           </Button>
         </Flex>
 
-        <Tabs.Content value="home">
+        <Tabs.Content value="home" w="full">
           <InPlayHome />
         </Tabs.Content>
-        <Tabs.Content value="standings">
+        <Tabs.Content value="standings" w="full">
           <InPlayStandings />
         </Tabs.Content>
-        <Tabs.Content value="stats">
+        <Tabs.Content value="stats" w="full">
           <InPlayStats />
         </Tabs.Content>
-        <Tabs.Content value="history">
+        <Tabs.Content value="history" w="full">
           <InPlayHistory />
         </Tabs.Content>
       </Tabs.Root>

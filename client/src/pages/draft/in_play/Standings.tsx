@@ -117,11 +117,12 @@ const Standings = () => {
     <Flex
       rounded="2xl"
       backgroundColor="whiteAlpha.500"
-      padding="8"
+      padding={{ base: '3', md: '8' }}
       direction="column"
-      height="36rem"
+      h="full"
+      w="full"
     >
-      <Text marginBottom="3">
+      <Text marginBottom="3" fontSize={{ base: 'xs', md: 'sm' }}>
         {`This is specific to the current draft. To see total standings, check `}
         <Link href="https://www.nhl.com/standings/2025-11-28/league" target="_blank">
           the official NHL site

@@ -76,7 +76,7 @@ const UpcomingGames = ({ upcomingGames }: { upcomingGames: [string, Game[]][] | 
               const date = formatDate(entry[0]);
               const games = entry[1];
               return (
-                <Flex direction="column" paddingBottom="8">
+                <Flex direction="column" paddingBottom="8" key={date}>
                   <Heading
                     paddingBottom="1"
                     borderBottom="1px solid black"
@@ -157,12 +157,6 @@ const Home = () => {
   if (!draft) {
     return <></>;
   }
-
-  const notCounted = (game: Game) => {
-    return (
-      !game.homeMember || !game.visitingMember || game.homeMember.id === game.visitingMember.id
-    );
-  };
 
   const filteredGamesThisWeek = (): [string, Game[]][] => {
     if (!upcomingGames) return [];
