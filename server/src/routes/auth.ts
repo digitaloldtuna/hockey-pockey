@@ -1,6 +1,6 @@
 import express from 'express';
 import { createProfile, getProfileFromUserId } from '../models/profiles';
-import { createUser, getUser, loginWithCredentials } from '../models/users';
+import { createUser, getUser, loginWithCredentials, refreshAccessToken } from '../models/users';
 
 const router = express.Router();
 
@@ -51,18 +51,64 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/session', async (req, res) => {
-  const token = req.cookies?.access_token;
-  if (!token) return res.status(401).json({ authenticated: false });
+  const access = req.cookies?.access_token;
+  const refresh = req.cookies?.refresh_token;
 
-  let user, profile;
+  if (!refresh) return res.status(401).json({ authenticated: false });
+
   try {
-    user = await getUser(token);
-    profile = await getProfileFromUserId(user.id);
+    const user = await getUser(access);
+    const profile = await getProfileFromUserId(user.id);
+    return res.json({ authenticated: true, user, profile });
   } catch (err) {
-    return res.status(401).json({ authenticated: false });
+    if (!refresh) {
+      return res.status(401).json({ authenticated: false });
+    }
+
+    try {
+      const { access_token, expires_in } = await refreshAccessToken(refresh);
+
+      // set new access token cookie
+      res.cookie('access_token', access_token, {
+        httpOnly: true,
+        secure: process.env.NODE_ENV === 'production',
+        sameSite: 'lax',
+        maxAge: expires_in * 1000,
+      });
+
+      // now fetch profile with new token
+      const user = await getUser(access_token);
+      const profile = await getProfileFromUserId(user.id);
+
+      return res.json({ authenticated: true, user, profile });
+    } catch (refreshErr) {
+      return res.status(401).json({ authenticated: false });
+    }
+  }
+});
+
+router.post('/refresh', async (req, res) => {
+  const refresh_token = req.cookies?.refresh_token;
+
+  if (!refresh_token) {
+    return res.status(401).json({ error: 'No refresh token' });
   }
 
-  return res.json({ authenticated: true, user, profile });
+  try {
+    const { access_token, expires_in } = await refreshAccessToken(refresh_token);
+
+    res.cookie('access_token', access_token, {
+      httpOnly: true,
+      secure: process.env.NODE_ENV === 'production',
+      sameSite: 'lax',
+      maxAge: expires_in * 1000,
+    });
+
+    return res.json({ message: 'Token refreshed' });
+  } catch (err) {
+    console.error('Refresh error:', err);
+    return res.status(401).json({ error: 'Invalid or expired refresh token' });
+  }
 });
 
 router.post('/logout', (req, res) => {

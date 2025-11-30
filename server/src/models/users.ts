@@ -76,3 +76,24 @@ export const getUser = async (
   }
   return user;
 };
+
+// models/users.ts
+export const refreshAccessToken = async (refresh_token: string) => {
+  const { data, error } = await supabaseAdmin.auth.refreshSession({ refresh_token });
+
+  if (error || !data.session) {
+    throw error || new Error('Failed to refresh session');
+  }
+
+  const session = data.session;
+
+  // compute expires_in manually
+  const now = Math.floor(Date.now() / 1000);
+  const expires_in = session.expires_at ? session.expires_at - now : 0;
+
+  return {
+    access_token: session.access_token,
+    refresh_token: session.refresh_token,
+    expires_in,
+  };
+};
