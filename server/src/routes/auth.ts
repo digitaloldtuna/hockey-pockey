@@ -51,13 +51,14 @@ router.post('/login', async (req, res) => {
 });
 
 router.get('/session', async (req, res) => {
-  const access = req.cookies?.access_token;
+  const access: string = req.cookies?.access_token;
   const refresh = req.cookies?.refresh_token;
 
   if (!refresh) return res.status(401).json({ authenticated: false });
 
   try {
     const user = await getUser(access);
+    console.log('Parsed user', user);
     const profile = await getProfileFromUserId(user.id);
     return res.json({ authenticated: true, user, profile });
   } catch (err) {

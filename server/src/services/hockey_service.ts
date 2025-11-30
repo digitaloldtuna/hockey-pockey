@@ -1,4 +1,4 @@
-import { Draft } from '../models/drafts';
+import { Draft, getDraftFromId } from '../models/drafts';
 import { getTeamOwnershipsFromDraft, TeamOwnership } from '../models/team_ownerships';
 import { getProfileFromIds, Profile } from '../models/profiles';
 import { getGames as getGamesApi } from './nhl_api';
@@ -14,14 +14,15 @@ import { getAllTeamIds, getAllTeams, Team } from '../models/teams';
 import _ from 'lodash';
 import { DraftMembership } from '../models/draft_memberships';
 import { updateEnvVariable } from '../models/env';
-import { getApiSeason } from '../utils/mappings';
+import { getApiSeason, getPoint, isFinalGame } from '../utils/mappings';
 import { getCurrentSeason } from './env_service';
 
 // WILL ONLY UPDATE FOR CURRENT SEASON
 export const refreshGames = async () => {
-  const apiSeason = getApiSeason(await getCurrentSeason());
+  const season = await getCurrentSeason();
+  const apiSeason = getApiSeason(season);
 
-  const gamesFromDB = await getGames({});
+  const gamesFromDB = await getGames({ season });
   const allGames: Record<number, any> = gamesFromDB.reduce(
     (arr, game) => {
       delete game.lastUpdated;
@@ -40,8 +41,10 @@ export const refreshGames = async () => {
     game.easternStartTime = `${game.easternStartTime}+00:00`;
 
     if (game.season !== apiSeason) return;
-    if (game.gameType !== 2 && game.gameType !== 3 && game.gameType !== 7) return;
-    if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) return;
+    if (game.gameType !== 2 && game.gameType !== 3) return;
+    if (!teamIds.has(game.homeTeamId) || !teamIds.has(game.visitingTeamId)) {
+      return;
+    }
     if (!(game.id in allGames)) {
       gamesToUpdateOrCreate.push(game);
       return;
@@ -55,6 +58,7 @@ export const refreshGames = async () => {
 };
 
 export const getLeaderboard = async (draftId: number) => {
+  const draft = await getDraftFromId(draftId);
   const teamOwnerships = await getTeamOwnershipsFromDraft(draftId);
   const draftMemberships = teamOwnerships.map((ownership) => ownership.draftMembership);
 
@@ -89,7 +93,7 @@ export const getLeaderboard = async (draftId: number) => {
   });
 
   // calculating score
-  const games = await getGames({});
+  const games = await getGames({ season: draft.season });
   games.forEach((game) => {
     const homeTeamId = String(game.homeTeamId);
     const visitingTeamId = String(game.visitingTeamId);
@@ -101,12 +105,15 @@ export const getLeaderboard = async (draftId: number) => {
     if (!teamsSelected.has(game.homeTeamId) || !teamsSelected.has(game.visitingTeamId)) return;
 
     // if home and away have same owner, continue
-    if (owner[homeTeamId] === owner[visitingTeamId]) return;
+    if (owner[homeTeamId] === owner[visitingTeamId]) {
+      if (isFinalGame(game.season, game.id)) scores[owner[homeTeamId]] += 5;
+      return;
+    }
 
     if (game.homeScore > game.visitingScore) {
-      scores[owner[homeTeamId]] += 1;
+      scores[owner[homeTeamId]] += getPoint(game.gameType);
     } else if (game.homeScore < game.visitingScore) {
-      scores[owner[visitingTeamId]] += 1;
+      scores[owner[visitingTeamId]] += getPoint(game.gameType);
     }
   });
 
@@ -159,9 +166,10 @@ export const getHistory = async (profile: Profile, draft: Draft) => {
 };
 
 export const getStandings = async (draftId: number) => {
+  const draft = await getDraftFromId(draftId);
   const teamOwnerships = await getTeamOwnershipsFromDraft(draftId);
   const validTeams = teamOwnerships.map((ownership) => ownership.team.apiId);
-  const rawGames = await getCompletedGamesForTeams(validTeams);
+  const rawGames = await getCompletedGamesForTeams({ season: draft.season, validTeams });
   const annotatedAndFilteredGames = (await annotateGames(rawGames, teamOwnerships)).filter(
     (game) => !(game.homeMember.id === game.visitingMember.id)
   );

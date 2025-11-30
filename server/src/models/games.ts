@@ -21,8 +21,10 @@ export type Game = {
 
 export const getGames = async ({ season }: { season?: number }): Promise<Game[]> => {
   if (!season) {
-    season = getApiSeason(await getCurrentSeason());
+    season = await getCurrentSeason();
   }
+  console.log(`Getting games for the ${season} season`);
+  season = getApiSeason(season);
 
   // supabase queries max out at 1000 records
   // to get all data we need to handle pagination
@@ -109,10 +111,18 @@ export const getCompletedGamesForSomeTeams = async (
   return data;
 };
 
-export const getCompletedGamesForTeams = async (validTeams: number[]) => {
+export const getCompletedGamesForTeams = async ({
+  season,
+  validTeams,
+}: {
+  season?: number;
+  validTeams: number[];
+}) => {
   if (validTeams.length === 0) return [];
 
-  const season = await getCurrentSeason();
+  if (!season) {
+    season = await getCurrentSeason();
+  }
   const apiSeason = getApiSeason(season);
 
   const { data, error } = await supabase
