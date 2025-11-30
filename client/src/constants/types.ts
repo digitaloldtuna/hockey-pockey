@@ -71,3 +71,8 @@ export type Standing = Team & {
   };
   win_rate: number;
 };
+
+export type EnvVariables = {
+  currentSeason: number;
+  lastRefreshed: Date;
+};

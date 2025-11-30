@@ -1,7 +1,6 @@
 import express from 'express';
-import { getProfileFromUserId, updateProfile } from '../models/profiles';
+import { getProfileFromUserId } from '../models/profiles';
 import multer from 'multer';
-import { supabaseAdmin } from '../supabase';
 import { updateProfileService } from '../services/profile_service';
 
 const upload = multer({ storage: multer.memoryStorage() });

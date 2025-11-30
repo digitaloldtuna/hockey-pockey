@@ -1,7 +1,7 @@
 import { createContext, useContext, useState, ReactNode } from 'react';
 import { useQuery } from '@tanstack/react-query';
 import api from '../api';
-import { Draft, Game, Standing } from '../constants/types';
+import { Draft, EnvVariables, Game, Standing } from '../constants/types';
 import { toastError, toastSuccess } from '../theme/toaster';
 import { useAuthentication } from './useAuthentication';
 
@@ -17,6 +17,7 @@ interface DraftContextType {
   leaderboard: any[] | null;
   standings: Standing[] | null;
   history: [string, Game[]][] | null;
+  envVariables: EnvVariables | null;
 
   refresh: () => void;
   isRefreshing: boolean;
@@ -28,6 +29,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
   const { session } = useAuthentication();
   const [draftId, setDraftId] = useState<string | null>(null);
 
+  const [envVariables, setEnvVariables] = useState<EnvVariables | null>(null);
   const [upcomingGames, setUpcomingGames] = useState<[string, Game[]][] | null>(null);
   const [leaderboard, setLeaderboard] = useState<any[] | null>(null);
   const [standings, setStandings] = useState<Standing[] | null>(null);
@@ -68,7 +70,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
       })
       .catch((reason) => {
         setStandings(null);
-        toastError('Cannot fetching games for week', reason);
+        toastError('Cannot fetch games for week', reason);
       });
   };
 
@@ -82,7 +84,21 @@ export function DraftProvider({ children }: { children: ReactNode }) {
       })
       .catch((reason) => {
         setHistory(null);
-        toastError('Cannot fetching games for week', reason);
+        toastError('Cannot fetch games for week', reason);
+      });
+  };
+
+  const fetchEnvVariables = () => {
+    if (!session?.authenticated || !draftId) return;
+    api
+      .get(`/config`)
+      .then((res) => {
+        const envVariables = res.data.variables;
+        setEnvVariables(envVariables);
+      })
+      .catch((reason) => {
+        setEnvVariables(null);
+        toastError('Cannot fetch configurations', reason);
       });
   };
 
@@ -98,6 +114,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
       fetchLeaderboard();
       fetchStandings();
       fetchHistory();
+      fetchEnvVariables();
       return res.data.draft as Draft;
     },
     enabled: !!draftId && session?.authenticated, // only fetch when there's a draftId
@@ -123,6 +140,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
         fetchLeaderboard();
         fetchStandings();
         fetchHistory();
+        fetchEnvVariables();
         return true;
       }
       return false;
@@ -147,6 +165,7 @@ export function DraftProvider({ children }: { children: ReactNode }) {
         leaderboard,
         standings,
         history,
+        envVariables,
         refresh,
         isRefreshing,
       }}

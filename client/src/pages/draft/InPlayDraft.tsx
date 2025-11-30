@@ -1,4 +1,4 @@
-import { Button, Flex, Tabs, Text, useBreakpointValue } from '@chakra-ui/react';
+import { Button, Flex, Tabs, Text, useBreakpointValue, VStack } from '@chakra-ui/react';
 import Layout from '../Layout';
 import { ROUTES } from '../../constants/routes';
 import { ArrowLeft, ChartBar, History, Home, RefreshCcw, Users } from 'lucide-react';
@@ -6,13 +6,33 @@ import { useNavigate } from 'react-router-dom';
 import { InPlayHistory, InPlayHome, InPlayStandings, InPlayStats } from './in_play';
 import { useDraft } from '../../hooks/useDraft';
 
+const formatLastRefreshed = (date?: Date) => {
+  if (!date) {
+    return <></>;
+  }
+  const now = new Date();
+  const past = new Date(date);
+  const diffInSeconds = Math.floor((now.getTime() - past.getTime()) / 1000);
+
+  if (diffInSeconds < 60) return `${diffInSeconds} second${diffInSeconds !== 1 ? 's' : ''} ago`;
+
+  const diffInMinutes = Math.floor(diffInSeconds / 60);
+  if (diffInMinutes < 60) return `${diffInMinutes} minute${diffInMinutes !== 1 ? 's' : ''} ago`;
+
+  const diffInHours = Math.floor(diffInMinutes / 60);
+  if (diffInHours < 24) return `${diffInHours} hour${diffInHours !== 1 ? 's' : ''} ago`;
+
+  const diffInDays = Math.floor(diffInHours / 24);
+  return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
+};
+
 const InPlayDraft = () => {
   const navigate = useNavigate();
   const orientation = useBreakpointValue<'horizontal' | 'vertical'>({
     base: 'horizontal',
     md: 'vertical',
   });
-  const { draft, refresh, isRefreshing } = useDraft();
+  const { draft, refresh, isRefreshing, envVariables } = useDraft();
   if (!draft) {
     return <></>;
   }
@@ -45,47 +65,52 @@ const InPlayDraft = () => {
         size={{ base: 'sm', md: 'lg' }}
         overflowY="visible"
       >
-        <Flex
-          justify={{ base: 'space-between', md: 'start' }}
-          align="center"
-          direction={{ base: 'row', md: 'column' }}
-          gap="3"
-          position={{ base: 'auto', md: 'sticky' }}
-          height="fit-content"
-          top="5" // <-- IMPORTANT
-          zIndex="100" // <-- keeps tabs above content while scrolling
-        >
-          <Tabs.List bg="whiteAlpha.500" rounded="2xl" p="1">
-            <Tabs.Trigger value="home" p="3">
-              <Home />
-              {orientation === 'vertical' && 'Home'}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="standings">
-              <Users />
-              {orientation === 'vertical' && 'Standings'}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="stats">
-              <ChartBar />
-              {orientation === 'vertical' && 'Stats'}
-            </Tabs.Trigger>
-            <Tabs.Trigger value="history">
-              <History />
-              {orientation === 'vertical' && 'History'}
-            </Tabs.Trigger>
-            <Tabs.Indicator rounded="2xl" />
-          </Tabs.List>
-          <Button
-            rounded="2xl"
-            colorPalette="oxford"
-            variant="surface"
-            onClick={refresh}
-            disabled={isRefreshing}
-            w={{ base: 'auto', md: '100%' }}
+        <VStack>
+          <Flex
+            justify={{ base: 'space-between', md: 'start' }}
+            align="center"
+            direction={{ base: 'row', md: 'column' }}
+            gap="3"
+            position={{ base: 'auto', md: 'sticky' }}
+            height="fit-content"
+            top="5" // <-- IMPORTANT
+            zIndex="100" // <-- keeps tabs above content while scrolling
           >
-            <RefreshCcw size={20} className={isRefreshing ? 'rotate' : ''} />
-            {isRefreshing ? 'refreshing' : 'refresh'}
-          </Button>
-        </Flex>
+            <Tabs.List bg="whiteAlpha.500" rounded="2xl" p="1">
+              <Tabs.Trigger value="home" p="3">
+                <Home />
+                {orientation === 'vertical' && 'Home'}
+              </Tabs.Trigger>
+              <Tabs.Trigger value="standings">
+                <Users />
+                {orientation === 'vertical' && 'Standings'}
+              </Tabs.Trigger>
+              <Tabs.Trigger value="stats">
+                <ChartBar />
+                {orientation === 'vertical' && 'Stats'}
+              </Tabs.Trigger>
+              <Tabs.Trigger value="history">
+                <History />
+                {orientation === 'vertical' && 'History'}
+              </Tabs.Trigger>
+              <Tabs.Indicator rounded="2xl" />
+            </Tabs.List>
+            <Button
+              rounded="2xl"
+              colorPalette="oxford"
+              variant="surface"
+              onClick={refresh}
+              disabled={isRefreshing}
+              w={{ base: 'auto', md: '100%' }}
+            >
+              <RefreshCcw size={20} className={isRefreshing ? 'rotate' : ''} />
+              {isRefreshing ? 'refreshing' : 'refresh'}
+            </Button>
+          </Flex>
+          <Text fontSize={{ base: '2xs', md: '2xs' }} opacity="0.5">
+            updated {formatLastRefreshed(envVariables?.lastRefreshed)}
+          </Text>
+        </VStack>
 
         <Tabs.Content value="home" w="full">
           <InPlayHome />

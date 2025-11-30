@@ -20,8 +20,20 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [session, setSession] = useState<Session | null>(null);
   const [profile, setProfile] = useState<Profile | null>(null);
   const [loading, setLoading] = useState(true);
-  const [initialized, setInitialized] = useState(false);
   const navigate = useNavigate();
+
+  const fetchSession = async () => {
+    try {
+      const res = await api.get('/authentication/session');
+      setSession(res.data);
+      setProfile(res.data.profile);
+    } catch {
+      setSession({ authenticated: false });
+      setProfile(null);
+    } finally {
+      setLoading(false);
+    }
+  };
 
   // Run once at mount
   useEffect(() => {
@@ -29,24 +41,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
      * Fetch session exactly once on page load.
      * Axios interceptor will retry /session if a refresh occurs.
      */
-    const fetchSession = async () => {
-      if (initialized) return;
-      setInitialized(true);
-
-      try {
-        const res = await api.get('/authentication/session');
-        setSession(res.data);
-        setProfile(res.data.profile);
-      } catch {
-        setSession({ authenticated: false });
-        setProfile(null);
-      } finally {
-        setLoading(false);
-      }
-    };
-
     fetchSession();
-  }, [initialized]);
+  }, []);
 
   /**
    * Signup
@@ -71,11 +67,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     try {
       setLoading(true);
       await api.post('/authentication/login', { email, password });
-
-      const sessionRes = await api.get('/authentication/session');
-      setSession(sessionRes.data);
-      setProfile(sessionRes.data.profile);
-
+      await fetchSession();
       navigate(ROUTES.HOME);
     } catch (err: any) {
       toastError(err.response?.data?.error || 'Login failed');
