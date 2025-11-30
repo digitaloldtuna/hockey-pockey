@@ -1,4 +1,4 @@
-import { Center, Flex, Heading, HStack, ScrollArea, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Center, Flex, Heading, HStack, Spinner, Text, VStack } from '@chakra-ui/react';
 import { HistoryCard } from '../../../components';
 import { Game, Profile } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
