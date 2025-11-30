@@ -82,6 +82,7 @@ router.get('/session', async (req, res) => {
 
       return res.json({ authenticated: true, user, profile });
     } catch (refreshErr) {
+      console.error('Session error:', refreshErr);
       return res.status(401).json({ authenticated: false });
     }
   }
