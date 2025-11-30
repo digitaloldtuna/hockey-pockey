@@ -19,23 +19,29 @@ import { Tooltip } from '../../../theme/tooltip';
 import { getAvatarColour } from '../../../utils';
 
 const formatDate = (date: string) => {
-  const today = new Date();
+  const now = new Date();
 
-  // Get tomorrow by adding 1 day
-  const tomorrow = new Date(today);
-  tomorrow.setDate(today.getDate() + 1);
+  const today = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+  }).format(now);
+
+  now.setDate(now.getDate() + 1);
+  const tomorrow = new Intl.DateTimeFormat('en-CA', {
+    timeZone: 'America/New_York',
+  }).format(now);
+
+  console.log('dates', today, tomorrow);
 
   // Format function
-  const formatDate = (date: Date) => date.toISOString().split('T')[0]; // "YYYY-MM-DD"
   const prettyDate = new Date(date + 'T05:00:00Z').toLocaleDateString('en-US', {
     year: 'numeric',
     month: 'long', // full month name
     day: 'numeric',
   });
 
-  if (date === formatDate(today)) {
+  if (date === today) {
     date = `Today - ${prettyDate}`;
-  } else if (date === formatDate(tomorrow)) {
+  } else if (date === tomorrow) {
     date = `Tomorrow - ${prettyDate}`;
   } else {
     date = prettyDate;
