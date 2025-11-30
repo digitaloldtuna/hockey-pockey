@@ -46,7 +46,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   // Run once at mount
   useEffect(() => {
     fetchSession();
-  }, []);
+  }, [fetchSession]);
 
   /**
    * Signup
