@@ -151,7 +151,11 @@ export const getHistory = async (profile: Profile, draft: Draft) => {
     .map((ownership) => ownership.team.apiId);
   const validTeams = teamOwnerships.map((ownership) => ownership.team.apiId);
 
-  const rawGames = await getCompletedGamesForSomeTeams(selectedTeams, validTeams);
+  const rawGames = await getCompletedGamesForSomeTeams({
+    season: draft.season,
+    selectedTeams,
+    validTeams,
+  });
 
   // have to manually remove playing aginst yourself
   const selectedTeamSet = new Set(selectedTeams);

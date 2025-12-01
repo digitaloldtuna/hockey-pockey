@@ -86,15 +86,23 @@ export const getGamesInTimeFrame = async ({
   return data;
 };
 
-export const getCompletedGamesForSomeTeams = async (
-  selectedTeams: number[],
-  validTeams: number[]
-) => {
+export const getCompletedGamesForSomeTeams = async ({
+  season,
+  selectedTeams,
+  validTeams,
+}: {
+  season?: number;
+  selectedTeams: number[];
+  validTeams: number[];
+}) => {
+  if (!season) {
+    season = await getCurrentSeason();
+  }
+  console.log('Getting completed games for the', season, 'season');
+  const apiSeason = getApiSeason(season);
+
   if (selectedTeams.length === 0 || validTeams.length === 0) return [];
   const formatted = `(${selectedTeams.join(',')})`;
-
-  const season = await getCurrentSeason();
-  const apiSeason = getApiSeason(season);
 
   const { data, error } = await supabase
     .from('games')

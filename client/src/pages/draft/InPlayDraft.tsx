@@ -54,7 +54,7 @@ const InPlayDraft = () => {
           fontFamily="heading"
           lineHeight="1"
         >
-          <b>{draft.name}</b>
+          <b>{draft.name + ' '}</b>
           {draft.season}
         </Text>
       </Flex>
