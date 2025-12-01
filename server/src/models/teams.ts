@@ -1,6 +1,7 @@
-import { supabaseAdmin as supabase } from '../supabase';
+import { supabaseAdmin } from '../supabase';
 import { getTeamOwnershipsFromUser } from './team_ownerships';
 
+const supabase = supabaseAdmin();
 export interface Team {
   id: number;
   apiId: number;

@@ -1,4 +1,6 @@
-import { supabaseAdmin as supabase } from '../supabase';
+import { supabaseAdmin } from '../supabase';
+
+const supabase = supabaseAdmin();
 
 export interface EnvVariable {
   id: string;

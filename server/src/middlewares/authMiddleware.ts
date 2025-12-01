@@ -1,6 +1,8 @@
 import { supabaseAdmin } from '../supabase';
 import { Request, Response, NextFunction } from 'express';
 
+const supabase = supabaseAdmin();
+
 export const authenticate = async (req: Request, res: Response, next: NextFunction) => {
   const accessToken = req.cookies.access_token;
 
@@ -11,7 +13,7 @@ export const authenticate = async (req: Request, res: Response, next: NextFuncti
   const {
     data: { user },
     error,
-  } = await supabaseAdmin.auth.getUser(accessToken);
+  } = await supabase.auth.getUser(accessToken);
 
   if (error || !user) {
     return res.status(401).json({ error: 'Invalid session' });

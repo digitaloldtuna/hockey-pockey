@@ -1,6 +1,8 @@
 import { getCurrentSeason } from '../services/env_service';
-import { supabaseAdmin as supabase } from '../supabase';
+import { supabaseAdmin } from '../supabase';
 import { getApiSeason } from '../utils/mappings';
+
+const supabase = supabaseAdmin();
 
 export type Game = {
   id: number;

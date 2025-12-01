@@ -1,12 +1,14 @@
 import { nanoid } from 'nanoid';
 import { getCurrentSeason } from '../services/env_service';
-import { supabaseAdmin as supabase } from '../supabase';
+import { supabaseAdmin } from '../supabase';
 import {
   createDraftMembership,
   getAllMembersForDraft,
   memberBelongsToDraft,
 } from './draft_memberships';
 import { Profile } from './profiles';
+
+const supabase = supabaseAdmin();
 
 export type Draft = {
   id: number;

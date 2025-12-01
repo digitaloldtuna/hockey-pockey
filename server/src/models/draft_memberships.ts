@@ -1,6 +1,8 @@
-import { supabaseAdmin as supabase } from '../supabase';
-import { getProfileFromId, Profile } from './profiles';
-import { Draft, getDraftFromId } from './drafts';
+import { supabaseAdmin } from '../supabase';
+import { getProfileFromId } from './profiles';
+import { getDraftFromId } from './drafts';
+
+const supabase = supabaseAdmin();
 
 export type DraftMembership<T = string> = {
   id: number;

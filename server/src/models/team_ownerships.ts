@@ -1,8 +1,10 @@
 import { getCurrentSeason } from '../services/env_service';
-import { supabaseAdmin as supabase } from '../supabase';
+import { supabaseAdmin } from '../supabase';
 import { DraftMembership, getDraftMembershipFromMemberAndDraft } from './draft_memberships';
 import { Profile } from './profiles';
 import { Team } from './teams';
+
+const supabase = supabaseAdmin();
 
 export type TeamOwnership<TeamType = number, DraftType = number> = {
   id: number;

@@ -1,4 +1,7 @@
-import { supabaseAdmin, supabaseClient } from '../supabase';
+import { supabaseAdmin as admin, supabaseClient as client } from '../supabase';
+
+const supabaseAdmin = admin();
+const supabaseClient = client();
 
 export interface User {
   id: string;
