@@ -1,6 +1,8 @@
 /* eslint-disable */
 import { getStandingsNow, getTeams } from '../services/nhl_api';
-import { supabaseAdmin as supabase } from '../supabase';
+import { supabaseAdmin } from '../supabase';
+
+const supabase = supabaseAdmin();
 
 export const TestSupabase = async (query: string) => {
   try {

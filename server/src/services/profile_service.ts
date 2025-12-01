@@ -1,5 +1,7 @@
 import { updateProfile } from '../models/profiles';
-import { supabaseAdmin as supabase } from '../supabase';
+import { supabaseAdmin } from '../supabase';
+
+const supabase = supabaseAdmin();
 
 export const updateProfileService = async (
   userId: string,
