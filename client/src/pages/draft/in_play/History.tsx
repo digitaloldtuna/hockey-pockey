@@ -1,78 +1,41 @@
-import { Center, Flex, Heading, HStack, Spinner, Text, VStack } from '@chakra-ui/react';
-import { HistoryCard } from '../../../components';
-import { Game, Profile } from '../../../constants/types';
+import { Flex, Heading, ScrollArea, Switch } from '@chakra-ui/react';
+import { Scroll } from 'lucide-react';
+import { useId, useState } from 'react';
+import { Game } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { useDraft } from '../../../hooks/useDraft';
-import { formatDate } from '../../../utils';
-
-const winsIndicator = (games: Game[], profile: Profile) => {
-  if (!profile) return <></>;
-  let count = 0;
-  games.forEach((game) => {
-    if (
-      (profile.id === game.homeMember?.id && game.homeScore > game.visitingScore) ||
-      (profile.id === game.visitingMember?.id && game.homeScore < game.visitingScore)
-    ) {
-      count++;
-    }
-  });
-
-  if (count === 0) {
-    return <>no wins 💀</>;
-  } else {
-    return <>+{count} wins</>;
-  }
-};
-
-const HistoryList = ({
-  history,
-  profile,
-}: {
-  history: [string, Game[]][] | null;
-  profile: Profile | null;
-}) => {
-  if (history === null || profile === null) {
-    return (
-      <Center w="full" h="null">
-        <Spinner size="xl" color="blue.500" />
-      </Center>
-    );
-  }
-
-  return (
-    <Flex direction="column" gap="3">
-      {history.map((entry) => {
-        const date = formatDate(entry[0], true);
-        const games = entry[1];
-        return (
-          <Flex direction="column" paddingBottom="8" key={date}>
-            <HStack
-              paddingBottom="1"
-              borderBottom="1px solid black"
-              marginBottom="3"
-              justify="space-between"
-            >
-              <Heading size={{ base: 'md', md: 'xl' }}>{date}</Heading>
-              <Text fontSize={{ base: 'sm', md: 'lg' }}>{winsIndicator(games, profile)}</Text>
-            </HStack>
-            <VStack>
-              {games.map((game) => (
-                <HistoryCard game={game} key={game.id} />
-              ))}
-            </VStack>
-          </Flex>
-        );
-      })}
-    </Flex>
-  );
-};
+import { Tooltip } from '../../../theme/tooltip';
+import HistoryList from './HistoryList';
 
 const History = () => {
+  const [filtered, setFiltered] = useState<Boolean>(true);
+  const id = useId();
+
   const { profile } = useAuthentication();
   const { draft, history } = useDraft();
   if (!draft) {
     return <></>;
   }
+
+  const filteredHistory =
+    (filtered
+      ? history
+          ?.map((historyEntry) => {
+            const day = historyEntry[0];
+            const games = historyEntry[1];
+            return [
+              day,
+              games.filter(
+                (game) =>
+                  game.homeMember &&
+                  game.visitingMember &&
+                  profile &&
+                  (game.homeMember.id === profile.id || game.visitingMember.id === profile.id)
+              ),
+            ] as [string, Game[]];
+          })
+          .filter((day) => day[1].length > 0)
+      : history) || null;
 
   return (
     <Flex
@@ -81,7 +44,39 @@ const History = () => {
       padding={{ base: '3', md: '8' }}
       direction="column"
     >
-      <HistoryList history={history} profile={profile} />
+      <Flex
+        align="center"
+        direction="horizontal"
+        justify="space-between"
+        marginBottom={{ base: '2', md: '5' }}
+      >
+        <Heading size={{ base: 'lg', md: '2xl' }} color="oxford" fontWeight="bold">
+          {filtered ? 'Your Games' : 'All Games'}
+        </Heading>
+        <Tooltip ids={{ trigger: id }} content="">
+          <Switch.Root
+            ids={{ root: id }}
+            checked={filtered}
+            onCheckedChange={(e: { checked: boolean }) => setFiltered(e.checked)}
+            size={{ base: 'xs', md: 'md' }}
+          >
+            <Switch.HiddenInput />
+            <Switch.Control />
+            <Switch.Label size="xs">your games</Switch.Label>
+          </Switch.Root>
+        </Tooltip>
+      </Flex>
+      <ScrollArea.Root height="30rem" variant="hover">
+        <ScrollArea.Viewport>
+          <ScrollArea.Content>
+            <HistoryList history={filteredHistory} />
+          </ScrollArea.Content>
+        </ScrollArea.Viewport>
+        <ScrollArea.Scrollbar>
+          <ScrollArea.Thumb />
+        </ScrollArea.Scrollbar>
+        <ScrollArea.Corner />
+      </ScrollArea.Root>
     </Flex>
   );
 };

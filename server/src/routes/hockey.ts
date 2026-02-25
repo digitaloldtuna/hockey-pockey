@@ -60,9 +60,8 @@ router.get('/member/history', async (req, res) => {
     }
     const draftId = Number(req.query.id);
     const draft = await getDraftFromId(draftId);
-    const profile = await getProfileFromUserId(user.id);
 
-    const history = await getHistory(profile, draft);
+    const history = await getHistory(draft);
     return res.json({ history });
   } catch (e) {
     return res.status(401).json({ error: `Error: ${e}` });

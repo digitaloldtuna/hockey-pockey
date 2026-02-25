@@ -4,6 +4,7 @@ import { getProfileFromIds, Profile } from '../models/profiles';
 import { getGames as getGamesApi } from './nhl_api';
 import {
   Game,
+  getAllCompletedGames,
   getCompletedGamesForSomeTeams,
   getCompletedGamesForTeams,
   getGames,
@@ -144,26 +145,13 @@ export const getGamesThisWeek = async (draftId: number) => {
   return partitionedGames;
 };
 
-export const getHistory = async (profile: Profile, draft: Draft) => {
+export const getHistory = async (draft: Draft) => {
   const teamOwnerships = await getTeamOwnershipsFromDraft(draft.id);
-  const selectedTeams = teamOwnerships
-    .filter((ownership) => ownership.draftMembership.profile.id === profile.id)
-    .map((ownership) => ownership.team.apiId);
-  const validTeams = teamOwnerships.map((ownership) => ownership.team.apiId);
-
-  const rawGames = await getCompletedGamesForSomeTeams({
+  const allCompletedGames = await getAllCompletedGames({
     season: draft.season,
-    selectedTeams,
-    validTeams,
   });
 
-  // have to manually remove playing aginst yourself
-  const selectedTeamSet = new Set(selectedTeams);
-  const filteredGames = rawGames.filter(
-    (game) => !(selectedTeamSet.has(game.homeTeamId) && selectedTeamSet.has(game.visitingTeamId))
-  );
-
-  const annotatedGames = await annotateGames(filteredGames, teamOwnerships);
+  const annotatedGames = await annotateGames(allCompletedGames, teamOwnerships);
   const partitionedGames = partitionGamesByDate(annotatedGames);
 
   return partitionedGames;

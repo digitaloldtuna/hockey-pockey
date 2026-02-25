@@ -30,9 +30,16 @@ const HistoryCard = ({ game }: { game: Game }) => {
   const isBase = useBreakpointValue({ base: true, md: false });
 
   const { profile } = useAuthentication();
+  const sameOwner =
+    game.homeMember?.id && game.visitingMember?.id && game.visitingMember.id === game.homeMember.id;
   const won =
-    (profile?.id === game.homeMember?.id && game.homeScore > game.visitingScore) ||
-    (profile?.id === game.visitingMember?.id && game.homeScore < game.visitingScore);
+    !sameOwner &&
+    ((profile?.id === game.homeMember?.id && game.homeScore > game.visitingScore) ||
+      (profile?.id === game.visitingMember?.id && game.homeScore < game.visitingScore));
+  const lost =
+    !sameOwner &&
+    ((profile?.id === game.homeMember?.id && game.homeScore < game.visitingScore) ||
+      (profile?.id === game.visitingMember?.id && game.homeScore > game.visitingScore));
 
   const badge = (member?: Profile) => {
     return (
@@ -53,6 +60,16 @@ const HistoryCard = ({ game }: { game: Game }) => {
     );
   };
 
+  let backgroundColor = 'white';
+  let borderColor = 'gray';
+  if (won) {
+    backgroundColor = '#f2fcf2';
+    borderColor = '#4ccf51';
+  } else if (lost) {
+    backgroundColor = '#fcf2f2';
+    borderColor = '#cf4c4c';
+  }
+
   return (
     <Grid
       templateColumns="repeat(3, 1fr)"
@@ -60,8 +77,9 @@ const HistoryCard = ({ game }: { game: Game }) => {
       paddingX={{ base: '3', md: '5' }}
       rounded="2xl"
       borderWidth="3px"
-      borderColor={won ? '#4ccf51' : '#cf4c4c'}
-      backgroundColor={won ? '#f2fcf2' : '#fcf2f2'}
+      borderColor={borderColor}
+      backgroundColor={backgroundColor}
+      opacity={won || lost ? 1 : 0.6}
       width="100%"
     >
       <HStack>

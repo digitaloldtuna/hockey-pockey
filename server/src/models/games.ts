@@ -149,6 +149,24 @@ export const getCompletedGamesForTeams = async ({
   return data;
 };
 
+export const getAllCompletedGames = async ({ season }: { season?: number }) => {
+  if (!season) {
+    season = await getCurrentSeason();
+  }
+  const apiSeason = getApiSeason(season);
+
+  const { data, error } = await supabase
+    .from('games')
+    .select('*')
+    .eq('season', apiSeason)
+    .eq('gameStateId', 7);
+
+  if (error) {
+    throw Error(`Cannot fetch games by teams: ${error.message}`);
+  }
+  return data;
+};
+
 const getDateRange = (start: string, end: string): string[] => {
   const result: string[] = [];
 
