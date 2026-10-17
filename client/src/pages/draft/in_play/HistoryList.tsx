@@ -8,6 +8,7 @@ const winsIndicator = (games: Game[], profile: Profile) => {
   if (!profile) return <></>;
   let count = 0;
   games.forEach((game) => {
+    if (game.homeMember?.id === game.visitingMember?.id) return;
     if (
       (profile.id === game.homeMember?.id && game.homeScore > game.visitingScore) ||
       (profile.id === game.visitingMember?.id && game.homeScore < game.visitingScore)
