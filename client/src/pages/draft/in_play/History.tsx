@@ -1,5 +1,4 @@
 import { Flex, Heading, ScrollArea, Switch } from '@chakra-ui/react';
-import { Scroll } from 'lucide-react';
 import { useId, useState } from 'react';
 import { Game } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
