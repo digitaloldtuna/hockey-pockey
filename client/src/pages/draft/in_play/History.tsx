@@ -8,7 +8,7 @@ import { Tooltip } from '../../../theme/tooltip';
 import HistoryList from './HistoryList';
 
 const History = () => {
-  const [filtered, setFiltered] = useState<Boolean>(true);
+  const [filtered, setFiltered] = useState<boolean>(true);
   const id = useId();
 
   const { profile } = useAuthentication();
