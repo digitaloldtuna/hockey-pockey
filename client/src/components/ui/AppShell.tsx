@@ -3,8 +3,9 @@ import { ArrowLeft, LogOut, Menu, X } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import SkateBackground from '../SkateBackground';
 import { useAuthentication } from '../../hooks/useAuthentication';
-import { FrostOverlay, PuckMark, Snowflake } from './Brand';
+import { PuckMark, Snowflake } from './Brand';
 
 export type NavItem = {
   key: string;
@@ -190,8 +191,9 @@ const AppShell = ({
       minH="100vh"
       direction={{ base: 'column', md: 'row' }}
       align="stretch"
-      bg="page"
+      bg="#98adc0"
     >
+      <SkateBackground fixed />
       <MobileBar nav={nav} aside={aside} back={back} showBrand={showBrand} />
 
       <Flex
@@ -260,6 +262,7 @@ const AppShell = ({
 
       <Flex
         as="main"
+        position="relative"
         flex="1"
         minW="0"
         direction="column"
@@ -270,8 +273,6 @@ const AppShell = ({
       >
         {children}
       </Flex>
-
-      <FrostOverlay />
     </Flex>
   );
 };

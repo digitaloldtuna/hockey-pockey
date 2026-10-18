@@ -10,7 +10,7 @@ const font = new FontLoader().parse(fontData as unknown as Parameters<FontLoader
 const LINES = ['HOCKEY', 'POCKEY'];
 const FOV = 32;
 const LINE_GAP = 1.3;
-const LETTER_GAP = 0.27;
+const LETTER_GAP = 0.17;
 
 const makeCanvas = (size: number, fill: string) => {
   const canvas = document.createElement('canvas');
@@ -231,23 +231,42 @@ const makeWobble = () => {
 const makeLetterGeometry = (char: string) => {
   const wobble = makeWobble();
 
-  const uneven = (path: THREE.Path, count: number) =>
-    path.getSpacedPoints(count).map((point) => {
+  // widen every stroke a little by pushing outline points away from the filled area
+  const BOLD = 0.05;
+  const uneven = (path: THREE.Path, count: number, side: number) => {
+    const points = path.getSpacedPoints(count);
+    return points.map((point, k) => {
+      const prev = points[(k - 1 + points.length) % points.length];
+      const next = points[(k + 1) % points.length];
+      const [dx, dy] = [next.x - prev.x, next.y - prev.y];
+      const length = Math.hypot(dx, dy) || 1;
       const w = wobble(point.x, point.y, 0);
-      return new THREE.Vector2(point.x + w.x * 0.018, point.y + w.y * 0.018);
+      return new THREE.Vector2(
+        point.x + (dy / length) * BOLD * side + w.x * 0.01,
+        point.y - (dx / length) * BOLD * side + w.y * 0.01
+      );
     });
+  };
 
   const shapes = font.generateShapes(char, 1).map((shape) => {
-    const outline = new THREE.Shape(uneven(shape, 260));
-    outline.holes = shape.holes.map((hole) => new THREE.Path(uneven(hole, 140)));
+    const outlinePoints = shape.getSpacedPoints(260);
+    let area = 0;
+    outlinePoints.forEach((point, k) => {
+      const next = outlinePoints[(k + 1) % outlinePoints.length];
+      area += point.x * next.y - next.x * point.y;
+    });
+    // right-hand normal points away from the fill for a counter-clockwise outline
+    const side = area >= 0 ? 1 : -1;
+    const outline = new THREE.Shape(uneven(shape, 260, side));
+    outline.holes = shape.holes.map((hole) => new THREE.Path(uneven(hole, 140, side)));
     return outline;
   });
 
   const geometry = new THREE.ExtrudeGeometry(shapes, {
     depth: 0.22 + Math.random() * 0.16,
     bevelEnabled: true,
-    bevelThickness: 0.15 + Math.random() * 0.2,
-    bevelSize: 0.06 + Math.random() * 0.11,
+    bevelThickness: 0.2 + Math.random() * 0.12,
+    bevelSize: 0.08 + Math.random() * 0.04,
     bevelOffset: 0,
     bevelSegments: 12,
     curveSegments: 12,
@@ -258,7 +277,7 @@ const makeLetterGeometry = (char: string) => {
   for (let k = 0; k < position.count; k++) {
     const [x, y, z] = [position.getX(k), position.getY(k), position.getZ(k)];
     const w = wobble(x * 1.3, y * 1.3, z * 1.3);
-    position.setXYZ(k, x + w.x * 0.035, y + w.y * 0.035, z + w.z * 0.07);
+    position.setXYZ(k, x + w.x * 0.02, y + w.y * 0.02, z + w.z * 0.035);
   }
   geometry.computeVertexNormals();
   return geometry;
@@ -285,7 +304,7 @@ const IceTitle = () => {
     renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
     renderer.setClearColor(0x000000, 0);
     renderer.toneMapping = THREE.ACESFilmicToneMapping;
-    renderer.toneMappingExposure = 1.35;
+    renderer.toneMappingExposure = 1.05;
     renderer.domElement.style.display = 'block';
     renderer.domElement.style.width = '100%';
     renderer.domElement.style.height = '100%';
@@ -296,12 +315,12 @@ const IceTitle = () => {
     const envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = envMap;
 
-    const key = new THREE.DirectionalLight(0xffffff, 5);
+    const key = new THREE.DirectionalLight(0xffffff, 3);
     key.position.set(-3, 5, 6);
-    const glint = new THREE.DirectionalLight(0xffffff, 4);
+    const glint = new THREE.DirectionalLight(0xffffff, 2.4);
     glint.position.set(5, 2, 4);
     // light from behind makes the bevelled edges glow
-    const back = new THREE.DirectionalLight(0xeaf6ff, 8);
+    const back = new THREE.DirectionalLight(0xeaf6ff, 5);
     back.position.set(-2, 1, -4);
     scene.add(key, glint, back);
 
@@ -338,11 +357,11 @@ const IceTitle = () => {
       bumpScale: 2.2,
       emissive: new THREE.Color(0xdff1ff),
       emissiveMap: detailTexture,
-      emissiveIntensity: 0.38,
+      emissiveIntensity: 0.2,
       clearcoat: 1,
       clearcoatRoughness: 0.02,
       specularIntensity: 1,
-      envMapIntensity: 2,
+      envMapIntensity: 1.1,
       transparent: true,
       // add light only: leave the canvas alpha alone so unlit areas stay transparent
       blending: THREE.CustomBlending,

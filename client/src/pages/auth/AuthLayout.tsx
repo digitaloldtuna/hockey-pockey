@@ -1,6 +1,8 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
+import DarkIceBackground from '../../components/DarkIceBackground';
+import LedTicker from '../../components/LedTicker';
 import { ROUTES } from '../../constants/routes';
 
 const IceTitle = lazy(() => import('../../components/IceTitle'));
@@ -50,16 +52,20 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
       align="center"
       justify="center"
       gap={{ base: 4, lg: 10 }}
-      p={{ base: 4, md: 8 }}
-      color="sidebarText"
-      bgImage="linear-gradient(160deg, #4272b8 0%, #2f5390 100%)"
+      px={{ base: 4, md: 8 }}
+      py={{ base: 20, md: 24 }}
+      color="ink"
+      bg="#050c1c"
     >
+      <DarkIceBackground />
+      <LedTicker edge="top" reverse />
+      <LedTicker edge="bottom" />
+
       {/* brand area, straight on the page background */}
       <Flex
         position="relative"
         direction="column"
-        align={{ base: 'center', lg: 'flex-start' }}
-        textAlign={{ base: 'center', lg: 'left' }}
+        align="center"
         gap="4"
         flex={{ base: 'none', lg: '1 1 0' }}
         w="full"
@@ -69,15 +75,6 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
         <Suspense fallback={<Box w="full" aspectRatio="1.7" />}>
           <IceTitle />
         </Suspense>
-        <Box maxW="380px">
-          <Heading as="h2" fontSize="24px" lineHeight="1.2" mb="2" color="white">
-            Pick your teams. Watch the points pile up.
-          </Heading>
-          <Text fontSize="13px" color="#D5E3F5">
-            A simple NHL draft with your friends. Claim teams, follow the games, and see who&apos;s
-            on top.
-          </Text>
-        </Box>
       </Flex>
 
       {/* login / signup card */}

@@ -89,7 +89,59 @@
   animation: sweep 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+@keyframes ticker {
+  from {
+    transform: translateX(0);
+  }
+  to {
+    transform: translateX(-50%);
+  }
+}
+
+.ticker-track {
+  display: flex;
+  width: max-content;
+  animation: ticker 45s linear infinite;
+}
+
+.ticker-reverse {
+  animation-direction: reverse;
+}
+
+@keyframes grain {
+  0% {
+    transform: translate(0, 0);
+  }
+  20% {
+    transform: translate(-6%, 4%);
+  }
+  40% {
+    transform: translate(5%, -7%);
+  }
+  60% {
+    transform: translate(-4%, -3%);
+  }
+  80% {
+    transform: translate(7%, 5%);
+  }
+  100% {
+    transform: translate(0, 0);
+  }
+}
+
+.ice-grain {
+  animation: grain 1.2s steps(6) infinite;
+}
+
 @media (prefers-reduced-motion: reduce) {
+  .ice-grain {
+    animation: none;
+  }
+
+  .ticker-track {
+    animation: none;
+  }
+
   .drift,
   .rise,
   .pop,
