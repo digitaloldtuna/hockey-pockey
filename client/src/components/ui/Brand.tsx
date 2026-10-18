@@ -49,3 +49,25 @@ export const FrostOverlay = () => (
     <rect width="100%" height="100%" filter="url(#frost)" />
   </svg>
 );
+
+// coarse speckled grain, like frost dust on a blue surface
+export const GrainOverlay = () => (
+  <svg
+    aria-hidden="true"
+    style={{
+      position: 'absolute',
+      inset: 0,
+      width: '100%',
+      height: '100%',
+      pointerEvents: 'none',
+      opacity: 0.55,
+      mixBlendMode: 'soft-light',
+    }}
+  >
+    <filter id="grain">
+      <feTurbulence type="fractalNoise" baseFrequency="0.65" numOctaves="3" seed="9" />
+      <feColorMatrix values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 2.2 -0.9" />
+    </filter>
+    <rect width="100%" height="100%" filter="url(#grain)" />
+  </svg>
+);

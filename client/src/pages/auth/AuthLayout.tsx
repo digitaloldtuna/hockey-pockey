@@ -1,7 +1,9 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
+import { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { FrostOverlay, PuckMark, Snowflake } from '../../components/ui';
 import { ROUTES } from '../../constants/routes';
+
+const IceTitle = lazy(() => import('../../components/IceTitle'));
 
 interface AuthLayoutProps {
   mode: 'login' | 'signup';
@@ -44,91 +46,78 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
       position="relative"
       overflow="hidden"
       minH="100vh"
-      p={{ base: 3, md: 8 }}
+      direction={{ base: 'column', lg: 'row' }}
       align="center"
       justify="center"
-      bg="page"
+      gap={{ base: 4, lg: 10 }}
+      p={{ base: 4, md: 8 }}
+      color="sidebarText"
+      bgImage="linear-gradient(160deg, #4272b8 0%, #2f5390 100%)"
     >
+      {/* brand area, straight on the page background */}
       <Flex
         position="relative"
-        wrap="wrap"
+        direction="column"
+        align={{ base: 'center', lg: 'flex-start' }}
+        textAlign={{ base: 'center', lg: 'left' }}
+        gap="4"
+        flex={{ base: 'none', lg: '1 1 0' }}
         w="full"
-        maxW="1040px"
+        maxW="920px"
+        minW="0"
+      >
+        <Suspense fallback={<Box w="full" aspectRatio="1.7" />}>
+          <IceTitle />
+        </Suspense>
+        <Box maxW="380px">
+          <Heading as="h2" fontSize="24px" lineHeight="1.2" mb="2" color="white">
+            Pick your teams. Watch the points pile up.
+          </Heading>
+          <Text fontSize="13px" color="#D5E3F5">
+            A simple NHL draft with your friends. Claim teams, follow the games, and see who&apos;s
+            on top.
+          </Text>
+        </Box>
+      </Flex>
+
+      {/* login / signup card */}
+      <Flex
+        position="relative"
+        direction="column"
+        gap="4"
+        w="full"
+        maxW="440px"
+        flex="none"
+        p={{ base: 6, md: 8 }}
+        color="ink"
+        bg="card"
         border="2px solid"
         borderColor="line"
         rounded="panel"
-        overflow="hidden"
-        bg="card"
+        boxShadow="0 18px 40px rgba(10, 25, 55, 0.35)"
       >
+        <Box className="rise">
+          <Heading as="h1" fontSize="28px" lineHeight="1.15">
+            {COPY[mode].heading}
+          </Heading>
+          <Text mt="1.5" fontSize="13px" color="inkMuted">
+            {COPY[mode].sub}
+          </Text>
+        </Box>
         <Flex
-          position="relative"
-          overflow="hidden"
-          direction="column"
-          gap="5"
-          flex="1 1 440px"
-          minH={{ base: '260px', md: '600px' }}
-          p="9"
-          color="sidebarText"
-          bg="sidebar"
+          role="group"
+          aria-label="Log in or create account"
+          gap="1"
+          p="1"
+          rounded="14px"
+          bg="ownerNone"
+          border="1px solid #B3C1D0"
         >
-          <Box position="absolute" right="28px" top="24px">
-            <Snowflake size={64} opacity={0.85} />
-          </Box>
-          <Flex align="center" gap="3">
-            <PuckMark size={46} />
-            <Text
-              fontFamily="heading"
-              fontWeight="bold"
-              fontSize="30px"
-              lineHeight="1"
-              color="white"
-            >
-              Hockey Pockey
-            </Text>
-          </Flex>
-          <Box maxW="340px">
-            <Heading as="h2" fontSize="24px" lineHeight="1.2" mb="2" color="white">
-              Pick your teams. Watch the points pile up.
-            </Heading>
-            <Text fontSize="13px" color="#C3D3E6">
-              A simple NHL draft with your friends. Claim teams, follow the games, and see
-              who&apos;s on top.
-            </Text>
-          </Box>
+          {toggle('login', 'Log in')}
+          {toggle('signup', 'Sign up')}
         </Flex>
-
-        <Flex
-          direction="column"
-          justify="center"
-          gap="4"
-          flex="1 1 400px"
-          px={{ base: 6, md: 10 }}
-          py="9"
-        >
-          <Box className="rise">
-            <Heading as="h1" fontSize="28px" lineHeight="1.15">
-              {COPY[mode].heading}
-            </Heading>
-            <Text mt="1.5" fontSize="13px" color="inkMuted">
-              {COPY[mode].sub}
-            </Text>
-          </Box>
-          <Flex
-            role="group"
-            aria-label="Log in or create account"
-            gap="1"
-            p="1"
-            rounded="14px"
-            bg="ownerNone"
-            border="1px solid #B3C1D0"
-          >
-            {toggle('login', 'Log in')}
-            {toggle('signup', 'Sign up')}
-          </Flex>
-          {children}
-        </Flex>
+        {children}
       </Flex>
-      <FrostOverlay />
     </Flex>
   );
 };
