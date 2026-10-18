@@ -1,11 +1,11 @@
-import { Center, Flex, Heading, HStack, Spinner, Text, VStack } from '@chakra-ui/react';
+import { Center, Flex, Spinner, Text } from '@chakra-ui/react';
 import { HistoryCard } from '../../../components';
 import { Game, Profile } from '../../../constants/types';
+import { DayHeader } from '../../../components/ui';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { formatDate } from '../../../utils';
 
 const winsIndicator = (games: Game[], profile: Profile) => {
-  if (!profile) return <></>;
   let count = 0;
   games.forEach((game) => {
     if (game.homeMember?.id === game.visitingMember?.id) return;
@@ -17,11 +17,7 @@ const winsIndicator = (games: Game[], profile: Profile) => {
     }
   });
 
-  if (count === 0) {
-    return <>no wins 💀</>;
-  } else {
-    return <>+{count} wins</>;
-  }
+  return count === 0 ? 'no wins' : `+${count} ${count === 1 ? 'win' : 'wins'}`;
 };
 
 const HistoryList = ({ history }: { history: [string, Game[]][] | null }) => {
@@ -29,37 +25,33 @@ const HistoryList = ({ history }: { history: [string, Game[]][] | null }) => {
 
   if (history === null || profile === null) {
     return (
-      <Center w="full" h="null">
+      <Center w="full" py="8">
         <Spinner size="xl" color="blue.500" />
       </Center>
     );
   }
 
+  if (history.length === 0) {
+    return (
+      <Text p="4" color="inkMuted">
+        No games match this filter
+      </Text>
+    );
+  }
+
   return (
-    <Flex direction="column" gap="3">
-      {history.map((entry) => {
-        const date = formatDate(entry[0], true);
-        const games = entry[1];
-        return (
-          <Flex direction="column" paddingBottom="8" key={date}>
-            <HStack
-              paddingBottom="1"
-              borderBottom="1px solid black"
-              marginBottom="3"
-              justify="space-between"
-            >
-              <Heading size={{ base: 'md', md: 'xl' }}>{date}</Heading>
-              <Text fontSize={{ base: 'sm', md: 'lg' }}>{winsIndicator(games, profile)}</Text>
-            </HStack>
-            <VStack>
-              {games.map((game) => (
-                <HistoryCard game={game} key={game.id} />
-              ))}
-            </VStack>
+    <>
+      {history.map(([date, games]) => (
+        <section key={date}>
+          <DayHeader title={formatDate(date, true)} right={winsIndicator(games, profile)} />
+          <Flex direction="column" gap="1.5" p={{ base: 2, md: 2.5 }}>
+            {games.map((game) => (
+              <HistoryCard game={game} key={game.id} />
+            ))}
           </Flex>
-        );
-      })}
-    </Flex>
+        </section>
+      ))}
+    </>
   );
 };
 

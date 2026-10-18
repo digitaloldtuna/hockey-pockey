@@ -1,116 +1,105 @@
-import {
-  Avatar,
-  Center,
-  Flex,
-  HStack,
-  Image,
-  Link,
-  Spinner,
-  Table,
-  Tag,
-  Text,
-  VStack,
-} from '@chakra-ui/react';
-import { useDraft } from '../../../hooks/useDraft';
+import { Avatar, Box, Center, Grid, Image, Link, Spinner, Table, Text } from '@chakra-ui/react';
+import { PageHeader, Pill, StatTile, Surface } from '../../../components/ui';
 import { Profile, Standing } from '../../../constants/types';
-import { getAvatarColour, getConferenceColour, getDivisionColour } from '../../../utils';
 import { useAuthentication } from '../../../hooks/useAuthentication';
+import { useDraft } from '../../../hooks/useDraft';
+import { getOwnerColour } from '../../../utils';
 
 const formatLastTen = (record: boolean[]) => {
-  let wins = 0;
-  let loses = 0;
-  record.forEach((won) => (won ? wins++ : loses++));
-
-  return `${wins} - ${loses}`;
+  const wins = record.filter(Boolean).length;
+  return `${wins} - ${record.length - wins}`;
 };
 
-const StandingsTable = ({ standings, profile }: { standings: Standing[]; profile: Profile }) => {
-  return (
-    <Table.ScrollArea>
-      <Table.Root size="sm" stickyHeader>
-        <Table.Header>
-          <Table.Row bg="bg.subtle">
-            <Table.ColumnHeader>Place</Table.ColumnHeader>
-            <Table.ColumnHeader>Team</Table.ColumnHeader>
-            <Table.ColumnHeader>Wins</Table.ColumnHeader>
-            <Table.ColumnHeader>Loses</Table.ColumnHeader>
-            <Table.ColumnHeader>L10</Table.ColumnHeader>
-            <Table.ColumnHeader>Win Rate</Table.ColumnHeader>
-            <Table.ColumnHeader>Owner</Table.ColumnHeader>
-          </Table.Row>
-        </Table.Header>
+const HEADERS = ['#', 'Team', 'W', 'L', 'L10', 'Win %', 'Owner'];
 
-        <Table.Body>
-          {standings.map((standing, i) => (
+const StandingsTable = ({ standings, profile }: { standings: Standing[]; profile: Profile }) => (
+  <Table.ScrollArea>
+    <Table.Root size="sm" stickyHeader minW="560px" bg="transparent">
+      <Table.Header>
+        <Table.Row bg="lineSoft">
+          {HEADERS.map((header) => (
+            <Table.ColumnHeader
+              key={header}
+              py="2"
+              px="3"
+              bg="lineSoft"
+              color="ink"
+              fontSize="11px"
+              letterSpacing="0.08em"
+              textTransform="uppercase"
+              borderColor="line"
+            >
+              {header}
+            </Table.ColumnHeader>
+          ))}
+        </Table.Row>
+      </Table.Header>
+
+      <Table.Body>
+        {standings.map((standing, i) => {
+          const mine = standing.member.id === profile.id;
+          return (
             <Table.Row
               key={standing.id}
-              backgroundColor={profile && standing.member.id === profile.id ? '#f7fcfc' : ''}
+              bg={mine ? 'pinkWash' : 'transparent'}
+              transition="background .15s ease"
+              _hover={{ bg: '#E4EDF6' }}
             >
-              <Table.Cell>
-                <HStack>
-                  {i + 1}
-                  {profile && standing.member.id === profile.id && <Text>⭐</Text>}
-                </HStack>
+              <Table.Cell py="1.5" px="3" borderColor="lineSoft" fontWeight="bold" color="inkMuted">
+                {i + 1}
               </Table.Cell>
-              <Table.Cell>
-                <HStack margin="2" gap="3">
-                  <Image src={standing.logo} boxSize="50px" fit="cover" alt={standing.fullName} />
-                  <VStack align="start">
-                    <Text fontWeight="bold" fontSize="sm">
+              <Table.Cell py="1.5" px="3" borderColor="lineSoft">
+                <Box display="flex" alignItems="center" gap="2">
+                  <Image
+                    src={standing.logo}
+                    boxSize={{ base: '28px', md: '36px' }}
+                    fit="contain"
+                    alt=""
+                  />
+                  <Box minW="0">
+                    <Text fontWeight="semibold" fontSize="12px">
                       {standing.fullName}
                     </Text>
-                    <HStack>
-                      <Tag.Root
-                        size="sm"
-                        colorPalette={getConferenceColour(standing.conferenceName)}
-                      >
-                        <Tag.Label>{standing.conferenceName}</Tag.Label>
-                      </Tag.Root>
-                      <Tag.Root size="sm" colorPalette={getDivisionColour(standing.divisionName)}>
-                        <Tag.Label>{standing.divisionName}</Tag.Label>
-                      </Tag.Root>
-                    </HStack>
-                  </VStack>
-                </HStack>
+                    <Text fontSize="10px" color="inkMuted">
+                      {standing.conferenceName} · {standing.divisionName}
+                    </Text>
+                  </Box>
+                </Box>
               </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="md" fontWeight="bold">
-                  {standing.wins}
-                </Text>
+              <Table.Cell py="1.5" px="3" borderColor="lineSoft" fontWeight="bold">
+                {standing.wins}
               </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="md" fontWeight="bold">
-                  {standing.loses}
-                </Text>
+              <Table.Cell py="1.5" px="3" borderColor="lineSoft" fontWeight="bold">
+                {standing.loses}
               </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="md" fontWeight="bold">
-                  {formatLastTen(standing.lt)}
-                </Text>
+              <Table.Cell py="1.5" px="3" borderColor="lineSoft" fontWeight="bold">
+                {formatLastTen(standing.lt)}
               </Table.Cell>
-              <Table.Cell>
-                <Text fontSize="md" fontWeight="bold">
-                  {standing.win_rate}%
-                </Text>
+              <Table.Cell py="1.5" px="3" borderColor="lineSoft" fontWeight="bold">
+                {standing.win_rate}%
               </Table.Cell>
-              <Table.Cell>
-                <HStack>
-                  <Avatar.Root colorPalette={getAvatarColour(standing.member.id)}>
+              <Table.Cell py="1.5" px="3" borderColor="lineSoft">
+                <Box display="flex" alignItems="center" gap="2">
+                  <Avatar.Root
+                    size="xs"
+                    flex="none"
+                    border="1px solid #4B6079"
+                    bg={getOwnerColour(standing.member.id)}
+                    color="ink"
+                  >
                     <Avatar.Fallback name={standing.member.name} />
                     <Avatar.Image src={standing.member.profileImage || undefined} />
                   </Avatar.Root>
-                  <Tag.Root size="lg" colorPalette={getAvatarColour(standing.member.id)}>
-                    <Tag.Label>{standing.member.name}</Tag.Label>
-                  </Tag.Root>
-                </HStack>
+                  <Pill bg={getOwnerColour(standing.member.id)}>{standing.member.name}</Pill>
+                </Box>
               </Table.Cell>
             </Table.Row>
-          ))}
-        </Table.Body>
-      </Table.Root>
-    </Table.ScrollArea>
-  );
-};
+          );
+        })}
+      </Table.Body>
+    </Table.Root>
+  </Table.ScrollArea>
+);
 
 const Standings = () => {
   const { profile } = useAuthentication();
@@ -119,30 +108,56 @@ const Standings = () => {
     return <></>;
   }
 
+  const mine = standings?.filter((s) => s.member.id === profile?.id) ?? [];
+  const best = standings?.reduce<Standing | undefined>(
+    (top, s) => (!top || s.win_rate > top.win_rate ? s : top),
+    undefined
+  );
+
   return (
-    <Flex
-      rounded="2xl"
-      backgroundColor="whiteAlpha.500"
-      padding={{ base: '3', md: '8' }}
-      direction="column"
-      h="full"
-      w="full"
-    >
-      <Text marginBottom="3" fontSize={{ base: 'xs', md: 'sm' }}>
-        {`This is specific to the current draft. To see total standings, check `}
-        <Link href="https://www.nhl.com/standings/2025-11-28/league" target="_blank">
-          the official NHL site
-        </Link>
-        .
-      </Text>
-      {standings && profile ? (
-        <StandingsTable standings={standings} profile={profile} />
-      ) : (
-        <Center w="full" h="full">
-          <Spinner size="xl" color="blue.500" />
-        </Center>
-      )}
-    </Flex>
+    <>
+      <PageHeader title="Standings" note="Teams in this draft" />
+
+      <Grid templateColumns="repeat(auto-fit, minmax(min(180px, 100%), 1fr))" gap="3">
+        <StatTile
+          label="Your teams"
+          value={mine.length}
+          sub={`${mine.reduce((sum, s) => sum + s.wins, 0)} wins combined`}
+          bg="ownerPink"
+        />
+        <StatTile
+          label="Teams drafted"
+          value={standings?.length ?? '-'}
+          sub={`${draft.members.length} players`}
+          bg="ownerBlue"
+          delay="0.08s"
+        />
+        <StatTile
+          label="Best win rate"
+          value={best ? `${best.win_rate}%` : '-'}
+          sub={best?.fullName}
+          bg="ownerMint"
+          delay="0.16s"
+        />
+      </Grid>
+
+      <Surface as="section" aria-label="Standings">
+        <Text px="14px" py="2" fontSize="11px" color="inkMuted">
+          This is specific to the current draft. To see total standings, check{' '}
+          <Link href="https://www.nhl.com/standings/2025-11-28/league" target="_blank">
+            the official NHL site
+          </Link>
+          .
+        </Text>
+        {standings && profile ? (
+          <StandingsTable standings={standings} profile={profile} />
+        ) : (
+          <Center w="full" py="8">
+            <Spinner size="xl" color="blue.500" />
+          </Center>
+        )}
+      </Surface>
+    </>
   );
 };
 

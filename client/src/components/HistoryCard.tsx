@@ -43,7 +43,13 @@ const HistoryCard = ({ game }: { game: Game }) => {
 
   const badge = (member?: Profile) => {
     return (
-      <Tag.Root size="sm" colorPalette={member ? getAvatarColour(member.id) : 'yellow'}>
+      <Tag.Root
+        size="sm"
+        height="18px"
+        minH="0"
+        fontSize="10px"
+        colorPalette={member ? getAvatarColour(member.id) : 'yellow'}
+      >
         <Tag.Label>{member ? member.name : 'unclaimed'}</Tag.Label>
       </Tag.Root>
     );
@@ -52,10 +58,10 @@ const HistoryCard = ({ game }: { game: Game }) => {
   const middlePiece = (game: Game) => {
     return (
       <>
-        <Heading size={{ base: '2xl', md: '3xl' }}>
+        <Heading size={{ base: 'lg', md: 'xl' }}>
           {game.homeScore} vs. {game.visitingScore}
         </Heading>
-        <Text fontSize={{ base: 'xs', md: 'sm' }}>{formatTime12(game.easternStartTime)}</Text>
+        <Text fontSize="2xs">{formatTime12(game.easternStartTime)}</Text>
       </>
     );
   };
@@ -73,10 +79,10 @@ const HistoryCard = ({ game }: { game: Game }) => {
   return (
     <Grid
       templateColumns="repeat(3, 1fr)"
-      padding="3"
-      paddingX={{ base: '3', md: '5' }}
-      rounded="2xl"
-      borderWidth="3px"
+      paddingY="1.5"
+      paddingX={{ base: '2', md: '3' }}
+      rounded="xl"
+      borderWidth="2px"
       borderColor={borderColor}
       backgroundColor={backgroundColor}
       opacity={won || lost ? 1 : 0.6}
@@ -85,12 +91,12 @@ const HistoryCard = ({ game }: { game: Game }) => {
       <HStack>
         <Image
           src={game.homeTeam?.logo}
-          boxSize={{ base: '35px', md: '60px' }}
+          boxSize={{ base: '28px', md: '38px' }}
           fit="cover"
           alt={game.homeTeam?.fullName}
         />
-        <VStack align="start" gap="1">
-          <Heading size="sm">{isBase ? game.homeTeam?.code : game.homeTeam?.fullName}</Heading>
+        <VStack align="start" gap="0.5">
+          <Heading size="xs">{isBase ? game.homeTeam?.code : game.homeTeam?.fullName}</Heading>
           {badge(game.homeMember)}
         </VStack>
       </HStack>
@@ -100,15 +106,15 @@ const HistoryCard = ({ game }: { game: Game }) => {
       </Flex>
 
       <HStack justify="end">
-        <VStack align="end" gap="1">
-          <Heading size="sm" textAlign="right">
+        <VStack align="end" gap="0.5">
+          <Heading size="xs" textAlign="right">
             {isBase ? game.visitingTeam?.code : game.visitingTeam?.fullName}
           </Heading>
           {badge(game.visitingMember)}
         </VStack>
         <Image
           src={game.visitingTeam?.logo}
-          boxSize={{ base: '35px', md: '60px' }}
+          boxSize={{ base: '28px', md: '38px' }}
           fit="cover"
           alt={game.visitingTeam?.fullName}
         />

@@ -31,7 +31,13 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
 
   const badge = (member?: Profile) => {
     return (
-      <Tag.Root size="sm" colorPalette={member ? getAvatarColour(member.id) : 'yellow'}>
+      <Tag.Root
+        size="sm"
+        height="18px"
+        minH="0"
+        fontSize="10px"
+        colorPalette={member ? getAvatarColour(member.id) : 'yellow'}
+      >
         <Tag.Label>{member ? member.name : 'unclaimed'}</Tag.Label>
       </Tag.Root>
     );
@@ -40,17 +46,17 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
   const middlePiece = (game: Game) => {
     if (game.gameStateId === 1) {
       return (
-        <Heading size={{ base: '2xl', md: '3xl' }}>{formatTime12(game.easternStartTime)}</Heading>
+        <Heading size={{ base: 'lg', md: 'xl' }}>{formatTime12(game.easternStartTime)}</Heading>
       );
     } else if (game.gameStateId === 7) {
       const winner = game.homeScore > game.visitingScore ? game.homeMember : game.visitingMember;
       return (
         <>
           <Stack align="center" direction={isBase ? 'column' : 'row'} gap={{ base: '0', md: '1' }}>
-            <Text fontSize={{ base: 'xs', md: 'sm' }}>winner:</Text>
+            <Text fontSize="2xs">winner:</Text>
             {badge(winner)}
           </Stack>
-          <Heading size={{ base: '2xl', md: '3xl' }}>
+          <Heading size={{ base: 'lg', md: 'xl' }}>
             {game.homeScore} vs. {game.visitingScore}
           </Heading>
         </>
@@ -58,10 +64,10 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
     } else {
       return (
         <>
-          <Heading size={{ base: '2xl', md: '3xl' }}>
+          <Heading size={{ base: 'lg', md: 'xl' }}>
             {game.homeScore} vs. {game.visitingScore}
           </Heading>
-          <Text fontSize={{ base: 'xs', md: 'sm' }}>{formatTime12(game.easternStartTime)}</Text>
+          <Text fontSize="2xs">{formatTime12(game.easternStartTime)}</Text>
         </>
       );
     }
@@ -70,25 +76,25 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
   return (
     <Grid
       templateColumns={{ base: '1fr 2fr 1fr', md: 'repeat(3, 1fr)' }}
-      gap={4}
-      padding="3"
-      paddingX={{ base: '3', md: '5' }}
-      rounded="2xl"
+      gap={2}
+      paddingY="1.5"
+      paddingX={{ base: '2', md: '3' }}
+      rounded="xl"
       backgroundColor={'white'}
       width="100%"
       opacity={fade ? 0.6 : 1}
-      borderWidth={game.gameStateId !== 1 && !fade ? '3px' : ''}
+      borderWidth={game.gameStateId !== 1 && !fade ? '2px' : ''}
       borderColor={game.gameStateId !== 7 ? 'orange' : 'brown'}
     >
       <HStack>
         <Image
           src={game.homeTeam?.logo}
-          boxSize={{ base: '35px', md: '60px' }}
+          boxSize={{ base: '28px', md: '38px' }}
           fit="cover"
           alt={game.homeTeam?.fullName}
         />
-        <VStack align="start" gap="1">
-          <Heading size="sm">{isBase ? game.homeTeam?.code : game.homeTeam?.fullName}</Heading>
+        <VStack align="start" gap="0.5">
+          <Heading size="xs">{isBase ? game.homeTeam?.code : game.homeTeam?.fullName}</Heading>
           {badge(game.homeMember)}
         </VStack>
       </HStack>
@@ -98,15 +104,15 @@ const GameCard = ({ fade = false, game }: { fade?: boolean; game: Game }) => {
       </Flex>
 
       <HStack justify="end">
-        <VStack align="end" gap="1">
-          <Heading size="sm" textAlign="right">
+        <VStack align="end" gap="0.5">
+          <Heading size="xs" textAlign="right">
             {isBase ? game.visitingTeam?.code : game.visitingTeam?.fullName}
           </Heading>
           {badge(game.visitingMember)}
         </VStack>
         <Image
           src={game.visitingTeam?.logo}
-          boxSize={{ base: '35px', md: '60px' }}
+          boxSize={{ base: '28px', md: '38px' }}
           fit="cover"
           alt={game.visitingTeam?.fullName}
         />

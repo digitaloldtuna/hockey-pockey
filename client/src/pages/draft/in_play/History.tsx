@@ -1,82 +1,77 @@
-import { Flex, Heading, ScrollArea, Switch } from '@chakra-ui/react';
-import { useId, useState } from 'react';
+import { Box, Flex, Grid } from '@chakra-ui/react';
+import { useState } from 'react';
+import { FilterChip, PageHeader, StatTile, Surface } from '../../../components/ui';
 import { Game } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { useDraft } from '../../../hooks/useDraft';
-import { Tooltip } from '../../../theme/tooltip';
+import { getResult, Result } from '../../../utils';
 import HistoryList from './HistoryList';
 
-const History = () => {
-  const [filtered, setFiltered] = useState<boolean>(true);
-  const id = useId();
+type Filter = 'mine' | 'win' | 'loss' | 'all';
 
+const FILTERS: { key: Filter; label: string }[] = [
+  { key: 'mine', label: 'Your games' },
+  { key: 'win', label: 'Wins' },
+  { key: 'loss', label: 'Losses' },
+  { key: 'all', label: 'All games' },
+];
+
+const History = () => {
+  const [filter, setFilter] = useState<Filter>('mine');
   const { profile } = useAuthentication();
   const { draft, history } = useDraft();
   if (!draft) {
     return <></>;
   }
 
-  const filteredHistory =
-    (filtered
-      ? history
-          ?.map((historyEntry) => {
-            const day = historyEntry[0];
-            const games = historyEntry[1];
-            return [
-              day,
-              games.filter(
-                (game) =>
-                  game.homeMember &&
-                  game.visitingMember &&
-                  profile &&
-                  (game.homeMember.id === profile.id || game.visitingMember.id === profile.id)
-              ),
-            ] as [string, Game[]];
-          })
-          .filter((day) => day[1].length > 0)
-      : history) || null;
+  const resultOf = (game: Game): Result => getResult(game, profile?.id);
+
+  const all = history?.flatMap(([, games]) => games) ?? [];
+  const wins = all.filter((g) => resultOf(g) === 'win').length;
+  const losses = all.filter((g) => resultOf(g) === 'loss').length;
+  const counted = wins + losses;
+  const winRate = counted === 0 ? '-' : `${Math.round((wins / counted) * 100)}%`;
+
+  const matches = (game: Game) => {
+    const result = resultOf(game);
+    if (filter === 'all') return true;
+    if (filter === 'mine') return result !== 'none';
+    return result === filter;
+  };
+
+  const shown =
+    history
+      ?.map(([day, games]) => [day, games.filter(matches)] as [string, Game[]])
+      .filter(([, games]) => games.length > 0) ?? null;
 
   return (
-    <Flex
-      rounded="2xl"
-      backgroundColor="whiteAlpha.500"
-      padding={{ base: '3', md: '8' }}
-      direction="column"
-    >
-      <Flex
-        align="center"
-        direction="horizontal"
-        justify="space-between"
-        marginBottom={{ base: '2', md: '5' }}
-      >
-        <Heading size={{ base: 'lg', md: '2xl' }} color="oxford" fontWeight="bold">
-          {filtered ? 'Your Games' : 'All Games'}
-        </Heading>
-        <Tooltip ids={{ trigger: id }} content="">
-          <Switch.Root
-            ids={{ root: id }}
-            checked={filtered}
-            onCheckedChange={(e: { checked: boolean }) => setFiltered(e.checked)}
-            size={{ base: 'xs', md: 'md' }}
-          >
-            <Switch.HiddenInput />
-            <Switch.Control />
-            <Switch.Label size="xs">your games</Switch.Label>
-          </Switch.Root>
-        </Tooltip>
+    <>
+      <PageHeader title="History" note="Past games with your teams" />
+
+      <Grid templateColumns="repeat(auto-fit, minmax(min(150px, 100%), 1fr))" gap="3">
+        <StatTile label="Wins" value={wins} bg="ownerMint" />
+        <StatTile label="Losses" value={losses} bg="loss" delay="0.06s" />
+        <StatTile label="Win rate" value={winRate} bg="ownerBlue" delay="0.12s" />
+        <StatTile label="Games" value={counted} bg="ownerYellow" delay="0.18s" />
+      </Grid>
+
+      <Flex role="group" aria-label="Filter by result" wrap="wrap" gap="2">
+        {FILTERS.map((f) => (
+          <FilterChip
+            key={f.key}
+            label={f.label}
+            pressed={filter === f.key}
+            onClick={() => setFilter(f.key)}
+          />
+        ))}
       </Flex>
-      <ScrollArea.Root height="30rem" variant="hover">
-        <ScrollArea.Viewport>
-          <ScrollArea.Content>
-            <HistoryList history={filteredHistory} />
-          </ScrollArea.Content>
-        </ScrollArea.Viewport>
-        <ScrollArea.Scrollbar>
-          <ScrollArea.Thumb />
-        </ScrollArea.Scrollbar>
-        <ScrollArea.Corner />
-      </ScrollArea.Root>
-    </Flex>
+
+      <Surface as="section" aria-label="Past games">
+        <Box>
+          <HistoryList history={history === null ? null : shown} />
+        </Box>
+      </Surface>
+    </>
   );
 };
 

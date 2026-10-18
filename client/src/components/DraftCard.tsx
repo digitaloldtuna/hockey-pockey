@@ -33,7 +33,7 @@ const DraftCard = ({ draft }: Props) => {
       rounded="2xl"
       backgroundColor="white"
       w="100%"
-      width={{ base: '100%', md: 'xs' }}
+      minW="0"
       p={{ base: 3, md: 5 }}
       h="fit-content"
       _hover={{
