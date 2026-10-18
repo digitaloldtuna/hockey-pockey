@@ -1,8 +1,6 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { lazy, Suspense } from 'react';
 import { useNavigate } from 'react-router-dom';
-import DarkIceBackground from '../../components/DarkIceBackground';
-import LedTicker from '../../components/LedTicker';
 import { ROUTES } from '../../constants/routes';
 
 const IceTitle = lazy(() => import('../../components/IceTitle'));
@@ -53,14 +51,10 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
       justify="center"
       gap={{ base: 4, lg: 10 }}
       px={{ base: 4, md: 8 }}
-      py={{ base: 20, md: 24 }}
+      py={{ base: 6, md: 8 }}
       color="ink"
-      bg="#050c1c"
+      bg="#071b33"
     >
-      <DarkIceBackground />
-      <LedTicker edge="top" reverse />
-      <LedTicker edge="bottom" />
-
       {/* brand area, straight on the page background */}
       <Flex
         position="relative"
