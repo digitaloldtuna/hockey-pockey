@@ -2,13 +2,14 @@ import { Avatar, AvatarGroup, Box, Flex, Tag, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
 import { DraftStatusLabel } from '../constants/mappings';
 import { Draft } from '../constants/types';
-import { getAvatarColour } from '../utils';
+import { memberColour, readableOn } from '../utils';
 
+// background and text colour for each status tag
 const DraftStatusToColour = {
-  open: 'yellow',
-  closed: 'red',
-  team_selection: 'purple',
-  in_play: 'green',
+  open: { bg: 'ownerSun', color: 'ink' },
+  closed: { bg: 'plum', color: 'white' },
+  team_selection: { bg: 'ownerLavender', color: 'ink' },
+  in_play: { bg: 'ownerSage', color: 'ink' },
 };
 
 type Props = {
@@ -33,7 +34,7 @@ const DraftCard = ({ draft }: Props) => {
       rounded="2xl"
       backgroundColor="white"
       w="100%"
-      width={{ base: '100%', md: 'xs' }}
+      minW="0"
       p={{ base: 3, md: 5 }}
       h="fit-content"
       _hover={{
@@ -48,7 +49,11 @@ const DraftCard = ({ draft }: Props) => {
           {draft.name}
         </Text>
 
-        <Tag.Root size="sm" colorPalette={DraftStatusToColour[draft.status]}>
+        <Tag.Root
+          size="sm"
+          bg={DraftStatusToColour[draft.status].bg}
+          color={DraftStatusToColour[draft.status].color}
+        >
           <Tag.Label>{DraftStatusLabel[draft.status]}</Tag.Label>
         </Tag.Root>
       </Flex>
@@ -57,7 +62,11 @@ const DraftCard = ({ draft }: Props) => {
       <Flex justify="space-between" align="center">
         <AvatarGroup spaceX={{ base: '-2', md: '0' }} size="sm">
           {members.map((member) => (
-            <Avatar.Root key={member.id} colorPalette={getAvatarColour(member.id)}>
+            <Avatar.Root
+              key={member.id}
+              bg={memberColour(member)}
+              color={readableOn(member.colour)}
+            >
               <Avatar.Fallback name={member.name} />
               <Avatar.Image src={member.profileImage || undefined} />
             </Avatar.Root>

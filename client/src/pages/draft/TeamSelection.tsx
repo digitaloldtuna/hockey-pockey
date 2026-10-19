@@ -155,13 +155,15 @@ const TeamSelection = ({ draft }: Props) => {
                             <HStack>
                               <Tag.Root
                                 size="sm"
-                                colorPalette={getConferenceColour(team.conferenceName)}
+                                bg={getConferenceColour(team.conferenceName)}
+                                color="ink"
                               >
                                 <Tag.Label>{team.conferenceName}</Tag.Label>
                               </Tag.Root>
                               <Tag.Root
                                 size="sm"
-                                colorPalette={getDivisionColour(team.divisionName)}
+                                bg={getDivisionColour(team.divisionName)}
+                                color="ink"
                               >
                                 <Tag.Label>{team.divisionName}</Tag.Label>
                               </Tag.Root>

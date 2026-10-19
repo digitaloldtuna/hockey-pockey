@@ -1,22 +1,19 @@
-import { Flex } from '@chakra-ui/react';
+import { ReactNode } from 'react';
+import AppShell, { BackLink, NavItem } from '../components/ui/AppShell';
 
 type Props = {
-  marginX?: string;
-  children: React.ReactNode;
+  nav?: NavItem[];
+  aside?: ReactNode;
+  back?: BackLink;
+  showBrand?: boolean;
+  children: ReactNode;
 };
 
-const Layout = ({ marginX, children }: Props) => {
+const Layout = ({ nav, aside, back, showBrand, children }: Props) => {
   return (
-    <Flex
-      marginX={marginX}
-      paddingX={{ base: 4, sm: 6, md: 12, lg: 20 }} // reduced on small screens
-      paddingY={{ base: 4, sm: 6, md: 8, lg: 10 }} // reduced on small screens
-      gap={{ base: 3, md: 5 }} // smaller gap on mobile
-      direction="column"
-      overflow="visible"
-    >
+    <AppShell nav={nav} aside={aside} back={back} showBrand={showBrand}>
       {children}
-    </Flex>
+    </AppShell>
   );
 };
 

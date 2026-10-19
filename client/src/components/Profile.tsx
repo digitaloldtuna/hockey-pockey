@@ -1,29 +1,21 @@
 import { useState } from 'react';
-import {
-  Button,
-  Input,
-  VStack,
-  Fieldset,
-  Field,
-  FileUpload,
-  Avatar,
-  Tag,
-  Flex,
-} from '@chakra-ui/react';
+import { Button, Input, VStack, Field, FileUpload, Avatar, Text, Flex } from '@chakra-ui/react';
 import { Formik, Form, Field as FormField } from 'formik';
 
 import { useAuthentication } from '../hooks/useAuthentication';
 import { Upload } from 'lucide-react';
 import api from '../api';
+import ColourPicker from './ColourPicker';
 
 interface ProfileFormValues {
   name: string;
   email: string;
   profileImage: File | null;
+  colour: string;
 }
 
 const Profile = () => {
-  const { profile, handleLogout } = useAuthentication();
+  const { profile } = useAuthentication();
   const [previewUrl, setPreviewUrl] = useState<string | null>(profile?.profileImage || null);
 
   const initialValues = profile
@@ -31,11 +23,13 @@ const Profile = () => {
         name: profile.name,
         email: profile.email || '',
         profileImage: null,
+        colour: profile.colour || '',
       }
     : {
         name: 'John Doe',
         email: 'johndoe@example.com',
         profileImage: null,
+        colour: '',
       };
 
   const handleFileChange = (
@@ -60,6 +54,8 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('name', values.name);
       formData.append('email', values.email);
+      // the colour you appear in on leaderboards and charts
+      if (values.colour) formData.append('colour', values.colour);
 
       // Only append the file if the user selected one
       if (values.profileImage) {
@@ -79,54 +75,72 @@ const Profile = () => {
     }
   };
 
+  const inputStyle = {
+    size: 'sm' as const,
+    bg: 'sidebarRaised',
+    color: 'sidebarText',
+    border: '1px solid #5E7189',
+    rounded: '10px',
+    fontSize: '12px',
+    _placeholder: { color: 'sidebarMuted' },
+    _disabled: { opacity: 0.6 },
+  };
+
   return (
     <Formik initialValues={initialValues} onSubmit={onSubmit}>
       {({ setFieldValue, values }) => (
         <Form>
-          <VStack rounded="2xl" backgroundColor="white" p={{ base: 4, md: 8 }} gap="5">
-            {/* Profile Image */}
-            <Fieldset.Root>
-              <Field.Root align="center">
-                <VStack gap="4" justify="center" w="full">
-                  <Avatar.Root
-                    width="100px"
-                    height="100px"
-                    name={values.name}
-                    src={previewUrl || undefined}
-                  >
-                    <Avatar.Fallback name={profile?.name || ''} />
-                    <Avatar.Image src={previewUrl || undefined} />
-                  </Avatar.Root>
-                  <Flex justify="center" direction="column" align="center" gap={2}>
-                    {previewUrl && (
-                      <Tag.Root size="sm" colorPalette={'red'}>
-                        <Tag.Label>your image is publically accessible</Tag.Label>
-                      </Tag.Root>
-                    )}
-                    <FileUpload.Root
-                      maxFiles={1}
-                      accept={{ 'image/*': [] }}
-                      onFileAccept={(details: { files: File[] }) =>
-                        handleFileChange(details.files, setFieldValue)
-                      }
-                    >
-                      <FileUpload.HiddenInput />
-                      <FileUpload.Trigger asChild>
-                        <Button variant="outline" size="sm" w="full">
-                          <Upload /> Upload file
-                        </Button>
-                      </FileUpload.Trigger>
-                    </FileUpload.Root>
-                  </Flex>
-                </VStack>
-              </Field.Root>
-            </Fieldset.Root>
+          <VStack align="stretch" gap="2">
+            <Text
+              px="10px"
+              fontWeight="bold"
+              fontSize="10px"
+              letterSpacing="0.12em"
+              textTransform="uppercase"
+              color="#A9BCD2"
+            >
+              Profile
+            </Text>
+
+            <Flex align="center" gap="3">
+              <Avatar.Root
+                size="lg"
+                flex="none"
+                border="1px solid #5E7189"
+                name={values.name}
+                src={previewUrl || undefined}
+              >
+                <Avatar.Fallback name={profile?.name || ''} />
+                <Avatar.Image src={previewUrl || undefined} />
+              </Avatar.Root>
+              <FileUpload.Root
+                maxFiles={1}
+                accept={{ 'image/*': [] }}
+                onFileAccept={(details: { files: File[] }) =>
+                  handleFileChange(details.files, setFieldValue)
+                }
+              >
+                <FileUpload.HiddenInput />
+                <FileUpload.Trigger asChild>
+                  <Button variant="outline" size="xs" rounded="10px" color="sidebarText">
+                    <Upload size={14} /> Change photo
+                  </Button>
+                </FileUpload.Trigger>
+              </FileUpload.Root>
+            </Flex>
+            {previewUrl && (
+              <Text fontSize="10px" color="sidebarMuted">
+                Your image is publicly accessible.
+              </Text>
+            )}
 
             <FormField name="name">
               {({ field }: { field: any }) => (
                 <Field.Root>
-                  <Field.Label>Name</Field.Label>
-                  <Input {...field} placeholder="Your Name" />
+                  <Field.Label fontSize="11px" color="sidebarMuted">
+                    Name
+                  </Field.Label>
+                  <Input {...field} placeholder="Your name" {...inputStyle} />
                 </Field.Root>
               )}
             </FormField>
@@ -134,26 +148,35 @@ const Profile = () => {
             <FormField name="email">
               {({ field }: { field: any }) => (
                 <Field.Root>
-                  <Field.Label>Email</Field.Label>
-                  <Input {...field} disabled />
+                  <Field.Label fontSize="11px" color="sidebarMuted">
+                    Email
+                  </Field.Label>
+                  <Input {...field} disabled {...inputStyle} />
                 </Field.Root>
               )}
             </FormField>
-            <VStack gap="5">
-              <Button colorScheme="blue" type="submit" alignSelf="center" rounded="2xl">
-                Save Changes
-              </Button>
-              <Button
-                colorScheme="blue"
-                type="submit"
-                alignSelf="center"
-                rounded="2xl"
-                onClick={handleLogout}
-                variant="outline"
-              >
-                Log Out
-              </Button>
-            </VStack>
+
+            <Field.Root>
+              <Field.Label fontSize="11px" color="sidebarMuted">
+                Your colour
+              </Field.Label>
+              <ColourPicker
+                value={values.colour}
+                onChange={(colour) => setFieldValue('colour', colour)}
+              />
+            </Field.Root>
+
+            <Button
+              type="submit"
+              size="sm"
+              rounded="10px"
+              bg="mist"
+              color="ink"
+              border="1px solid #5E7189"
+              _hover={{ bg: '#D5DEE7' }}
+            >
+              Save changes
+            </Button>
           </VStack>
         </Form>
       )}

@@ -4,7 +4,15 @@ import './App.css';
 import { ChakraProvider } from '@chakra-ui/react';
 import { system } from './theme/theme';
 import { AuthProvider } from './hooks/useAuthentication';
-import { CreateDraft, Draft, HomePage, JoinDraft, LoginPage, SignupPage } from './pages';
+import {
+  AuthLayout,
+  CreateDraft,
+  Draft,
+  HomePage,
+  JoinDraft,
+  LoginPage,
+  SignupPage,
+} from './pages';
 import { ROUTES } from './constants/routes';
 import { ProtectedRoute, UnprotectedRoute } from './components';
 import { Toaster } from './theme/toaster';
@@ -22,8 +30,10 @@ function App() {
             <DraftProvider>
               <Routes>
                 <Route element={<UnprotectedRoute />}>
-                  <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
-                  <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+                  <Route element={<AuthLayout />}>
+                    <Route path={ROUTES.SIGNUP} element={<SignupPage />} />
+                    <Route path={ROUTES.LOGIN} element={<LoginPage />} />
+                  </Route>
                 </Route>
                 <Route element={<ProtectedRoute />}>
                   <Route path={ROUTES.HOME} element={<HomePage />} />

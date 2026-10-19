@@ -1,4 +1,15 @@
-import { Box, Button, Center, Flex, Grid, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Grid,
+  Heading,
+  Spinner,
+  Stack,
+  Text,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import Layout from './Layout';
 import { Plus, UserPlus } from 'lucide-react';
 import { useAuthentication } from '../hooks/useAuthentication';
@@ -6,10 +17,45 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import DraftCard from '../components/DraftCard';
 import { useTitle } from '../hooks/useTitle';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import api from '../api';
 import Profile from '../components/Profile';
 import { Draft } from '../constants/types';
+
+const DraftSection = ({ title, children }: { title: string; children: React.ReactNode }) => (
+  <Flex
+    direction="column"
+    gap="3"
+    rounded="card"
+    bg="card"
+    border="1px solid"
+    borderColor="line"
+    p={{ base: 4, md: 6 }}
+    w="100%"
+    maxW="100%"
+    height="fit-content"
+  >
+    <Heading as="h2" fontSize="18px">
+      {title}
+    </Heading>
+    {children}
+  </Flex>
+);
+
+const DraftGrid = ({ drafts }: { drafts: Draft[] }) => (
+  <Grid
+    templateColumns="repeat(auto-fill, minmax(min(100%, 220px), 1fr))"
+    gap={5}
+    w="100%"
+    maxW="100%"
+  >
+    {drafts.map((draft) => (
+      <DraftCard key={draft.id} draft={draft} />
+    ))}
+  </Grid>
+);
+
+const IceTitle = lazy(() => import('../components/IceTitle'));
 
 const HomePage = () => {
   useTitle('Home');
@@ -35,19 +81,26 @@ const HomePage = () => {
     fetchDrafts();
   }, []);
 
+  const activeDrafts = drafts.filter((draft) => draft.status !== 'closed');
+  const closedDrafts = drafts.filter((draft) => draft.status === 'closed');
+
+  // one line on wide screens, two on narrow ones so the letters stay big enough to read
+  const narrow = useBreakpointValue({ base: true, md: false });
+  const name = profile?.name;
+  const welcomeLines = !name
+    ? ['Welcome!']
+    : narrow
+      ? ['Welcome,', `${name}!`]
+      : [`Welcome, ${name}!`];
+
   const handleCreateDraft = () => navigate(ROUTES.DRAFT.CREATE);
   const handleJoinDraft = () => navigate(ROUTES.DRAFT.JOIN);
 
   return (
-    <Layout>
+    <Layout aside={<Profile />} showBrand>
       {/* Prevent horizontal scrolling */}
       <Box w="100%">
-        <Grid
-          templateColumns={{ base: '1fr', md: '3fr 1fr' }}
-          gap={{ base: 0, md: 10 }}
-          w="100%"
-          maxW="100%"
-        >
+        <Grid templateColumns="minmax(0, 1fr)" gap={{ base: 0, md: 10 }} w="100%" maxW="100%">
           {/* Right Section */}
           <Box w="100%" maxW="100%">
             {/* Top Section: Welcome + Buttons */}
@@ -61,14 +114,19 @@ const HomePage = () => {
               w="100%"
               maxW="100%"
             >
-              <Text
-                fontSize={{ base: '3xl', md: '5xl' }}
-                color="oxford"
-                w="100%"
-                fontFamily="heading"
-              >
-                Welcome, <b>{profile?.name}</b>!
-              </Text>
+              <Box w="100%" maxW={{ base: '85%', md: '560px' }}>
+                <Suspense fallback={<Box h="60px" />}>
+                  <IceTitle
+                    lines={welcomeLines}
+                    chips={9}
+                    puck={false}
+                    align="left"
+                    stroke={0.75}
+                    bleed="-110% -4%"
+                    fallbackColor="var(--chakra-colors-sidebarText)"
+                  />
+                </Suspense>
+              </Box>
 
               {/* Buttons */}
               <Grid
@@ -101,55 +159,39 @@ const HomePage = () => {
               </Grid>
             </Flex>
 
-            {/* Draft Cards Container */}
-            <Flex
-              rounded="2xl"
-              backgroundColor="whiteAlpha.500"
-              p={{ base: 4, md: 8 }}
-              w="100%"
-              maxW="100%"
-              height="fit-content"
-            >
-              {/* Loading */}
-              {draftLoading && (
-                <Center w="full">
-                  <Spinner size="xl" color="blue.500" />
-                </Center>
-              )}
+            {/* Draft Cards Containers */}
+            <Flex direction="column" gap="5">
+              <DraftSection title="Your drafts">
+                {/* Loading */}
+                {draftLoading && (
+                  <Center w="full">
+                    <Spinner size="xl" color="blue.500" />
+                  </Center>
+                )}
 
-              {/* Empty State */}
-              {!draftLoading && drafts.length === 0 && (
-                <Center w="full" textAlign="center">
-                  <Stack>
-                    <Heading size="md">You have no drafts 😶‍🌫️</Heading>
-                    <Text>Join a draft, or create one!</Text>
-                  </Stack>
-                </Center>
-              )}
+                {/* Empty State */}
+                {!draftLoading && drafts.length === 0 && (
+                  <Center w="full" textAlign="center">
+                    <Stack>
+                      <Heading size="md">You have no drafts 😶‍🌫️</Heading>
+                      <Text>Join a draft, or create one!</Text>
+                    </Stack>
+                  </Center>
+                )}
 
-              {/* Draft Cards Grid */}
-              {!draftLoading && drafts.length > 0 && (
-                <Grid
-                  templateColumns={{
-                    base: '1fr',
-                    sm: 'repeat(2, 1fr)',
-                    lg: 'repeat(3, 1fr)',
-                  }}
-                  gap={5}
-                  w="100%"
-                  maxW="100%"
-                >
-                  {drafts.map((draft) => (
-                    <DraftCard key={draft.id} draft={draft} />
-                  ))}
-                </Grid>
+                {!draftLoading && drafts.length > 0 && activeDrafts.length === 0 && (
+                  <Text color="inkMuted">No active drafts</Text>
+                )}
+
+                {!draftLoading && activeDrafts.length > 0 && <DraftGrid drafts={activeDrafts} />}
+              </DraftSection>
+
+              {!draftLoading && closedDrafts.length > 0 && (
+                <DraftSection title="Closed drafts">
+                  <DraftGrid drafts={closedDrafts} />
+                </DraftSection>
               )}
             </Flex>
-          </Box>
-
-          {/* Profile Section */}
-          <Box mt={{ base: 4, md: 10 }} w="100%" maxW="100%">
-            <Profile />
           </Box>
         </Grid>
       </Box>

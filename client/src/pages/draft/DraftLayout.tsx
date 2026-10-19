@@ -1,6 +1,5 @@
-import { Button, Flex, Link, Text } from '@chakra-ui/react';
+import { Button, Flex, Text } from '@chakra-ui/react';
 import Layout from '../Layout';
-import { useAuthentication } from '../../hooks/useAuthentication';
 import { ArrowLeft } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
@@ -12,30 +11,32 @@ type Props = {
 
 const DraftLayout = ({ title, children }: Props) => {
   const navigate = useNavigate();
-  const { handleLogout } = useAuthentication();
   return (
-    <Layout marginX="10">
-      <Flex justify="start" align="center" marginTop="10">
+    <Layout>
+      <Flex justify="start" align="center">
         <Button
           variant="plain"
-          size="2xl"
-          gap="8"
+          size="lg"
           padding="0"
+          color="sidebarText"
           onClick={() => navigate(ROUTES.HOME)}
         >
           <ArrowLeft />
         </Button>
-        <Text fontSize="5xl" color="oxford" fontWeight="bold">
+        <Text as="h1" fontFamily="heading" fontSize="28px" fontWeight="bold" color="sidebarText">
           {title}
         </Text>
       </Flex>
-      <Flex rounded="2xl" backgroundColor="whiteAlpha.500" padding="8" direction="column" gap="3">
+      <Flex
+        rounded="card"
+        bg="card"
+        border="1px solid"
+        borderColor="line"
+        padding={{ base: '4', md: '8' }}
+        direction="column"
+        gap="3"
+      >
         {children}
-      </Flex>
-      <Flex justify="center">
-        <Link color="highElfBlue" onClick={handleLogout}>
-          logout
-        </Link>
       </Flex>
     </Layout>
   );
