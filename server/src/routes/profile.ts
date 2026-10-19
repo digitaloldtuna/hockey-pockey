@@ -28,8 +28,8 @@ router.post('/update', upload.single('profileImage'), async (req, res) => {
     }
 
     // Grab other fields from form-data
-    const { name, email } = req.body;
-    const profile = await updateProfileService(user.id, { file: req.file, name, email });
+    const { name, email, colour } = req.body;
+    const profile = await updateProfileService(user.id, { file: req.file, name, email, colour });
 
     return res.json({ profile });
   } catch (e) {

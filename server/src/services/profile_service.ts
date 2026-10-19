@@ -5,7 +5,7 @@ const supabase = supabaseAdmin();
 
 export const updateProfileService = async (
   userId: string,
-  context: { file?: Express.Multer.File; name: string; email: string }
+  context: { file?: Express.Multer.File; name: string; email: string; colour?: string }
 ) => {
   let profileImageUrl: string | null = null;
 
@@ -30,6 +30,13 @@ export const updateProfileService = async (
 
   // Build the data object for database update
   const dataToUpdate: any = { name: context.name };
+  if (context.colour !== undefined && context.colour !== '') {
+    // only accept a plain #rrggbb value
+    if (!/^#[0-9a-fA-F]{6}$/.test(context.colour)) {
+      throw Error('colour must be a hex value like #ff9767');
+    }
+    dataToUpdate.colour = context.colour.toLowerCase();
+  }
   if (profileImageUrl) dataToUpdate.profileImage = profileImageUrl;
 
   const updatedProfile = await updateProfile({ userId, profile: dataToUpdate });

@@ -5,11 +5,13 @@ import { Formik, Form, Field as FormField } from 'formik';
 import { useAuthentication } from '../hooks/useAuthentication';
 import { Upload } from 'lucide-react';
 import api from '../api';
+import ColourPicker from './ColourPicker';
 
 interface ProfileFormValues {
   name: string;
   email: string;
   profileImage: File | null;
+  colour: string;
 }
 
 const Profile = () => {
@@ -21,11 +23,13 @@ const Profile = () => {
         name: profile.name,
         email: profile.email || '',
         profileImage: null,
+        colour: profile.colour || '',
       }
     : {
         name: 'John Doe',
         email: 'johndoe@example.com',
         profileImage: null,
+        colour: '',
       };
 
   const handleFileChange = (
@@ -50,6 +54,8 @@ const Profile = () => {
       const formData = new FormData();
       formData.append('name', values.name);
       formData.append('email', values.email);
+      // the colour you appear in on leaderboards and charts
+      if (values.colour) formData.append('colour', values.colour);
 
       // Only append the file if the user selected one
       if (values.profileImage) {
@@ -149,6 +155,16 @@ const Profile = () => {
                 </Field.Root>
               )}
             </FormField>
+
+            <Field.Root>
+              <Field.Label fontSize="11px" color="sidebarMuted">
+                Your colour
+              </Field.Label>
+              <ColourPicker
+                value={values.colour}
+                onChange={(colour) => setFieldValue('colour', colour)}
+              />
+            </Field.Root>
 
             <Button
               type="submit"

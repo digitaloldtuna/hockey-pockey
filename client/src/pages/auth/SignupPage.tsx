@@ -2,7 +2,6 @@ import { useAuthentication } from '../../hooks/useAuthentication';
 import { useTitle } from '../../hooks/useTitle';
 import { Form, Formik } from 'formik';
 import * as Yup from 'yup';
-import AuthLayout from './AuthLayout';
 import AuthField, { SubmitButton } from './AuthField';
 
 interface ProfileFormValues {
@@ -35,10 +34,10 @@ const SignupPage = () => {
   };
 
   return (
-    <AuthLayout mode="signup">
+    <>
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         {() => (
-          <Form style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <Form style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <AuthField
               name="name"
               label="Display name"
@@ -64,7 +63,7 @@ const SignupPage = () => {
           </Form>
         )}
       </Formik>
-    </AuthLayout>
+    </>
   );
 };
 

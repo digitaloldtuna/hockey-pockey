@@ -1,4 +1,15 @@
-import { Box, Button, Center, Flex, Grid, Heading, Spinner, Stack, Text } from '@chakra-ui/react';
+import {
+  Box,
+  Button,
+  Center,
+  Flex,
+  Grid,
+  Heading,
+  Spinner,
+  Stack,
+  Text,
+  useBreakpointValue,
+} from '@chakra-ui/react';
 import Layout from './Layout';
 import { Plus, UserPlus } from 'lucide-react';
 import { useAuthentication } from '../hooks/useAuthentication';
@@ -6,7 +17,7 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../constants/routes';
 import DraftCard from '../components/DraftCard';
 import { useTitle } from '../hooks/useTitle';
-import { useEffect, useState } from 'react';
+import { lazy, Suspense, useEffect, useState } from 'react';
 import api from '../api';
 import Profile from '../components/Profile';
 import { Draft } from '../constants/types';
@@ -44,6 +55,8 @@ const DraftGrid = ({ drafts }: { drafts: Draft[] }) => (
   </Grid>
 );
 
+const IceTitle = lazy(() => import('../components/IceTitle'));
+
 const HomePage = () => {
   useTitle('Home');
   const [drafts, setDrafts] = useState<Draft[]>([]);
@@ -71,6 +84,15 @@ const HomePage = () => {
   const activeDrafts = drafts.filter((draft) => draft.status !== 'closed');
   const closedDrafts = drafts.filter((draft) => draft.status === 'closed');
 
+  // one line on wide screens, two on narrow ones so the letters stay big enough to read
+  const narrow = useBreakpointValue({ base: true, md: false });
+  const name = profile?.name;
+  const welcomeLines = !name
+    ? ['Welcome!']
+    : narrow
+      ? ['Welcome,', `${name}!`]
+      : [`Welcome, ${name}!`];
+
   const handleCreateDraft = () => navigate(ROUTES.DRAFT.CREATE);
   const handleJoinDraft = () => navigate(ROUTES.DRAFT.JOIN);
 
@@ -92,14 +114,19 @@ const HomePage = () => {
               w="100%"
               maxW="100%"
             >
-              <Text
-                fontSize={{ base: '3xl', md: '5xl' }}
-                color="oxford"
-                w="100%"
-                fontFamily="heading"
-              >
-                Welcome, <b>{profile?.name}</b>!
-              </Text>
+              <Box w="100%" maxW={{ base: '85%', md: '560px' }}>
+                <Suspense fallback={<Box h="60px" />}>
+                  <IceTitle
+                    lines={welcomeLines}
+                    chips={9}
+                    puck={false}
+                    align="left"
+                    stroke={0.75}
+                    bleed="-110% -4%"
+                    fallbackColor="var(--chakra-colors-sidebarText)"
+                  />
+                </Suspense>
+              </Box>
 
               {/* Buttons */}
               <Grid

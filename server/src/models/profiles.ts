@@ -8,6 +8,7 @@ export interface Profile {
   createdAt?: Date;
   user: string;
   profileImage?: string;
+  colour?: string; // hex colour the member is shown in, e.g. #ff9767
 }
 
 export const createProfile = async ({
@@ -70,7 +71,7 @@ export const updateProfile = async ({
 
   const { data, error } = await supabase
     .from('profiles')
-    .update({ name: profile.name, profileImage: profile.profileImage })
+    .update({ name: profile.name, profileImage: profile.profileImage, colour: profile.colour })
     .eq('id', oldProfile.id)
     .select()
     .single();

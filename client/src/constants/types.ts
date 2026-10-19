@@ -11,6 +11,7 @@ export type Profile = {
   user: string;
   email?: string;
   profileImage?: string;
+  colour?: string; // hex colour the member picked for themselves
 };
 
 export type Draft = {

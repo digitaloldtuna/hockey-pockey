@@ -2,7 +2,6 @@ import { useAuthentication } from '../../hooks/useAuthentication';
 import { useTitle } from '../../hooks/useTitle';
 import * as Yup from 'yup';
 import { Form, Formik } from 'formik';
-import AuthLayout from './AuthLayout';
 import AuthField, { SubmitButton } from './AuthField';
 
 interface LoginFormValues {
@@ -29,10 +28,10 @@ const LoginPage = () => {
   };
 
   return (
-    <AuthLayout mode="login">
+    <>
       <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={onSubmit}>
         {() => (
-          <Form style={{ display: 'flex', flexDirection: 'column', gap: 12 }}>
+          <Form style={{ display: 'flex', flexDirection: 'column', gap: 8 }}>
             <AuthField
               name="email"
               label="Email"
@@ -51,7 +50,7 @@ const LoginPage = () => {
           </Form>
         )}
       </Formik>
-    </AuthLayout>
+    </>
   );
 };
 

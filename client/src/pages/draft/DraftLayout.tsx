@@ -14,10 +14,16 @@ const DraftLayout = ({ title, children }: Props) => {
   return (
     <Layout>
       <Flex justify="start" align="center">
-        <Button variant="plain" size="lg" padding="0" onClick={() => navigate(ROUTES.HOME)}>
+        <Button
+          variant="plain"
+          size="lg"
+          padding="0"
+          color="sidebarText"
+          onClick={() => navigate(ROUTES.HOME)}
+        >
           <ArrowLeft />
         </Button>
-        <Text as="h1" fontFamily="heading" fontSize="28px" fontWeight="bold">
+        <Text as="h1" fontFamily="heading" fontSize="28px" fontWeight="bold" color="sidebarText">
           {title}
         </Text>
       </Flex>

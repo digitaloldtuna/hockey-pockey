@@ -120,14 +120,14 @@ const InPlayDraft = () => {
         minH="44px"
         rounded="10px"
         border="1px solid #16263A"
-        bg="ownerYellow"
+        bg="ownerSun"
         color="ink"
         fontWeight="bold"
         fontSize="12px"
         cursor={isRefreshing ? 'progress' : 'pointer'}
         opacity={isRefreshing ? 0.7 : 1}
         transition="background .15s ease"
-        _hover={{ bg: '#F2D56A' }}
+        _hover={{ bg: '#FFD974' }}
       >
         <RefreshCcw size={16} className={isRefreshing ? 'rotate' : ''} />
         {isRefreshing ? 'Refreshing scores...' : 'Refresh scores'}

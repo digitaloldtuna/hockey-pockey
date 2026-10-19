@@ -1,9 +1,55 @@
-export const PuckMark = ({ size = 38 }: { size?: number }) => (
+const GREY = '#8b939d';
+
+const PuckFace = ({ mood, size }: { mood: 'happy' | 'angry'; size: number }) => (
   <svg width={size} height={size} viewBox="0 0 46 46" aria-hidden="true">
-    <path d="M5 19v9c0 5 8 9 18 9s18-4 18-9v-9" fill="#8FA1B5" stroke="#EAF1F8" strokeWidth="1.5" />
-    <ellipse cx="23" cy="19" rx="18" ry="9" fill="#C3CED9" stroke="#EAF1F8" strokeWidth="1.5" />
-    <ellipse cx="23" cy="18" rx="11" ry="4.5" fill="none" stroke="#EAF1F8" strokeWidth="1.2" />
+    <circle cx="23" cy="23" r="19.5" fill="#1c2026" stroke="#566174" strokeWidth="1.6" />
+    {mood === 'happy' ? (
+      <>
+        <circle cx="16.5" cy="18.5" r="1.9" fill={GREY} />
+        <circle cx="29.5" cy="18.5" r="1.9" fill={GREY} />
+        <path
+          d="M14 26.5Q23 35 32 26.5"
+          fill="none"
+          stroke={GREY}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+      </>
+    ) : (
+      <>
+        <circle cx="16.5" cy="22" r="1.7" fill={GREY} />
+        <circle cx="29.5" cy="22" r="1.7" fill={GREY} />
+        <path
+          d="M11.5 14L20 18.5M34.5 14L26 18.5"
+          fill="none"
+          stroke={GREY}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+        <path
+          d="M15 33Q23 26 31 33"
+          fill="none"
+          stroke={GREY}
+          strokeWidth="2.2"
+          strokeLinecap="round"
+        />
+      </>
+    )}
   </svg>
+);
+
+// the puck from the login page, standing upright: a smile on one side that flips to a scowl on hover
+export const PuckMark = ({ size = 38 }: { size?: number }) => (
+  <span className="puck-flip" style={{ width: size, height: size }}>
+    <span className="puck-flip-inner">
+      <span className="puck-face">
+        <PuckFace mood="happy" size={size} />
+      </span>
+      <span className="puck-face puck-face-back">
+        <PuckFace mood="angry" size={size} />
+      </span>
+    </span>
+  </span>
 );
 
 export const Snowflake = ({ size = 70, opacity = 0.55 }: { size?: number; opacity?: number }) => (

@@ -7,7 +7,7 @@ import { FontLoader } from 'three/examples/jsm/loaders/FontLoader.js';
 
 const font = new FontLoader().parse(fontData as unknown as Parameters<FontLoader['parse']>[0]);
 
-const LINES = ['HOCKEY', 'POCKEY'];
+const DEFAULT_LINES = ['HOCKEY', 'POCKEY'];
 const FOV = 32;
 const LINE_GAP = 1.3;
 const rand = (min: number, max: number) => min + Math.random() * (max - min);
@@ -230,11 +230,11 @@ const makeWobble = () => {
 };
 
 // an extruded letter whose outline and bevel are irregular, like hand-chipped ice
-const makeLetterGeometry = (char: string) => {
+const makeLetterGeometry = (char: string, stroke: number) => {
   const wobble = makeWobble();
 
   // widen every stroke a little by pushing outline points away from the filled area
-  const BOLD = 0.05;
+  const BOLD = 0.05 * stroke;
   const uneven = (path: THREE.Path, count: number, side: number) => {
     const points = path.getSpacedPoints(count);
     return points.map((point, k) => {
@@ -268,7 +268,7 @@ const makeLetterGeometry = (char: string) => {
     depth: 0.22 + Math.random() * 0.16,
     bevelEnabled: true,
     bevelThickness: 0.2 + Math.random() * 0.12,
-    bevelSize: 0.08 + Math.random() * 0.04,
+    bevelSize: (0.08 + Math.random() * 0.04) * stroke,
     bevelOffset: 0,
     bevelSegments: 12,
     curveSegments: 12,
@@ -361,7 +361,55 @@ const makeChunkGeometry = (size: number) => {
   return geometry;
 };
 
-const IceTitle = () => {
+const advanceOf = (char: string) => {
+  const glyph = (fontData.glyphs as Record<string, { ha: number }>)[char];
+  return glyph ? glyph.ha / fontData.resolution : 0.4;
+};
+
+// width / height of a block of text, so its box can be sized before the 3D scene exists
+const iceAspect = (lines: string[]) => {
+  const width =
+    Math.max(
+      ...lines.map(
+        (line) =>
+          Array.from(line).reduce((sum, char) => sum + advanceOf(char) + LETTER_GAP, 0) - LETTER_GAP
+      )
+    ) + 0.3;
+  // a single line also needs room for the comma and for the bevels
+  const height = lines.length === 1 ? 1.45 : (lines.length - 1) * LINE_GAP + 1.15;
+  return width / height;
+};
+
+type IceTitleProps = {
+  lines?: string[];
+  chips?: number; // how many small ice chips float around the text
+  puck?: boolean; // the hockey puck you can knock around
+  bleed?: string; // how far the canvas extends past the text's box, as a CSS inset
+  fallbackColor?: string; // colour of the plain text shown if WebGL is unavailable
+  align?: 'center' | 'left'; // where the text sits when its box is wider than it needs
+  aspect?: number; // width / height of the box; worked out from the text if left out
+  stroke?: number; // how heavy the letters are: 1 is the bold login look, lower is thinner
+  height?: number; // fixed height in px: the box is then exactly as wide as the text needs
+  solid?: boolean; // opaque ice that hides the page behind it, instead of clear glass
+  bodyOpacity?: number; // how much of the page behind shows through the clear glass
+  light?: number; // scales every light and reflection; below 1 is dimmer
+};
+
+const IceTitle = ({
+  lines = DEFAULT_LINES,
+  chips: chipCount = 14,
+  puck: showPuck = true,
+  bleed = '-55% -32%',
+  fallbackColor = 'white',
+  align = 'center',
+  aspect,
+  stroke = 1,
+  height,
+  solid = false,
+  bodyOpacity = 0.36,
+  light = 1,
+}: IceTitleProps) => {
+  const linesKey = lines.join('\n');
   const mountRef = useRef<HTMLDivElement>(null);
   const hostRef = useRef<HTMLDivElement>(null);
   const [failed, setFailed] = useState(false);
@@ -370,6 +418,7 @@ const IceTitle = () => {
     const mount = mountRef.current;
     const host = hostRef.current;
     if (!mount || !host) return;
+    const lineList = linesKey.split('\n');
 
     let renderer: THREE.WebGLRenderer;
     try {
@@ -395,12 +444,12 @@ const IceTitle = () => {
     const envMap = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
     scene.environment = envMap;
 
-    const key = new THREE.DirectionalLight(0xffffff, 3);
+    const key = new THREE.DirectionalLight(0xffffff, 3 * light);
     key.position.set(-3, 5, 6);
-    const glint = new THREE.DirectionalLight(0xffffff, 2.4);
+    const glint = new THREE.DirectionalLight(0xffffff, 2.4 * light);
     glint.position.set(5, 2, 4);
     // light from behind makes the bevelled edges glow
-    const back = new THREE.DirectionalLight(0xeaf6ff, 5);
+    const back = new THREE.DirectionalLight(0xeaf6ff, 5 * light);
     back.position.set(-2, 1, -4);
     scene.add(key, glint, back);
 
@@ -409,24 +458,43 @@ const IceTitle = () => {
     const detailTexture = makeDetailTexture();
 
     // clear, wet ice: glossy where polished, hazy where frosted
-    const material = new THREE.MeshPhysicalMaterial({
-      color: 0xf2faff,
-      metalness: 0,
-      roughness: 1, // scaled down by the roughness map, so most of the surface stays glossy
-      roughnessMap: roughnessTexture,
-      bumpMap: bumpTexture,
-      bumpScale: 1.5,
-      transmission: 1,
-      thickness: 2,
-      ior: 1.31,
-      attenuationColor: new THREE.Color(0xa9d6f5),
-      attenuationDistance: 3,
-      specularIntensity: 0.25,
-      envMapIntensity: 0.5,
-      // alpha from transmission only reaches the page when blending is on
-      transparent: true,
-      opacity: 0.36,
-    });
+    const material = new THREE.MeshPhysicalMaterial(
+      solid
+        ? {
+            // opaque frosted ice: hides whatever is drawn behind the letters
+            color: 0xb2cde4,
+            metalness: 0,
+            roughness: 1,
+            roughnessMap: roughnessTexture,
+            bumpMap: bumpTexture,
+            bumpScale: 1.5,
+            clearcoat: 0.4,
+            clearcoatRoughness: 0.25,
+            specularIntensity: 0.4,
+            envMapIntensity: 0.6 * light,
+            // partly see-through, so the ice reads as glassy but still mostly covers what is behind it
+            transparent: bodyOpacity < 1,
+            opacity: bodyOpacity,
+          }
+        : {
+            color: 0xf2faff,
+            metalness: 0,
+            roughness: 1, // scaled down by the roughness map, so most of the surface stays glossy
+            roughnessMap: roughnessTexture,
+            bumpMap: bumpTexture,
+            bumpScale: 1.5,
+            transmission: 1,
+            thickness: 2,
+            ior: 1.31,
+            attenuationColor: new THREE.Color(0xa9d6f5),
+            attenuationDistance: 3,
+            specularIntensity: 0.25,
+            envMapIntensity: 0.5 * light,
+            // alpha from transmission only reaches the page when blending is on
+            transparent: true,
+            opacity: bodyOpacity,
+          }
+    );
 
     // bright layer on top: glossy glints plus cracks and bubbles, added at full strength
     const sheen = new THREE.MeshPhysicalMaterial({
@@ -437,11 +505,11 @@ const IceTitle = () => {
       bumpScale: 2.2,
       emissive: new THREE.Color(0xdff1ff),
       emissiveMap: detailTexture,
-      emissiveIntensity: 0.2,
+      emissiveIntensity: 0.2 * light,
       clearcoat: 1,
       clearcoatRoughness: 0.02,
       specularIntensity: 1,
-      envMapIntensity: 1.1,
+      envMapIntensity: 1.1 * light,
       transparent: true,
       // add light only: leave the canvas alpha alone so unlit areas stay transparent
       blending: THREE.CustomBlending,
@@ -453,7 +521,6 @@ const IceTitle = () => {
       depthWrite: false,
     });
 
-    const glyphScale = 1 / fontData.resolution;
     const geometries: THREE.BufferGeometry[] = [];
     type Letter = {
       mesh: THREE.Mesh;
@@ -472,20 +539,20 @@ const IceTitle = () => {
     const group = new THREE.Group();
 
     // one mesh per letter so each can move on its own
-    LINES.forEach((line, row) => {
+    lineList.forEach((line, row) => {
       const placed: { char: string; pen: number }[] = [];
       let pen = 0;
       Array.from(line).forEach((char) => {
         placed.push({ char, pen });
-        pen +=
-          ((fontData.glyphs as Record<string, { ha: number }>)[char]?.ha ?? 0) * glyphScale +
-          LETTER_GAP;
+        pen += advanceOf(char) + LETTER_GAP;
       });
       const lineWidth = pen - LETTER_GAP;
-      const lineY = (row === 0 ? 1 : -1) * (LINE_GAP / 2) - 0.36;
+      const lineY = ((lineList.length - 1) / 2 - row) * LINE_GAP - 0.36;
 
       placed.forEach(({ char, pen: penX }) => {
-        const geometry = makeLetterGeometry(char);
+        // spaces, and characters the font lacks, just leave a gap
+        if (char === ' ' || !(fontData.glyphs as Record<string, unknown>)[char]) return;
+        const geometry = makeLetterGeometry(char, stroke);
         // give each letter its own patch of the detail textures
         const uv = geometry.attributes.uv;
         const [offsetU, offsetV] = [Math.random() * 4, Math.random() * 4];
@@ -525,15 +592,16 @@ const IceTitle = () => {
     // small chips of the same ice drifting around the title
     type Chunk = {
       mesh: THREE.Mesh;
-      rx: number;
-      ry: number;
+      fx: number; // how far out the orbit reaches, as a share of the room around the text
+      fy: number;
       cz: number;
       speed: number;
       phase: number;
       spin: THREE.Vector3;
     };
+    const room = { x: 2, y: 2 }; // free space around the text, in scene units
     const chunkGroup = new THREE.Group();
-    const chunks: Chunk[] = Array.from({ length: 14 }, () => {
+    const chunks: Chunk[] = Array.from({ length: chipCount }, () => {
       const geometry = makeChunkGeometry(Math.pow(Math.random(), 1.5) * 0.07 + 0.03);
       geometries.push(geometry);
       const mesh = new THREE.Mesh(geometry, material);
@@ -543,8 +611,8 @@ const IceTitle = () => {
       chunkGroup.add(mesh);
       return {
         mesh,
-        rx: textSize.x * 0.5 + rand(-0.2, 2.8),
-        ry: textSize.y * 0.5 + rand(0, 2),
+        fx: rand(-0.1, 0.95),
+        fy: rand(0, 0.95),
         cz: rand(-1.6, 1.2),
         speed: rand(0.018, 0.045) * (Math.random() < 0.5 ? -1 : 1),
         phase: rand(0, Math.PI * 2),
@@ -578,6 +646,7 @@ const IceTitle = () => {
     const puckGroup = new THREE.Group();
     puckGroup.add(puckFlip);
     scene.add(puckGroup);
+    puckGroup.visible = showPuck;
 
     const puck = {
       rx: textSize.x * 0.5 + 0.5,
@@ -605,6 +674,11 @@ const IceTitle = () => {
       const pxPerUnit =
         Math.min(mount.clientWidth / textSize.x, mount.clientHeight / textSize.y) * 0.98;
       camera.position.set(0, 0, hostH / pxPerUnit / (2 * halfTan) + textSize.z);
+      // slide the view so the text hugs the left edge of its box instead of the middle
+      camera.position.x =
+        align === 'left' ? Math.max(mount.clientWidth / 2 / pxPerUnit - textSize.x / 2, 0) : 0;
+      room.x = Math.max((hostW - mount.clientWidth) / 2 / pxPerUnit, 0.3);
+      room.y = Math.max((hostH - mount.clientHeight) / 2 / pxPerUnit, 0.3);
       camera.updateProjectionMatrix();
     };
 
@@ -673,112 +747,116 @@ const IceTitle = () => {
         mesh.rotation.z = Math.sin(a * 0.9 + 2.2) * 0.05 - letter.twist * 0.6;
       });
 
-      // puck: same drift as the chips, plus a springy shove away from the pointer
-      const dt = Math.min(Math.max(t - puck.last, 0), 0.05);
-      puck.last = t;
-      const puckAngle = puck.phase + t * puck.speed;
-      // a rounded-rectangle path that hugs the outside of the title
-      const [c, sn] = [Math.cos(puckAngle), Math.sin(puckAngle)];
-      const baseX = Math.sign(c) * Math.sqrt(Math.abs(c)) * puck.rx;
-      const baseY =
-        Math.sign(sn) * Math.sqrt(Math.abs(sn)) * puck.ry + Math.sin(t * 0.3 + puck.phase) * 0.08;
-      // drifts in front of and behind the title, like the chips
-      const baseZ = puck.cz + Math.sin(puckAngle * 2) * 1.3;
+      if (showPuck) {
+        // puck: same drift as the chips, plus a springy shove away from the pointer
+        const dt = Math.min(Math.max(t - puck.last, 0), 0.05);
+        puck.last = t;
+        const puckAngle = puck.phase + t * puck.speed;
+        // a rounded-rectangle path that hugs the outside of the title
+        const [c, sn] = [Math.cos(puckAngle), Math.sin(puckAngle)];
+        const baseX = Math.sign(c) * Math.sqrt(Math.abs(c)) * puck.rx;
+        const baseY =
+          Math.sign(sn) * Math.sqrt(Math.abs(sn)) * puck.ry + Math.sin(t * 0.3 + puck.phase) * 0.08;
+        // drifts in front of and behind the title, like the chips
+        const baseZ = puck.cz + Math.sin(puckAngle * 2) * 1.3;
 
-      if (easePush) {
-        const current = new THREE.Vector3(baseX, baseY, baseZ).add(puck.offset);
-        const accel = new THREE.Vector3();
-        if (pointerOver) {
-          raycaster.setFromCamera(ndc, camera);
-          const puckPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -current.z);
-          const point = new THREE.Vector3();
-          if (raycaster.ray.intersectPlane(puckPlane, point)) {
-            const dx = current.x - point.x;
-            const dy = current.y - point.y;
-            const distance = Math.hypot(dx, dy) || 0.001;
-            if (distance < PUCK_REACH) {
-              const strength = 1 - distance / PUCK_REACH;
-              accel.set((dx / distance) * strength * 34, (dy / distance) * strength * 34, 0);
-              // knocked spinning, in the direction it was hit from
-              puck.spinVelocity.x += (dy / distance) * strength * 14 * dt * 6;
-              puck.spinVelocity.y += (dx / distance) * strength * 14 * dt * 6;
+        if (easePush) {
+          const current = new THREE.Vector3(baseX, baseY, baseZ).add(puck.offset);
+          const accel = new THREE.Vector3();
+          if (pointerOver) {
+            raycaster.setFromCamera(ndc, camera);
+            const puckPlane = new THREE.Plane(new THREE.Vector3(0, 0, 1), -current.z);
+            const point = new THREE.Vector3();
+            if (raycaster.ray.intersectPlane(puckPlane, point)) {
+              const dx = current.x - point.x;
+              const dy = current.y - point.y;
+              const distance = Math.hypot(dx, dy) || 0.001;
+              if (distance < PUCK_REACH) {
+                const strength = 1 - distance / PUCK_REACH;
+                accel.set((dx / distance) * strength * 34, (dy / distance) * strength * 34, 0);
+                // knocked spinning, in the direction it was hit from
+                puck.spinVelocity.x += (dy / distance) * strength * 14 * dt * 6;
+                puck.spinVelocity.y += (dx / distance) * strength * 14 * dt * 6;
+              }
             }
           }
-        }
-        // underdamped spring back to its orbit, so it overshoots and bounces
-        puck.velocity.addScaledVector(accel, dt);
-        puck.velocity.addScaledVector(puck.offset, -3.6 * dt);
-        puck.velocity.multiplyScalar(Math.max(0, 1 - 1.3 * dt));
-        if (puck.velocity.length() > 4.5) puck.velocity.setLength(4.5);
-        puck.offset.addScaledVector(puck.velocity, dt);
-        // bounces off an invisible wall instead of flying away
-        if (puck.offset.length() > MAX_KNOCK) {
-          puck.offset.setLength(MAX_KNOCK);
-          puck.velocity.multiplyScalar(-0.45);
-        }
-
-        // the letters are solid: the puck can pass in front of or behind them, but not through
-        letters.forEach(({ mesh, halfW, halfH, halfD, centerY }) => {
-          const px = baseX + puck.offset.x;
-          const py = baseY + puck.offset.y;
-          const pz = baseZ + puck.offset.z;
-          const lx = mesh.position.x;
-          const ly = mesh.position.y + centerY;
-          const lz = mesh.position.z;
-          const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
-          let nx = px - clamp(px, lx - halfW, lx + halfW);
-          let ny = py - clamp(py, ly - halfH, ly + halfH);
-          let nz = pz - clamp(pz, lz - halfD, lz + halfD);
-          const distance = Math.hypot(nx, ny, nz);
-          let depth = PUCK_COLLIDE - distance;
-          if (depth <= 0) return;
-
-          if (distance < 0.0001) {
-            // centre is inside the box: leave by the nearest face
-            const exits = [
-              { x: -1, y: 0, z: 0, d: px - (lx - halfW) },
-              { x: 1, y: 0, z: 0, d: lx + halfW - px },
-              { x: 0, y: -1, z: 0, d: py - (ly - halfH) },
-              { x: 0, y: 1, z: 0, d: ly + halfH - py },
-              { x: 0, y: 0, z: -1, d: pz - (lz - halfD) },
-              { x: 0, y: 0, z: 1, d: lz + halfD - pz },
-            ].sort((a, b) => a.d - b.d)[0];
-            [nx, ny, nz] = [exits.x, exits.y, exits.z];
-            depth = exits.d + PUCK_COLLIDE;
-          } else {
-            nx /= distance;
-            ny /= distance;
-            nz /= distance;
+          // underdamped spring back to its orbit, so it overshoots and bounces
+          puck.velocity.addScaledVector(accel, dt);
+          puck.velocity.addScaledVector(puck.offset, -3.6 * dt);
+          puck.velocity.multiplyScalar(Math.max(0, 1 - 1.3 * dt));
+          if (puck.velocity.length() > 4.5) puck.velocity.setLength(4.5);
+          puck.offset.addScaledVector(puck.velocity, dt);
+          // bounces off an invisible wall instead of flying away
+          if (puck.offset.length() > MAX_KNOCK) {
+            puck.offset.setLength(MAX_KNOCK);
+            puck.velocity.multiplyScalar(-0.45);
           }
-          puck.offset.x += nx * depth;
-          puck.offset.y += ny * depth;
-          puck.offset.z += nz * depth;
-          const into = puck.velocity.x * nx + puck.velocity.y * ny + puck.velocity.z * nz;
-          if (into < 0) {
-            puck.velocity.x -= (1 + 0.55) * into * nx;
-            puck.velocity.y -= (1 + 0.55) * into * ny;
-            puck.velocity.z -= (1 + 0.55) * into * nz;
-            // clipped a letter: give it a little spin
-            puck.spinVelocity.z += (nx - ny) * -into * 0.6;
-          }
-        });
 
-        puck.spin.addScaledVector(puck.spinVelocity, dt);
-        puck.spinVelocity.multiplyScalar(Math.max(0, 1 - 1.3 * dt));
-        puck.spin.multiplyScalar(Math.max(0, 1 - 0.35 * dt));
+          // the letters are solid: the puck can pass in front of or behind them, but not through
+          letters.forEach(({ mesh, halfW, halfH, halfD, centerY }) => {
+            const px = baseX + puck.offset.x;
+            const py = baseY + puck.offset.y;
+            const pz = baseZ + puck.offset.z;
+            const lx = mesh.position.x;
+            const ly = mesh.position.y + centerY;
+            const lz = mesh.position.z;
+            const clamp = (v: number, lo: number, hi: number) => Math.min(Math.max(v, lo), hi);
+            let nx = px - clamp(px, lx - halfW, lx + halfW);
+            let ny = py - clamp(py, ly - halfH, ly + halfH);
+            let nz = pz - clamp(pz, lz - halfD, lz + halfD);
+            const distance = Math.hypot(nx, ny, nz);
+            let depth = PUCK_COLLIDE - distance;
+            if (depth <= 0) return;
+
+            if (distance < 0.0001) {
+              // centre is inside the box: leave by the nearest face
+              const exits = [
+                { x: -1, y: 0, z: 0, d: px - (lx - halfW) },
+                { x: 1, y: 0, z: 0, d: lx + halfW - px },
+                { x: 0, y: -1, z: 0, d: py - (ly - halfH) },
+                { x: 0, y: 1, z: 0, d: ly + halfH - py },
+                { x: 0, y: 0, z: -1, d: pz - (lz - halfD) },
+                { x: 0, y: 0, z: 1, d: lz + halfD - pz },
+              ].sort((a, b) => a.d - b.d)[0];
+              [nx, ny, nz] = [exits.x, exits.y, exits.z];
+              depth = exits.d + PUCK_COLLIDE;
+            } else {
+              nx /= distance;
+              ny /= distance;
+              nz /= distance;
+            }
+            puck.offset.x += nx * depth;
+            puck.offset.y += ny * depth;
+            puck.offset.z += nz * depth;
+            const into = puck.velocity.x * nx + puck.velocity.y * ny + puck.velocity.z * nz;
+            if (into < 0) {
+              puck.velocity.x -= (1 + 0.55) * into * nx;
+              puck.velocity.y -= (1 + 0.55) * into * ny;
+              puck.velocity.z -= (1 + 0.55) * into * nz;
+              // clipped a letter: give it a little spin
+              puck.spinVelocity.z += (nx - ny) * -into * 0.6;
+            }
+          });
+
+          puck.spin.addScaledVector(puck.spinVelocity, dt);
+          puck.spinVelocity.multiplyScalar(Math.max(0, 1 - 1.3 * dt));
+          puck.spin.multiplyScalar(Math.max(0, 1 - 0.35 * dt));
+        }
+        puckGroup.position.set(baseX, baseY, baseZ).add(puck.offset);
+        // faces the viewer, slowly turning over so the smile and the scowl each get a turn
+        // no spin about its own axis, so the faces stay upright
+        puckMesh.rotation.set(
+          Math.PI / 2 - 0.2 + Math.sin(t * 0.25 + puck.phase) * 0.25,
+          0,
+          Math.sin(t * 0.2 + puck.phase) * 0.12
+        );
+        puckFlip.rotation.set(puck.spin.x, t * 0.35 + puck.spin.y, puck.spin.z);
       }
-      puckGroup.position.set(baseX, baseY, baseZ).add(puck.offset);
-      // faces the viewer, slowly turning over so the smile and the scowl each get a turn
-      // no spin about its own axis, so the faces stay upright
-      puckMesh.rotation.set(
-        Math.PI / 2 - 0.2 + Math.sin(t * 0.25 + puck.phase) * 0.25,
-        0,
-        Math.sin(t * 0.2 + puck.phase) * 0.12
-      );
-      puckFlip.rotation.set(puck.spin.x, t * 0.35 + puck.spin.y, puck.spin.z);
 
-      chunks.forEach(({ mesh, rx, ry, cz, speed, phase, spin }) => {
+      chunks.forEach(({ mesh, fx, fy, cz, speed, phase, spin }) => {
         const angle = phase + t * speed;
+        const rx = textSize.x * 0.5 + fx * room.x;
+        const ry = textSize.y * 0.5 + fy * room.y;
         mesh.position.set(
           Math.cos(angle) * rx,
           Math.sin(angle) * ry + Math.sin(t * 0.3 + phase) * 0.12,
@@ -834,12 +912,20 @@ const IceTitle = () => {
       renderer.dispose();
       host.removeChild(renderer.domElement);
     };
-  }, []);
+  }, [linesKey, chipCount, showPuck, align, stroke, solid, bodyOpacity, light]);
+
+  const boxAspect = aspect ?? (linesKey === DEFAULT_LINES.join('\n') ? 1.7 : iceAspect(lines));
 
   if (failed) {
     return (
-      <Text fontFamily="heading" fontWeight="bold" fontSize="48px" lineHeight="1" color="white">
-        Hockey Pockey
+      <Text
+        fontFamily="heading"
+        fontWeight="bold"
+        fontSize="48px"
+        lineHeight="1"
+        color={fallbackColor}
+      >
+        {lines.join(' ')}
       </Text>
     );
   }
@@ -848,13 +934,14 @@ const IceTitle = () => {
     <Box
       ref={mountRef}
       role="img"
-      aria-label="Hockey Pockey"
-      w="full"
-      aspectRatio="1.7"
+      aria-label={lines.join(' ')}
+      w={height ? `${Math.round(boxAspect * height)}px` : 'full'}
+      maxW="100%"
+      aspectRatio={boxAspect}
       position="relative"
     >
       {/* larger than the title so the ice chunks can drift around it */}
-      <Box ref={hostRef} position="absolute" inset="-55% -32%" pointerEvents="none" />
+      <Box ref={hostRef} position="absolute" inset={bleed} pointerEvents="none" />
     </Box>
   );
 };

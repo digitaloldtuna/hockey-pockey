@@ -12,8 +12,8 @@ type Props = {
 const AuthField = ({ name, label, type = 'text', placeholder, autoComplete }: Props) => (
   <FormField name={name}>
     {({ field }: FieldProps) => (
-      <Field.Root width="full">
-        <Field.Label fontWeight="semibold" fontSize="12px">
+      <Field.Root width="full" gap="1">
+        <Field.Label fontWeight="semibold" fontSize="11px">
           {label}
         </Field.Label>
         <Input
@@ -21,9 +21,10 @@ const AuthField = ({ name, label, type = 'text', placeholder, autoComplete }: Pr
           type={type}
           placeholder={placeholder}
           autoComplete={autoComplete}
-          minH="44px"
-          px="14px"
-          rounded="12px"
+          h="36px"
+          px="12px"
+          rounded="10px"
+          fontSize="13px"
           bg="white"
           border="1px solid"
           borderColor="line"
@@ -45,9 +46,9 @@ export const SubmitButton = ({ children }: { children: React.ReactNode }) => (
   <button
     type="submit"
     style={{
-      minHeight: 44,
-      marginTop: 8,
-      borderRadius: 12,
+      minHeight: 38,
+      marginTop: 4,
+      borderRadius: 10,
       border: '1px solid #16263A',
       background: '#2E4058',
       color: '#fff',

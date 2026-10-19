@@ -49,10 +49,10 @@ const History = () => {
       <PageHeader title="History" note="Past games with your teams" />
 
       <Grid templateColumns="repeat(auto-fit, minmax(min(150px, 100%), 1fr))" gap="3">
-        <StatTile label="Wins" value={wins} bg="ownerMint" />
+        <StatTile label="Wins" value={wins} bg="ownerSage" />
         <StatTile label="Losses" value={losses} bg="loss" delay="0.06s" />
-        <StatTile label="Win rate" value={winRate} bg="ownerBlue" delay="0.12s" />
-        <StatTile label="Games" value={counted} bg="ownerYellow" delay="0.18s" />
+        <StatTile label="Win rate" value={winRate} bg="ownerSky" delay="0.12s" />
+        <StatTile label="Games" value={counted} bg="ownerSun" delay="0.18s" />
       </Grid>
 
       <Flex role="group" aria-label="Filter by result" wrap="wrap" gap="2">

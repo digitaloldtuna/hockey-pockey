@@ -13,7 +13,14 @@ import {
 import { Game } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { useDraft } from '../../../hooks/useDraft';
-import { formatDate, getOwnerColour, OWNER_HEX, todayET } from '../../../utils';
+import {
+  formatDate,
+  memberColour,
+  memberHex,
+  placements,
+  readableOn,
+  todayET,
+} from '../../../utils';
 
 const ordinal = (n: number) =>
   ['th', 'st', 'nd', 'rd'][n % 100 > 10 && n % 100 < 14 ? 0 : n % 10 < 4 ? n % 10 : 0];
@@ -43,9 +50,17 @@ const Home = () => {
   const allGames = (upcomingGames ?? []).flatMap(([, games]) => games);
   const todayGames = (upcomingGames ?? []).find(([date]) => date === today)?.[1] ?? [];
 
-  const rank = leaderboard ? leaderboard.findIndex((m) => m.id === profile?.id) + 1 : 0;
+  // tied scores share a place
+  const places = leaderboard ? placements(leaderboard, (m) => m.score) : [];
+  const myIndex = leaderboard ? leaderboard.findIndex((m) => m.id === profile?.id) : -1;
+  const rank = myIndex >= 0 ? places[myIndex] : 0;
+  const tied = rank > 0 && places.filter((place) => place === rank).length > 1;
   const myScore = leaderboard?.find((m) => m.id === profile?.id)?.score ?? 0;
   const leaderScore = leaderboard?.[0]?.score ?? 0;
+  // who is out in front; if several are tied there, name the first and count the rest
+  const leaders = leaderboard?.filter((m) => m.score === leaderScore) ?? [];
+  const leaderNames =
+    leaders.length > 1 ? `${leaders[0].name} +${leaders.length - 1}` : (leaders[0]?.name ?? '');
 
   const loading = (
     <Center w="full" py="8">
@@ -65,23 +80,23 @@ const Home = () => {
             rank === 0
               ? undefined
               : rank === 1
-                ? '1st place'
-                : `${rank}${ordinal(rank)} place · ${leaderScore - myScore} behind`
+                ? `${tied ? 'tied for ' : ''}1st place`
+                : `${tied ? 'tied for ' : ''}${rank}${ordinal(rank)} place · ${leaderScore - myScore} behind ${leaderNames}`
           }
-          bg="ownerPink"
+          bg="ownerLavender"
         />
         <StatTile
           label="Games today"
           value={todayGames.length}
           sub={`${todayGames.filter(isMine).length} with your teams`}
-          bg="ownerYellow"
+          bg="ownerSun"
           delay="0.08s"
         />
         <StatTile
           label="This week"
           value={allGames.length}
           sub={`${allGames.filter(isMine).length} with your teams`}
-          bg="ownerBlue"
+          bg="ownerSky"
           delay="0.16s"
         />
       </Grid>
@@ -108,7 +123,7 @@ const Home = () => {
                 right={`${games.length} ${games.length === 1 ? 'game' : 'games'}`}
               >
                 {date === today && (
-                  <Pill bg="ownerPink" blink>
+                  <Pill bg="ownerLavender" blink>
                     TODAY
                   </Pill>
                 )}
@@ -150,7 +165,7 @@ const Home = () => {
                   label="Share of total points by player"
                   segments={leaderboard.map((m) => ({
                     value: m.score,
-                    fill: OWNER_HEX[getOwnerColour(m.id)],
+                    fill: memberHex(m),
                   }))}
                 />
               </Flex>
@@ -165,17 +180,17 @@ const Home = () => {
                     py="1.5"
                     rounded="12px"
                     border="1px solid #B3C1D0"
-                    bg={member.id === profile?.id ? 'pinkWash' : 'white'}
+                    bg={member.id === profile?.id ? 'lavenderWash' : 'white'}
                   >
                     <Text w="14px" flex="none" fontWeight="bold" fontSize="13px" color="inkMuted">
-                      {i + 1}
+                      {places[i]}
                     </Text>
                     <Avatar.Root
                       size="sm"
                       flex="none"
                       border="1px solid #4B6079"
-                      bg={getOwnerColour(member.id)}
-                      color="ink"
+                      bg={memberColour(member)}
+                      color={readableOn(member.colour)}
                     >
                       <Avatar.Fallback name={member.name} />
                       <Avatar.Image src={member.profileImage || undefined} />

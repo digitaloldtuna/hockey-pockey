@@ -11,7 +11,7 @@ import {
 } from '@chakra-ui/react';
 import { Game, Profile } from '../constants/types';
 import { useAuthentication } from '../hooks/useAuthentication';
-import { getAvatarColour } from '../utils';
+import { memberColour, readableOn } from '../utils';
 
 // get time in HH:MM (AM or PM)
 function formatTime12(iso: string): string {
@@ -48,7 +48,8 @@ const HistoryCard = ({ game }: { game: Game }) => {
         height="18px"
         minH="0"
         fontSize="10px"
-        colorPalette={member ? getAvatarColour(member.id) : 'yellow'}
+        bg={memberColour(member)}
+        color={readableOn(member?.colour)}
       >
         <Tag.Label>{member ? member.name : 'unclaimed'}</Tag.Label>
       </Tag.Root>

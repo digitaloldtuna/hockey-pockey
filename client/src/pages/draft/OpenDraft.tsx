@@ -20,7 +20,7 @@ import { Tooltip } from '../../theme/tooltip';
 import { X } from 'lucide-react';
 import api from '../../api';
 import { useState } from 'react';
-import { getAvatarColour } from '../../utils';
+import { memberColour, readableOn } from '../../utils';
 
 type Props = {
   draft: Draft;
@@ -35,6 +35,7 @@ const OpenDraft = ({ draft }: Props) => {
       name: member.name,
       email: member.email || '',
       profileImage: member.profileImage,
+      colour: member.colour,
     }))
   );
   const isOwner = profile && draft.owner ? profile.id === draft.owner : false;
@@ -127,7 +128,7 @@ const OpenDraft = ({ draft }: Props) => {
             {members.map((member) => (
               <HStack key={member.name} justify="space-between">
                 <HStack gap="4">
-                  <Avatar.Root colorPalette={getAvatarColour(member.id)}>
+                  <Avatar.Root bg={memberColour(member)} color={readableOn(member.colour)}>
                     <Avatar.Fallback name={member.name} />
                     <Avatar.Image src={member.profileImage || undefined} />
                   </Avatar.Root>
@@ -135,7 +136,7 @@ const OpenDraft = ({ draft }: Props) => {
                     <HStack>
                       <Text fontWeight="medium">{member.name}</Text>
                       {member.owner && (
-                        <Tag.Root size="sm" gap="3" colorPalette={'red'}>
+                        <Tag.Root size="sm" gap="3" bg="ownerFlame" color="ink">
                           <Tag.Label>owner</Tag.Label>
                         </Tag.Root>
                       )}

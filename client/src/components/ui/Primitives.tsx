@@ -1,13 +1,35 @@
 import { Box, Flex, Heading, Image, Text } from '@chakra-ui/react';
-import { ReactNode } from 'react';
+import { lazy, ReactNode, Suspense } from 'react';
+
+// loaded on demand so three.js stays out of the main bundle
+const IceTitle = lazy(() => import('../IceTitle'));
+const TITLE_HEIGHT = 62;
 
 export const PageHeader = ({ title, note }: { title: ReactNode; note?: ReactNode }) => (
-  <Flex wrap="wrap" align="baseline" justify="space-between" columnGap="4" rowGap="1">
-    <Heading as="h1" fontSize="28px" lineHeight="1.1">
-      {title}
-    </Heading>
+  <Flex wrap="wrap" align="center" justify="space-between" columnGap="4" rowGap="1">
+    {typeof title === 'string' ? (
+      // the title is drawn as moving ice; the label keeps it readable to screen readers
+      <Box role="heading" aria-level={1} maxW="100%">
+        <Suspense fallback={<Box h={`${TITLE_HEIGHT}px`} />}>
+          <IceTitle
+            lines={[title]}
+            height={TITLE_HEIGHT}
+            chips={6}
+            puck={false}
+            align="left"
+            stroke={0.75}
+            bleed="-110% -4%"
+            fallbackColor="var(--chakra-colors-sidebarText)"
+          />
+        </Suspense>
+      </Box>
+    ) : (
+      <Heading as="h1" fontSize="28px" lineHeight="1.1">
+        {title}
+      </Heading>
+    )}
     {note && (
-      <Text color="inkMuted" fontWeight="medium">
+      <Text color="sidebarMuted" fontWeight="medium">
         {note}
       </Text>
     )}
@@ -108,10 +130,12 @@ export const DayHeader = ({
 export const Pill = ({
   children,
   bg,
+  color = 'ink',
   blink,
 }: {
   children: ReactNode;
   bg: string;
+  color?: string;
   blink?: boolean;
 }) => (
   <Text
@@ -124,7 +148,7 @@ export const Pill = ({
     bg={bg}
     fontWeight="semibold"
     fontSize="10px"
-    color="ink"
+    color={color}
   >
     {children}
   </Text>

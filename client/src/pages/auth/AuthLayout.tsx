@@ -1,22 +1,20 @@
 import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { lazy, Suspense } from 'react';
-import { useNavigate } from 'react-router-dom';
+import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 
 const IceTitle = lazy(() => import('../../components/IceTitle'));
-
-interface AuthLayoutProps {
-  mode: 'login' | 'signup';
-  children: React.ReactNode;
-}
 
 const COPY = {
   login: { heading: 'Welcome back', sub: 'Log in to see how your teams are doing.' },
   signup: { heading: 'Join the league', sub: 'Create an account to start drafting.' },
 };
 
-const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
+// Wraps both auth routes, so the 3D title and background stay mounted when switching tabs
+const AuthLayout = () => {
   const navigate = useNavigate();
+  const { pathname } = useLocation();
+  const mode: 'login' | 'signup' = pathname === ROUTES.SIGNUP ? 'signup' : 'login';
 
   const toggle = (key: 'login' | 'signup', label: string) => {
     const on = mode === key;
@@ -26,14 +24,14 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
         aria-pressed={on}
         onClick={() => !on && navigate(key === 'login' ? ROUTES.LOGIN : ROUTES.SIGNUP)}
         flex="1"
-        minH="44px"
+        minH="36px"
         rounded="10px"
         border="1px solid"
         borderColor={on ? '#5E7189' : 'transparent'}
         bg={on ? 'mist' : 'transparent'}
         color="ink"
         fontWeight={on ? 'bold' : 'medium'}
-        fontSize="13px"
+        fontSize="12px"
         cursor="pointer"
       >
         {label}
@@ -75,7 +73,7 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
       <Flex
         position="relative"
         direction="column"
-        gap="4"
+        gap="3"
         w="full"
         maxW="440px"
         flex="none"
@@ -87,11 +85,11 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
         rounded="panel"
         boxShadow="0 18px 40px rgba(10, 25, 55, 0.35)"
       >
-        <Box className="rise">
-          <Heading as="h1" fontSize="28px" lineHeight="1.15">
+        <Box key={mode} className="rise">
+          <Heading as="h1" fontSize="24px" lineHeight="1.15">
             {COPY[mode].heading}
           </Heading>
-          <Text mt="1.5" fontSize="13px" color="inkMuted">
+          <Text mt="1" fontSize="12px" color="inkMuted">
             {COPY[mode].sub}
           </Text>
         </Box>
@@ -107,7 +105,7 @@ const AuthLayout = ({ mode, children }: AuthLayoutProps) => {
           {toggle('login', 'Log in')}
           {toggle('signup', 'Sign up')}
         </Flex>
-        {children}
+        <Outlet />
       </Flex>
     </Flex>
   );

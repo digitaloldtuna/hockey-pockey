@@ -5,7 +5,6 @@ import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
 import SkateBackground from '../SkateBackground';
 import { useAuthentication } from '../../hooks/useAuthentication';
-import { PuckMark, Snowflake } from './Brand';
 
 export type NavItem = {
   key: string;
@@ -60,7 +59,7 @@ const BackButton = ({ back }: { back: BackLink }) => (
   </SidebarButton>
 );
 
-const Brand = ({ size }: { size: number }) => {
+const Brand = () => {
   const navigate = useNavigate();
   return (
     <Box
@@ -74,7 +73,6 @@ const Brand = ({ size }: { size: number }) => {
       cursor="pointer"
       aria-label="Hockey Pockey home"
     >
-      <PuckMark size={size} />
       <Text fontFamily="heading" fontWeight="bold" fontSize="18px" lineHeight="1" color="white">
         Hockey Pockey
       </Text>
@@ -113,7 +111,7 @@ const MobileBar = ({
       overflow="hidden"
     >
       <Flex align="center" gap="2" px="3" py="1.5">
-        {showBrand && <Brand size={30} />}
+        {showBrand && <Brand />}
         <Flex flex="1" justify="space-between" gap="1">
           {nav?.map((item) => (
             <Box
@@ -191,7 +189,7 @@ const AppShell = ({
       minH="100vh"
       direction={{ base: 'column', md: 'row' }}
       align="stretch"
-      bg="#98adc0"
+      bg="#4d657e"
     >
       <SkateBackground fixed />
       <MobileBar nav={nav} aside={aside} back={back} showBrand={showBrand} />
@@ -217,7 +215,7 @@ const AppShell = ({
         borderColor="mist"
         rounded="panel"
       >
-        <Brand size={38} />
+        <Brand />
 
         {aside}
 
@@ -251,9 +249,8 @@ const AppShell = ({
           </Box>
         )}
 
-        <Box alignSelf="center" mt="auto">
-          <Snowflake />
-        </Box>
+        {/* pushes Log out to the bottom */}
+        <Box mt="auto" />
 
         <SidebarButton onClick={handleLogout} icon={<LogOut size={18} />}>
           Log out
