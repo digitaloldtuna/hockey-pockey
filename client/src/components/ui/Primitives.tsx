@@ -5,7 +5,7 @@ import { lazy, ReactNode, Suspense } from 'react';
 const IceTitle = lazy(() => import('../IceTitle'));
 const TITLE_HEIGHT = 62;
 
-export const PageHeader = ({ title, note }: { title: ReactNode; note?: ReactNode }) => (
+export const PageHeader = ({ title }: { title: ReactNode }) => (
   <Flex wrap="wrap" align="center" justify="space-between" columnGap="4" rowGap="1">
     {typeof title === 'string' ? (
       // the title is drawn as moving ice; the label keeps it readable to screen readers
@@ -27,11 +27,6 @@ export const PageHeader = ({ title, note }: { title: ReactNode; note?: ReactNode
       <Heading as="h1" fontSize="28px" lineHeight="1.1">
         {title}
       </Heading>
-    )}
-    {note && (
-      <Text color="sidebarMuted" fontWeight="medium">
-        {note}
-      </Text>
     )}
   </Flex>
 );

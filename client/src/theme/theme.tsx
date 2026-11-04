@@ -36,7 +36,7 @@ const config = defineConfig({
         // design library
         ink: { value: '#16263A' },
         inkMuted: { value: '#4F6378' },
-        page: { value: '#E3EBF3' },
+        page: { value: '#4D657E' },
         card: { value: '#F4F8FB' },
         line: { value: '#8FA1B5' },
         lineSoft: { value: '#C9D6E4' },
@@ -80,6 +80,8 @@ const config = defineConfig({
     },
     html: {
       colorPalette: 'blue',
+      bg: 'page',
+      overscrollBehavior: 'none',
     },
     h1: { fontFamily: 'heading', fontWeight: 'bold' },
     h2: { fontFamily: 'heading', fontWeight: 'bold' },

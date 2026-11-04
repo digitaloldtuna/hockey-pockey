@@ -1,3 +1,11 @@
+/* Never show a different colour past the edges of the page: paint it from the first frame and
+   switch off the rubber-band scroll that reveals it. Login and signup override the colour. */
+html,
+body {
+  background-color: #4d657e;
+  overscroll-behavior: none;
+}
+
 body {
   margin: 0;
   -webkit-font-smoothing: antialiased;

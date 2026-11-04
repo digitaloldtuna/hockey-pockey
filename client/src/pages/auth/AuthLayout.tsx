@@ -2,6 +2,7 @@ import { Box, Flex, Heading, Text } from '@chakra-ui/react';
 import { lazy, Suspense } from 'react';
 import { Outlet, useLocation, useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
+import { usePageBackground } from '../../hooks/usePageBackground';
 
 const IceTitle = lazy(() => import('../../components/IceTitle'));
 
@@ -14,6 +15,7 @@ const COPY = {
 const AuthLayout = () => {
   const navigate = useNavigate();
   const { pathname } = useLocation();
+  usePageBackground('#071b33');
   const mode: 'login' | 'signup' = pathname === ROUTES.SIGNUP ? 'signup' : 'login';
 
   const toggle = (key: 'login' | 'signup', label: string) => {

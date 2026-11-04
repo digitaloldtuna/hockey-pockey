@@ -45,7 +45,7 @@ const Draft = () => {
       );
     } else if (draft.status === 'closed') {
       return (
-        <DraftLayout title={draft.name}>
+        <DraftLayout title={draft.name} iceTitle="Final Standings">
           <ClosedDraft draft={draft} />
         </DraftLayout>
       );

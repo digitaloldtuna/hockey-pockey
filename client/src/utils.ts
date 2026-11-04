@@ -126,3 +126,7 @@ export const placements = <T>(sorted: T[], keyOf: (item: T) => string | number):
   });
   return places;
 };
+
+// 1 -> "st", 2 -> "nd", 3 -> "rd", 11 -> "th"
+export const ordinal = (n: number) =>
+  ['th', 'st', 'nd', 'rd'][n % 100 > 10 && n % 100 < 14 ? 0 : n % 10 < 4 ? n % 10 : 0];

@@ -134,7 +134,7 @@ const Standings = () => {
 
   return (
     <>
-      <PageHeader title="Standings" note="Teams in this draft" />
+      <PageHeader title="Standings" />
 
       <Grid templateColumns="repeat(auto-fit, minmax(min(180px, 100%), 1fr))" gap="3">
         <StatTile

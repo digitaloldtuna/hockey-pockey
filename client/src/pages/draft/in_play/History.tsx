@@ -46,7 +46,7 @@ const History = () => {
 
   return (
     <>
-      <PageHeader title="History" note="Past games with your teams" />
+      <PageHeader title="History" />
 
       <Grid templateColumns="repeat(auto-fit, minmax(min(150px, 100%), 1fr))" gap="3">
         <StatTile label="Wins" value={wins} bg="ownerSage" />

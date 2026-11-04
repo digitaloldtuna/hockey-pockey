@@ -3,8 +3,8 @@ import { ArrowLeft, LogOut, Menu, X } from 'lucide-react';
 import { ReactNode, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { ROUTES } from '../../constants/routes';
-import SkateBackground from '../SkateBackground';
 import { useAuthentication } from '../../hooks/useAuthentication';
+import { usePageBackground } from '../../hooks/usePageBackground';
 
 export type NavItem = {
   key: string;
@@ -167,6 +167,9 @@ const MobileBar = ({
 };
 
 // persistent left sidebar on desktop, pinned top bar on mobile
+// same colour as the shell's own background, so over-scrolling never shows another one
+const SHELL_BACKGROUND = '#4d657e';
+
 const AppShell = ({
   nav,
   aside,
@@ -181,6 +184,7 @@ const AppShell = ({
   children: ReactNode;
 }) => {
   const { handleLogout } = useAuthentication();
+  usePageBackground(SHELL_BACKGROUND);
 
   return (
     <Flex
@@ -189,9 +193,8 @@ const AppShell = ({
       minH="100vh"
       direction={{ base: 'column', md: 'row' }}
       align="stretch"
-      bg="#4d657e"
+      bg={SHELL_BACKGROUND}
     >
-      <SkateBackground fixed />
       <MobileBar nav={nav} aside={aside} back={back} showBrand={showBrand} />
 
       <Flex
