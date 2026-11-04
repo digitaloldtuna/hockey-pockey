@@ -6,6 +6,7 @@ import { useAuthentication } from '../hooks/useAuthentication';
 import { Upload } from 'lucide-react';
 import api from '../api';
 import ColourPicker from './ColourPicker';
+import NotificationSettings from './NotificationSettings';
 
 interface ProfileFormValues {
   name: string;
@@ -87,100 +88,103 @@ const Profile = () => {
   };
 
   return (
-    <Formik initialValues={initialValues} onSubmit={onSubmit}>
-      {({ setFieldValue, values }) => (
-        <Form>
-          <VStack align="stretch" gap="2">
-            <Text
-              px="10px"
-              fontWeight="bold"
-              fontSize="10px"
-              letterSpacing="0.12em"
-              textTransform="uppercase"
-              color="#A9BCD2"
-            >
-              Profile
-            </Text>
-
-            <Flex align="center" gap="3">
-              <Avatar.Root
-                size="lg"
-                flex="none"
-                border="1px solid #5E7189"
-                name={values.name}
-                src={previewUrl || undefined}
+    <>
+      <Formik initialValues={initialValues} onSubmit={onSubmit}>
+        {({ setFieldValue, values }) => (
+          <Form>
+            <VStack align="stretch" gap="2">
+              <Text
+                px="10px"
+                fontWeight="bold"
+                fontSize="10px"
+                letterSpacing="0.12em"
+                textTransform="uppercase"
+                color="#A9BCD2"
               >
-                <Avatar.Fallback name={profile?.name || ''} />
-                <Avatar.Image src={previewUrl || undefined} />
-              </Avatar.Root>
-              <FileUpload.Root
-                maxFiles={1}
-                accept={{ 'image/*': [] }}
-                onFileAccept={(details: { files: File[] }) =>
-                  handleFileChange(details.files, setFieldValue)
-                }
-              >
-                <FileUpload.HiddenInput />
-                <FileUpload.Trigger asChild>
-                  <Button variant="outline" size="xs" rounded="10px" color="sidebarText">
-                    <Upload size={14} /> Change photo
-                  </Button>
-                </FileUpload.Trigger>
-              </FileUpload.Root>
-            </Flex>
-            {previewUrl && (
-              <Text fontSize="10px" color="sidebarMuted">
-                Your image is publicly accessible.
+                Profile
               </Text>
-            )}
 
-            <FormField name="name">
-              {({ field }: { field: any }) => (
-                <Field.Root>
-                  <Field.Label fontSize="11px" color="sidebarMuted">
-                    Name
-                  </Field.Label>
-                  <Input {...field} placeholder="Your name" {...inputStyle} />
-                </Field.Root>
+              <Flex align="center" gap="3">
+                <Avatar.Root
+                  size="lg"
+                  flex="none"
+                  border="1px solid #5E7189"
+                  name={values.name}
+                  src={previewUrl || undefined}
+                >
+                  <Avatar.Fallback name={profile?.name || ''} />
+                  <Avatar.Image src={previewUrl || undefined} />
+                </Avatar.Root>
+                <FileUpload.Root
+                  maxFiles={1}
+                  accept={{ 'image/*': [] }}
+                  onFileAccept={(details: { files: File[] }) =>
+                    handleFileChange(details.files, setFieldValue)
+                  }
+                >
+                  <FileUpload.HiddenInput />
+                  <FileUpload.Trigger asChild>
+                    <Button variant="outline" size="xs" rounded="10px" color="sidebarText">
+                      <Upload size={14} /> Change photo
+                    </Button>
+                  </FileUpload.Trigger>
+                </FileUpload.Root>
+              </Flex>
+              {previewUrl && (
+                <Text fontSize="10px" color="sidebarMuted">
+                  Your image is publicly accessible.
+                </Text>
               )}
-            </FormField>
 
-            <FormField name="email">
-              {({ field }: { field: any }) => (
-                <Field.Root>
-                  <Field.Label fontSize="11px" color="sidebarMuted">
-                    Email
-                  </Field.Label>
-                  <Input {...field} disabled {...inputStyle} />
-                </Field.Root>
-              )}
-            </FormField>
+              <FormField name="name">
+                {({ field }: { field: any }) => (
+                  <Field.Root>
+                    <Field.Label fontSize="11px" color="sidebarMuted">
+                      Name
+                    </Field.Label>
+                    <Input {...field} placeholder="Your name" {...inputStyle} />
+                  </Field.Root>
+                )}
+              </FormField>
 
-            <Field.Root>
-              <Field.Label fontSize="11px" color="sidebarMuted">
-                Your colour
-              </Field.Label>
-              <ColourPicker
-                value={values.colour}
-                onChange={(colour) => setFieldValue('colour', colour)}
-              />
-            </Field.Root>
+              <FormField name="email">
+                {({ field }: { field: any }) => (
+                  <Field.Root>
+                    <Field.Label fontSize="11px" color="sidebarMuted">
+                      Email
+                    </Field.Label>
+                    <Input {...field} disabled {...inputStyle} />
+                  </Field.Root>
+                )}
+              </FormField>
 
-            <Button
-              type="submit"
-              size="sm"
-              rounded="10px"
-              bg="mist"
-              color="ink"
-              border="1px solid #5E7189"
-              _hover={{ bg: '#D5DEE7' }}
-            >
-              Save changes
-            </Button>
-          </VStack>
-        </Form>
-      )}
-    </Formik>
+              <Field.Root>
+                <Field.Label fontSize="11px" color="sidebarMuted">
+                  Your colour
+                </Field.Label>
+                <ColourPicker
+                  value={values.colour}
+                  onChange={(colour) => setFieldValue('colour', colour)}
+                />
+              </Field.Root>
+
+              <Button
+                type="submit"
+                size="sm"
+                rounded="10px"
+                bg="mist"
+                color="ink"
+                border="1px solid #5E7189"
+                _hover={{ bg: '#D5DEE7' }}
+              >
+                Save changes
+              </Button>
+            </VStack>
+          </Form>
+        )}
+      </Formik>
+      <NotificationSettings />
+    </>
   );
 };
 

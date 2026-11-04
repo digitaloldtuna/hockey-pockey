@@ -24,3 +24,42 @@ export const getPoint = (gameType: number) => {
 export const isFinalGame = (season: number, gameId: number) => {
   return finalGameMapping[String(season)] === gameId;
 };
+
+// short team names for notifications, keyed by the three-letter code
+const teamNicknames: Record<string, string> = {
+  ANA: 'Ducks',
+  BOS: 'Bruins',
+  BUF: 'Sabres',
+  CGY: 'Flames',
+  CAR: 'Hurricanes',
+  CHI: 'Blackhawks',
+  COL: 'Avalanche',
+  CBJ: 'Blue Jackets',
+  DAL: 'Stars',
+  DET: 'Red Wings',
+  EDM: 'Oilers',
+  FLA: 'Panthers',
+  LAK: 'Kings',
+  MIN: 'Wild',
+  MTL: 'Canadiens',
+  NSH: 'Predators',
+  NJD: 'Devils',
+  NYI: 'Islanders',
+  NYR: 'Rangers',
+  OTT: 'Senators',
+  PHI: 'Flyers',
+  PIT: 'Penguins',
+  SEA: 'Kraken',
+  SJS: 'Sharks',
+  STL: 'Blues',
+  TBL: 'Lightning',
+  TOR: 'Maple Leafs',
+  UTA: 'Mammoth',
+  VAN: 'Canucks',
+  VGK: 'Golden Knights',
+  WSH: 'Capitals',
+  WPG: 'Jets',
+};
+
+export const getTeamNickname = (team: { code: string; fullName: string }) =>
+  teamNicknames[team.code] ?? team.fullName;

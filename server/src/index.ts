@@ -11,6 +11,9 @@ import cookieParser from 'cookie-parser';
 
 const app = express();
 
+// Railway puts a proxy in front of the app; trusting it lets rate limits see the real visitor
+app.set('trust proxy', 1);
+
 console.log('setting up APIs');
 
 // Enable CORS for all routes
@@ -31,6 +34,8 @@ app.use('/healthcheck', (req, res) => {
 });
 app.use('/api/authentication', authRouter);
 app.use('/api', authenticate, router);
+// an unknown API path is an error, not a reason to send back the web page
+app.use('/api', (_req, res) => res.status(404).json({ error: 'Not found' }));
 
 // Serve frontend
 app.use(express.static(path.join(__dirname, '../../client/build')));

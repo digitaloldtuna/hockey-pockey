@@ -3,6 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import api from '../api';
 import { ROUTES } from '../constants/routes';
 import { Profile, Session } from '../constants/types';
+import { releaseThisDevice } from '../push';
 import { toastError } from '../theme/toaster';
 
 interface AuthContextType {
@@ -82,6 +83,8 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const handleLogout = async () => {
     try {
       setLoading(true);
+      // stop this device getting the account's notifications; needs the login, so it goes first
+      await releaseThisDevice();
       await api.post('/authentication/logout');
     } finally {
       // Always wipe client state

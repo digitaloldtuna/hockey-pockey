@@ -152,3 +152,16 @@ export const submitDraft = async ({ draftId }: { draftId: number }) => {
 
   return data;
 };
+
+export const getInPlayDrafts = async (): Promise<
+  { id: number; name: string; season: number }[]
+> => {
+  const { data, error } = await supabase
+    .from('drafts')
+    .select('id,name,season')
+    .eq('status', 'in_play');
+  if (error) {
+    throw Error(`Error fetching drafts in play: ${error.message}`);
+  }
+  return data ?? [];
+};

@@ -190,3 +190,23 @@ const getDateRange = (start: string, end: string): string[] => {
 
   return result;
 };
+
+// Games that have finished since a date (YYYY-MM-DD). Much cheaper than loading a whole season.
+export const getFinishedGamesSince = async ({
+  season,
+  since,
+}: {
+  season: number;
+  since: string;
+}): Promise<Game[]> => {
+  const { data, error } = await supabase
+    .from('games')
+    .select('*')
+    .eq('season', getApiSeason(season))
+    .eq('gameStateId', 7)
+    .gte('gameDate', since);
+  if (error) {
+    throw Error(`Cannot fetch finished games: ${error.message}`);
+  }
+  return data ?? [];
+};
