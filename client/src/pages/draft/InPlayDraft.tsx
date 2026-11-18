@@ -1,15 +1,13 @@
 import { Box, Text } from '@chakra-ui/react';
 import { ChartBar, Copy, History, Home, RefreshCcw, Users } from 'lucide-react';
-import { ReactNode, useState } from 'react';
-import { useNavigate } from 'react-router-dom';
-import { ROUTES } from '../../constants/routes';
+import { ReactNode } from 'react';
+import { Navigate, useNavigate, useParams } from 'react-router-dom';
+import { DRAFT_TABS, DraftTab, draftPath, ROUTES } from '../../constants/routes';
 import { NavItem } from '../../components/ui';
 import { useDraft } from '../../hooks/useDraft';
 import { toastSuccess } from '../../theme/toaster';
 import Layout from '../Layout';
 import { InPlayHistory, InPlayHome, InPlayStandings, InPlayStats } from './in_play';
-
-type Tab = 'home' | 'standings' | 'stats' | 'history';
 
 const formatLastRefreshed = (date?: Date) => {
   if (!date) {
@@ -31,7 +29,7 @@ const formatLastRefreshed = (date?: Date) => {
   return `${diffInDays} day${diffInDays !== 1 ? 's' : ''} ago`;
 };
 
-const CONTENT: Record<Tab, ReactNode> = {
+const CONTENT: Record<DraftTab, ReactNode> = {
   home: <InPlayHome />,
   standings: <InPlayStandings />,
   stats: <InPlayStats />,
@@ -40,18 +38,24 @@ const CONTENT: Record<Tab, ReactNode> = {
 
 const InPlayDraft = () => {
   const navigate = useNavigate();
-  const [tab, setTab] = useState<Tab>('home');
+  // the tab is part of the address (/draft/3/stats), so reloading or sharing a link keeps it
+  const { tab: tabParam } = useParams<{ tab?: string }>();
   const { draft, refresh, isRefreshing, envVariables } = useDraft();
   if (!draft) {
     return <></>;
   }
 
-  const item = (key: Tab, label: string, icon: ReactNode): NavItem => ({
+  const tab = (tabParam ?? 'home') as DraftTab;
+  if (!DRAFT_TABS.includes(tab) || tabParam === 'home') {
+    return <Navigate to={draftPath(draft.id)} replace />;
+  }
+
+  const item = (key: DraftTab, label: string, icon: ReactNode): NavItem => ({
     key,
     label,
     icon,
     active: tab === key,
-    onClick: () => setTab(key),
+    onClick: () => navigate(draftPath(draft.id, key)),
   });
 
   const copyCode = () => {

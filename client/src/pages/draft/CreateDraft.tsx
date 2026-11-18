@@ -1,6 +1,7 @@
 import { Box, Button, Flex, Heading, Input, Text } from '@chakra-ui/react';
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { draftPath } from '../../constants/routes';
 import api from '../../api';
 import DraftLayout from './DraftLayout';
 import { useTitle } from '../../hooks/useTitle';
@@ -14,7 +15,7 @@ const CreateDraft = () => {
     try {
       await api.post('/draft/create', { name }).then((res) => {
         console.log('CREATE REPSONSE', res);
-        navigate(`/draft/${res.data.draft.id}`);
+        navigate(draftPath(res.data.draft.id));
       });
     } catch (e: any) {
       alert(`Error creating a draft: ${e}`);

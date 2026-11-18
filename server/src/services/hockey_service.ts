@@ -246,7 +246,7 @@ export const getStandings = async (draftId: number) => {
   return sortedStandings;
 };
 
-const annotateGames = async (
+export const annotateGames = async (
   games: Game[],
   teamOwnerships: TeamOwnership<Team, DraftMembership<Profile>>[]
 ) => {
@@ -283,7 +283,7 @@ const annotateGames = async (
   return gamesWithAnnotation;
 };
 
-const partitionGamesByDate = (games: Game[]) => {
+export const partitionGamesByDate = (games: Game[]) => {
   const gamesPartitioned = games.reduce(
     (arr, game) => {
       if (game.gameDate in arr) {

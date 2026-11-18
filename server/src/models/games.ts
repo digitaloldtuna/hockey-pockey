@@ -21,37 +21,39 @@ export type Game = {
   lastUpdated?: string;
 };
 
+// supabase queries max out at 1000 records, so anything that can be bigger is read a page at a time
+const PAGE_SIZE = 1000;
+
+const selectGames = () => supabase.from('games').select('*');
+type GamesQuery = ReturnType<typeof selectGames>;
+
+// Every game matching the filters. Pages are sorted by id: without a fixed order the database may
+// return rows in a different order for each page, so a game could be skipped or read twice.
+const getAllPages = async (
+  filter: (query: GamesQuery) => GamesQuery,
+  errorMessage: string
+): Promise<Game[]> => {
+  const results: Game[] = [];
+  for (let from = 0; ; from += PAGE_SIZE) {
+    const { data, error } = await filter(selectGames())
+      .order('id')
+      .range(from, from + PAGE_SIZE - 1);
+    if (error) {
+      throw Error(`${errorMessage}: ${error.message}`);
+    }
+    results.push(...data);
+    if (data.length < PAGE_SIZE) return results; // last page reached
+  }
+};
+
 export const getGames = async ({ season }: { season?: number }): Promise<Game[]> => {
   if (!season) {
     season = await getCurrentSeason();
   }
   console.log(`Getting games for the ${season} season`);
-  season = getApiSeason(season);
+  const apiSeason = getApiSeason(season);
 
-  // supabase queries max out at 1000 records
-  // to get all data we need to handle pagination
-  const pageSize = 1000;
-  let from = 0;
-  let results: any[] = [];
-
-  while (true) {
-    const { data, error } = await supabase
-      .from('games')
-      .select('*')
-      .eq('season', season)
-      .range(from, from + pageSize - 1);
-
-    if (error) {
-      throw Error(`Cannot fetch games: ${error}`);
-    }
-
-    results = results.concat(data);
-
-    if (data.length < pageSize) break; // last page reached
-    from += pageSize;
-  }
-
-  return results;
+  return getAllPages((query) => query.eq('season', apiSeason), 'Cannot fetch games');
 };
 
 export const updateOrCreateGames = async (games: Game[]) => {
@@ -135,18 +137,15 @@ export const getCompletedGamesForTeams = async ({
   }
   const apiSeason = getApiSeason(season);
 
-  const { data, error } = await supabase
-    .from('games')
-    .select('*')
-    .eq('season', apiSeason)
-    .eq('gameStateId', 7)
-    .in('homeTeamId', validTeams)
-    .in('visitingTeamId', validTeams);
-
-  if (error) {
-    throw Error(`Cannot fetch games by teams: ${error.message}`);
-  }
-  return data;
+  return getAllPages(
+    (query) =>
+      query
+        .eq('season', apiSeason)
+        .eq('gameStateId', 7)
+        .in('homeTeamId', validTeams)
+        .in('visitingTeamId', validTeams),
+    'Cannot fetch games by teams'
+  );
 };
 
 export const getAllCompletedGames = async ({ season }: { season?: number }) => {
@@ -155,16 +154,10 @@ export const getAllCompletedGames = async ({ season }: { season?: number }) => {
   }
   const apiSeason = getApiSeason(season);
 
-  const { data, error } = await supabase
-    .from('games')
-    .select('*')
-    .eq('season', apiSeason)
-    .eq('gameStateId', 7);
-
-  if (error) {
-    throw Error(`Cannot fetch games by teams: ${error.message}`);
-  }
-  return data;
+  return getAllPages(
+    (query) => query.eq('season', apiSeason).eq('gameStateId', 7),
+    'Cannot fetch completed games'
+  );
 };
 
 const getDateRange = (start: string, end: string): string[] => {

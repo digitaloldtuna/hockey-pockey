@@ -54,12 +54,18 @@ export const StatTile = ({
   sub,
   bg,
   delay = '0s',
+  image,
+  heading,
+  valueSize = '32px',
 }: {
   label: string;
   value: ReactNode;
-  sub?: string;
+  sub?: ReactNode;
   bg: string;
   delay?: string;
+  image?: ReactNode; // shown beside the value, e.g. a player's photo
+  heading?: ReactNode; // a smaller line above the value, e.g. a player's name
+  valueSize?: string;
 }) => (
   <Box
     className="pop"
@@ -76,14 +82,24 @@ export const StatTile = ({
     <Text fontWeight="semibold" fontSize="11px" letterSpacing="0.08em" textTransform="uppercase">
       {label}
     </Text>
-    <Text fontFamily="heading" fontWeight="bold" fontSize="32px" lineHeight="1.15">
-      {value}
-    </Text>
-    {sub && (
-      <Text fontSize="11px" fontWeight="medium">
-        {sub}
-      </Text>
-    )}
+    <Flex align="center" gap="3">
+      {image}
+      <Box minW="0">
+        {heading && (
+          <Text fontFamily="heading" fontWeight="bold" fontSize="15px" lineHeight="1.2" truncate>
+            {heading}
+          </Text>
+        )}
+        <Text fontFamily="heading" fontWeight="bold" fontSize={valueSize} lineHeight="1.15">
+          {value}
+        </Text>
+        {sub && (
+          <Text fontSize="11px" fontWeight="medium">
+            {sub}
+          </Text>
+        )}
+      </Box>
+    </Flex>
   </Box>
 );
 

@@ -2,11 +2,16 @@ import dotenv from 'dotenv';
 dotenv.config();
 
 import { refreshGames } from '../services/hockey_service';
+import { loadMissingBoxscores } from '../services/boxscores';
 import { sendResultNotifications } from '../services/result_notifications';
 
-// Run by a Railway cron service every few minutes: refresh the games, then tell people how their
-// teams did. Add --dry-run (or NOTIFY_DRY_RUN=true) to print what would be sent without sending.
+// Run by a Railway cron service every few minutes: refresh the games, tell people how their teams
+// did, then store player stats for newly finished games (for head-to-head on the stats page).
+// Add --dry-run (or NOTIFY_DRY_RUN=true) to print what would be sent without sending or storing.
 const HARD_STOP_MS = 60 * 1000;
+// player stats are loaded with whatever time is left, finishing well before the hard stop
+const BOXSCORES_UNTIL_MS = 50 * 1000;
+const startedAt = Date.now();
 
 const dryRun = process.argv.includes('--dry-run') || process.env.NOTIFY_DRY_RUN === 'true';
 
@@ -24,6 +29,14 @@ const run = async () => {
     console.error('notify: could not refresh games:', error);
   }
   await sendResultNotifications({ dryRun });
+  if (!dryRun) {
+    try {
+      await loadMissingBoxscores({ stopAt: startedAt + BOXSCORES_UNTIL_MS });
+    } catch (error) {
+      // the notifications have gone out; player stats will catch up on a later run
+      console.error('notify: could not load player stats:', error);
+    }
+  }
 };
 
 run()

@@ -8,6 +8,7 @@ import {
   getStandings,
   refreshGames,
 } from '../services/hockey_service';
+import { getDraftLeagueStandings, getDraftStats } from '../services/stats_service';
 
 const router = express.Router();
 
@@ -77,6 +78,36 @@ router.get('/standings', async (req, res) => {
     const draftId = Number(req.query.id);
     const standings = await getStandings(draftId);
     return res.json({ standings });
+  } catch (e) {
+    return res.status(401).json({ error: `Error: ${e}` });
+  }
+});
+
+// player and team stats for the stats page, for people in this draft only
+router.get('/stats', async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw Error('User is not authenticated');
+    }
+    const profile = await getProfileFromUserId(user.id);
+    const stats = await getDraftStats(Number(req.query.id), profile.id);
+    return res.json({ stats });
+  } catch (e) {
+    return res.status(401).json({ error: `Error: ${e}` });
+  }
+});
+
+// the NHL's official standings, with who drafted each team
+router.get('/league-standings', async (req, res) => {
+  try {
+    const user = req.user;
+    if (!user) {
+      throw Error('User is not authenticated');
+    }
+    const profile = await getProfileFromUserId(user.id);
+    const result = await getDraftLeagueStandings(Number(req.query.id), profile.id);
+    return res.json(result);
   } catch (e) {
     return res.status(401).json({ error: `Error: ${e}` });
   }

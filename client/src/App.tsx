@@ -39,7 +39,7 @@ function App() {
                   <Route path={ROUTES.HOME} element={<HomePage />} />
                   <Route path={ROUTES.DRAFT.CREATE} element={<CreateDraft />} />
                   <Route path={ROUTES.DRAFT.JOIN} element={<JoinDraft />} />
-                  <Route path="/draft/:draftId" element={<Draft />} />
+                  <Route path={ROUTES.DRAFT.VIEW} element={<Draft />} />
                 </Route>
               </Routes>
             </DraftProvider>

@@ -1,5 +1,6 @@
 import { Avatar, AvatarGroup, Box, Flex, Tag, Text } from '@chakra-ui/react';
 import { useNavigate } from 'react-router-dom';
+import { draftPath } from '../constants/routes';
 import { DraftStatusLabel } from '../constants/mappings';
 import { Draft } from '../constants/types';
 import { memberColour, readableOn } from '../utils';
@@ -41,7 +42,7 @@ const DraftCard = ({ draft }: Props) => {
         shadow: 'md',
         cursor: 'pointer',
       }}
-      onClick={() => navigate(`/draft/${draft.id}`)}
+      onClick={() => navigate(draftPath(draft.id))}
     >
       {/* Title + status */}
       <Flex justify="space-between" align="center" mb="2">

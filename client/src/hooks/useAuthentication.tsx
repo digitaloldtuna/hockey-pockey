@@ -1,8 +1,8 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 import { useNavigate } from 'react-router-dom';
 import api from '../api';
-import { ROUTES } from '../constants/routes';
-import { Profile, Session } from '../constants/types';
+import { draftPath, ROUTES } from '../constants/routes';
+import { Draft, Profile, Session } from '../constants/types';
 import { releaseThisDevice } from '../push';
 import { toastError } from '../theme/toaster';
 
@@ -60,6 +60,18 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     }
   };
 
+  // Where to land after logging in: straight into the draft if there is exactly one that isn't
+  // closed, otherwise the list of drafts. Only on login, so "All drafts" still reaches the list.
+  const landingPage = async () => {
+    try {
+      const res = await api.get('/draft/all');
+      const active = (res.data.drafts as Draft[]).filter((draft) => draft.status !== 'closed');
+      return active.length === 1 ? draftPath(active[0].id) : ROUTES.HOME;
+    } catch {
+      return ROUTES.HOME; // the list page shows its own error if drafts can't be loaded
+    }
+  };
+
   /**
    * Login
    * Axios interceptor + session endpoint will pick up tokens.
@@ -69,7 +81,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       setLoading(true);
       await api.post('/authentication/login', { email, password });
       await fetchSession();
-      navigate(ROUTES.HOME);
+      navigate(await landingPage());
     } catch (err: any) {
       toastError(err.response?.data?.error || 'Login failed');
     } finally {

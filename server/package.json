@@ -8,7 +8,8 @@
     "build": "tsc",
     "restart": "npm run start",
     "notify": "node dist/jobs/notify.js",
-    "notify:dry": "ts-node --transpile-only src/jobs/notify.ts --dry-run"
+    "notify:dry": "ts-node --transpile-only src/jobs/notify.ts --dry-run",
+    "boxscores": "ts-node --transpile-only src/jobs/boxscores.ts"
   },
   "keywords": [],
   "author": "",

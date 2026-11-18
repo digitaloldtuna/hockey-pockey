@@ -1,9 +1,11 @@
-import { Avatar, Box, Center, Grid, Image, Link, Spinner, Table, Text } from '@chakra-ui/react';
-import { PageHeader, Pill, StatTile, Surface } from '../../../components/ui';
+import { Avatar, Box, Center, Flex, Grid, Image, Spinner, Table, Text } from '@chakra-ui/react';
+import { useState } from 'react';
+import { FilterChip, PageHeader, Pill, StatTile, Surface } from '../../../components/ui';
 import { Profile, Standing } from '../../../constants/types';
 import { useAuthentication } from '../../../hooks/useAuthentication';
 import { useDraft } from '../../../hooks/useDraft';
 import { memberColour, placements, readableOn } from '../../../utils';
+import NhlStandings, { NhlView } from './NhlStandings';
 
 const formatLastTen = (record: boolean[]) => {
   const wins = record.filter(Boolean).length;
@@ -11,6 +13,16 @@ const formatLastTen = (record: boolean[]) => {
 };
 
 const HEADERS = ['#', 'Team', 'W', 'L', 'L10', 'Win %', 'Owner'];
+
+type View = 'draft' | NhlView;
+
+// one table, switched between the draft's own standings and the NHL's
+const VIEWS: { key: View; label: string }[] = [
+  { key: 'draft', label: 'This draft' },
+  { key: 'league', label: 'NHL league' },
+  { key: 'conference', label: 'NHL conference' },
+  { key: 'division', label: 'NHL division' },
+];
 
 const StandingsTable = ({ standings, profile }: { standings: Standing[]; profile: Profile }) => {
   // teams level on every tiebreaker the server sorts by (wins, win rate, last ten) share a place
@@ -120,6 +132,7 @@ const StandingsTable = ({ standings, profile }: { standings: Standing[]; profile
 };
 
 const Standings = () => {
+  const [view, setView] = useState<View>('draft');
   const { profile } = useAuthentication();
   const { draft, standings } = useDraft();
   if (!draft) {
@@ -159,20 +172,34 @@ const Standings = () => {
         />
       </Grid>
 
+      <Flex role="group" aria-label="Choose standings" wrap="wrap" gap="2">
+        {VIEWS.map((v) => (
+          <FilterChip
+            key={v.key}
+            label={v.label}
+            pressed={view === v.key}
+            onClick={() => setView(v.key)}
+          />
+        ))}
+      </Flex>
+
       <Surface as="section" aria-label="Standings">
-        <Text px="14px" py="2" fontSize="11px" color="inkMuted">
-          This is specific to the current draft. To see total standings, check{' '}
-          <Link href="https://www.nhl.com/standings/2025-11-28/league" target="_blank">
-            the official NHL site
-          </Link>
-          .
-        </Text>
-        {standings && profile ? (
-          <StandingsTable standings={standings} profile={profile} />
+        {view === 'draft' ? (
+          <>
+            <Text px="14px" py="2" fontSize="11px" color="inkMuted">
+              This is specific to the current draft: only games between drafted teams with different
+              owners count.
+            </Text>
+            {standings && profile ? (
+              <StandingsTable standings={standings} profile={profile} />
+            ) : (
+              <Center w="full" py="8">
+                <Spinner size="xl" color="blue.500" />
+              </Center>
+            )}
+          </>
         ) : (
-          <Center w="full" py="8">
-            <Spinner size="xl" color="blue.500" />
-          </Center>
+          <NhlStandings view={view} />
         )}
       </Surface>
     </>

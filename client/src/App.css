@@ -89,6 +89,21 @@
   animation: sweep 1s cubic-bezier(0.2, 0.8, 0.2, 1) both;
 }
 
+/* bars that fill in from the left */
+@keyframes grow {
+  from {
+    transform: scaleX(0);
+  }
+  to {
+    transform: scaleX(1);
+  }
+}
+
+.grow {
+  transform-origin: left center;
+  animation: grow 0.8s cubic-bezier(0.2, 0.8, 0.2, 1) both;
+}
+
 @keyframes ticker {
   from {
     transform: translateX(0);
@@ -153,7 +168,8 @@
   .rise,
   .pop,
   .blink,
-  .sweep {
+  .sweep,
+  .grow {
     animation: none;
   }
 }
